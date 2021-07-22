@@ -70,6 +70,60 @@ DATABASES = {
     }
 }
 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname}\t\t{asctime}\t\t{message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        # Include the default Django email handler for errors
+        # This is what you'd get without configuring logging at all.
+        'mail_admins': {
+            'class': 'django.utils.log.AdminEmailHandler',
+            'level': 'ERROR',
+             # But the emails are plain text by default - HTML is nicer
+            'include_html': True,
+        },
+        # Log to a text file that can be rotated by logrotate
+        'logfile': {
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': CONFIGS.get('LOGFILE','/var/log/simpletrader/django.log'),
+            'formatter': 'verbose'
+
+        },
+    },
+    'loggers': {
+        # Again, default Django configuration to email unhandled exceptions
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        # Might as well log any errors anywhere else in Django
+        'django': {
+            'handlers': ['logfile'],
+            'level': 'WARNING',
+            # 'level': 'INFO',
+            'propagate': False,
+        },
+        # Your own app - this assumes all your logger names start with "myapp."
+        'myapp': {
+            'handlers': ['logfile'],
+            'level': 'WARNING', # Or maybe INFO or DEBUG
+            'propagate': False
+        },
+    },
+}
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -120,3 +174,10 @@ CELERY_BROKER = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_NO}'
 CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_NO}'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = CONFIGS.get('EMAIL_HOST', 'smtp.gmail.com')
+# EMAIL_USE_TLS = True
+# EMAIL_PORT = CONFIGS.get('EMAIL_PORT', 587)
+# EMAIL_HOST_USER = CONFIGS.get('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = CONFIGS.get('EMAIL_HOST_PASSWORD')

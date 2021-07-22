@@ -1,11 +1,14 @@
 from django.shortcuts import HttpResponse
 
-from .tasks import test_task
+# from .tasks import test_task
+# from .client import Client
+
 
 def test_celery(request):
-    print('aaaaaaaaaaa')
-    t0 = test_task.delay(None)
-    print(t0.ready())
-    print('bbbbbbbbbbb')
+    # client = Client()
+    # print(client.get_orderbook('BTCIRT'))
 
-    return HttpResponse(':d')
+    # return HttpResponse(
+    #     str(client.get_orderbook('BTCIRT'))
+    # )
+    return 'asd'
