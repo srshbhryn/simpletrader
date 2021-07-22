@@ -1,3 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import HttpResponse
 
-# Create your views here.
+from .tasks import test_task
+
+def test_celery(request):
+    print('aaaaaaaaaaa')
+    t0 = test_task.delay(None)
+    print(t0.ready())
+    print('bbbbbbbbbbb')
+
+    return HttpResponse(':d')
