@@ -28,7 +28,7 @@ class MarketData(models.Model):
 class MarketTrades(models.Model):
     market = models.ForeignKey(Market, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    time = models.IntegerField()
+    time = models.PositiveBigIntegerField()
     price = models.FloatField()
     volume = models.FloatField()
     is_buy =models.BooleanField()

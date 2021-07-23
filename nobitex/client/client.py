@@ -11,7 +11,7 @@ import json
 
 class BaseClient:
 
-    API_URL = 'https://api.nobitex.ir/v2/'
+    API_URL = 'https://api.nobitex.ir/v2'
 
     def __init__(self):
         self._init_session()

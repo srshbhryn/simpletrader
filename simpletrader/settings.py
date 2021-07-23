@@ -116,9 +116,10 @@ LOGGING = {
             'propagate': False,
         },
         # Your own app - this assumes all your logger names start with "myapp."
-        'myapp': {
+        'binance': {
             'handlers': ['logfile'],
-            'level': 'WARNING', # Or maybe INFO or DEBUG
+            # 'level': 'WARNING', # Or maybe INFO or DEBUG
+            'level': 'INFO',
             'propagate': False
         },
     },
@@ -181,3 +182,24 @@ CELERY_CACHE_BACKEND = 'django-cache'
 # EMAIL_PORT = CONFIGS.get('EMAIL_PORT', 587)
 # EMAIL_HOST_USER = CONFIGS.get('EMAIL_HOST_USER')
 # EMAIL_HOST_PASSWORD = CONFIGS.get('EMAIL_HOST_PASSWORD')
+
+
+#########  APP settings:
+NOBITEX = {
+    'MARKETS':[
+        ('BTC','IRT'),
+        ('ETH','IRT'),
+        ('USDT','IRT'),
+        ('BTC','USDT'),
+        ('ETH','USDT'),
+    ],
+    'FEES': {
+        'TAKER': .003,
+        'MAKER': .002,
+    },
+    'TASK_PERIODS': {
+        'collect_market_data': 1,
+        'collect_market_trades': 30,
+    }
+}
+
