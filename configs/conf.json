@@ -1,0 +1,9 @@
+{
+    "DEBUG": true,
+    "SECRET_KEY": "removed_for_security",
+    "DB_PASSWORD": "removed_for_security",
+    "ALLOWED_HOSTS": ["sta.bluishred.net", "www.sta.bluishred.net"],
+    "EMAIL_HOST_USER": "srsh.bhryn@gmail.com",
+    "EMAIL_HOST_PASSWORD": "removed_for_security",
+    "REDIS_DB_NO": 11
+}
