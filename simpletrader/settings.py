@@ -151,6 +151,7 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+STATIC_ROOT = CONFIGS.get('STATIC_ROOT', '/srv/www/simpletrader/static/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

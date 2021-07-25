@@ -10,7 +10,7 @@ Environment="CONFPATH=/etc/broker/login.json"
 User=simpletrader
 Group=simpletrader
 WorkingDirectory=/home/simpletrader/simpletrader
-ExecStart/home/simpletrader/.local/bin/gunicorn --bind 0.0.0.0:9001 simpletrader.wsgi
+ExecStart=/home/simpletrader/.local/bin/gunicorn --bind 0.0.0.0:9001 simpletrader.wsgi
 
 [Install]
 WantedBy=multi-user.target
