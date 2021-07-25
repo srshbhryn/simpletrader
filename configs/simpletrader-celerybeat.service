@@ -10,7 +10,9 @@ EnvironmentFile=/etc/simpletrader/celery.env
 WorkingDirectory=/home/simpletrader/simpletrader
 ExecStart=/bin/sh -c '${CELERY_BIN} -A ${CELERY_APP} beat  \
   --pidfile=${CELERYBEAT_PID_FILE} \
-  --logfile=${CELERYBEAT_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL}'
+  --logfile=${CELERYBEAT_LOG_FILE} \
+  --scheduler=${CELERYBEAT_SCHEDULER} \
+  --loglevel=${CELERYD_LOG_LEVEL}'
 Restart=always
 
 [Install]
