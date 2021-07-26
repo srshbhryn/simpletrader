@@ -6,7 +6,7 @@ After=network.target
 Restart=always
 RestartSec=2s
 
-Environment="CONFPATH=/etc/broker/login.json"
+Environment="CONFPATH=/etc/simpletrader/conf.json"
 User=simpletrader
 Group=simpletrader
 WorkingDirectory=/home/simpletrader/simpletrader

@@ -3,6 +3,11 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 set -a
 source $SCRIPT_DIR/.env
 set +a
+
+
+sudo mkdir -p /var/run/simpletrader
+sudo chown -R simpletrader:simpletrader /var/run/simpletrader
+
 sudo mkdir /etc/$APP_NAME
 sudo mkdir /var/log/$APP_NAME
 sudo mkdir -p /srv/www/$APP_NAME
