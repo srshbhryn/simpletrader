@@ -111,7 +111,7 @@ LOGGING = {
         # Might as well log any errors anywhere else in Django
         'django': {
             'handlers': ['logfile'],
-            'level': 'WARNING',
+            'level': 'DEBUG' if DEBUG else 'WARNING',
             # 'level': 'INFO',
             'propagate': False,
         },
@@ -119,7 +119,7 @@ LOGGING = {
         'binance': {
             'handlers': ['logfile'],
             # 'level': 'WARNING', # Or maybe INFO or DEBUG
-            'level': 'INFO',
+            'level': 'DEBUG' if DEBUG else 'WARNING',
             'propagate': False
         },
     },
