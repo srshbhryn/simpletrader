@@ -8,7 +8,7 @@ sudo mkdir /var/log/$APP_NAME
 sudo mkdir -p /srv/www/$APP_NAME
 sudo mkdir -p /srv/www/$APP_NAME/static
 
-sudo cp $SCRIPT_DIR/configs/configs/* /etc/$APP_NAME/
+sudo cp $SCRIPT_DIR/configs/configs_examples/* /etc/$APP_NAME/
 sudo cp $SCRIPT_DIR/configs/nginx/$APP_NAME.conf /etc/nginx/sites-availabe/
 sudo ls -s /etc/nginx/sites-availabe/$APP_NAME.conf /etc/nginx/sites-enabled/$APP_NAME.conf
 
@@ -29,7 +29,7 @@ sudo mysql -uroot -e "CREATE USER ${DB_USER}@localhost IDENTIFIED BY '${DB_PASSW
 sudo mysql -uroot -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';"
 sudo mysql -uroot -e "FLUSH PRIVILEGES;"
 
-sudo certbot --nginx -d sta.bluishred.net -d www.sta.bluishred.net
+sudo certbot --nginx -d "sta.bluishred.net" -d "www.sta.bluishred.net"
 sudo crontab -l > mycron
 sudo echo "0 12 * * * /usr/bin/certbot renew --quiet" >> mycron
 sudo crontab mycron
