@@ -1,7 +1,7 @@
 # /bin/bash
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 set -a
-source SCRIPT_DIR/.env
+source $SCRIPT_DIR/.env
 set +a
 sudo mkdir /etc/$APP_NAME
 sudo mkdir /var/log/$APP_NAME
@@ -31,8 +31,8 @@ sudo mysql -uroot -e "FLUSH PRIVILEGES;"
 
 sudo certbot --nginx -d sta.bluishred.net -d www.sta.bluishred.net
 sudo crontab -l > mycron
-echo "0 12 * * * /usr/bin/certbot renew --quiet" >> mycron
-crontab mycron
-rm mycron
+sudo echo "0 12 * * * /usr/bin/certbot renew --quiet" >> mycron
+sudo crontab mycron
+sudo rm mycron
 
 
