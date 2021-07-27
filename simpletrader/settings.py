@@ -221,7 +221,7 @@ NOBITEX = {
         'MAKER': .0015,
     },
     'TASK_PERIODS': {
-        'collect_market_data': 2,
+        'collect_market_data': 8,
         'collect_market_trades': 30,
     }
 }
