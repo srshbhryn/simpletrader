@@ -187,7 +187,8 @@ CELERY_CACHE_BACKEND = 'django-cache'
 
 #########  APP settings:
 NOBITEX = {
-    'MARKETS':[
+    'DATA_DIR_PATH': BASE_DIR / 'data/nobitex',
+    'MARKETS': [
         ('BTC', 'IRT'),
         ('ETH', 'IRT'),
         ('LTC', 'IRT'),
@@ -220,9 +221,12 @@ NOBITEX = {
         'TAKER': .0015,
         'MAKER': .0015,
     },
+    'JOURNAL_ROTATE_PERIOD': 60,
     'TASK_PERIODS': {
-        'collect_market_data': 8,
+        'collect_market_data': 1,
         'collect_market_trades': 30,
+        'store_market_data':120,
+        'store_trades': 600
     }
 }
 
