@@ -103,6 +103,7 @@ marketdata_journal = JournalManger(
         'price',
         'volume',
         'is_buy',
+        'time',
     ],
     FILE_NAME='marketdata',
     FILE_ROTATE_PRERIOD=settings.NOBITEX['JOURNAL_ROTATE_PERIOD'],

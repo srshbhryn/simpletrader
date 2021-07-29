@@ -1,3 +1,4 @@
+import time
 import logging
 
 from celery import shared_task
@@ -16,12 +17,14 @@ def collect_market_data(symbol, market_id):
     log.info(f'getting market data for {symbol}.')
     try:
         response = client.get_orderbook(symbol)
+        timestamp = int(time.time())
         for md in response['bids']:
             marketdata_journal.append_line({
                 'market_id': market_id,
                 'price': md['price'],
                 'volume': md['volume'],
                 'is_buy': 0,
+                'time': timestamp,
             })
         for md in response['asks']:
             marketdata_journal.append_line({
@@ -29,6 +32,7 @@ def collect_market_data(symbol, market_id):
                 'price': md['price'],
                 'volume': md['volume'],
                 'is_buy': 1,
+                'time': timestamp,
             })
     except Exception as e:
         log.error(f'getting market data for {symbol} fialed: {e}')

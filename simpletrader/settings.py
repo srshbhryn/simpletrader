@@ -226,7 +226,7 @@ NOBITEX = {
         'collect_market_data': 1,
         'collect_market_trades': 30,
         'store_market_data':120,
-        'store_trades': 600
+        'store_trades': 120,
     }
 }
 
