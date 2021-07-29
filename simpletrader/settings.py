@@ -197,9 +197,9 @@ NOBITEX = {
         # ('BNB', 'IRT'),
         # ('EOS', 'IRT'),
         # ('XLM', 'IRT'),
-        ('ETC', 'IRT'),
+        # ('ETC', 'IRT'),
         # ('TRX', 'IRT'),
-        ('DOGE', 'IRT'),
+        # ('DOGE', 'IRT'),
         # ('UNI', 'IRT'),
         # ('DAI', 'IRT'),
         ('USDT', 'IRT'),
@@ -213,7 +213,7 @@ NOBITEX = {
         # ('XLM', 'USDT'),
         # ('ETC', 'USDT'),
         # ('TRX', 'USDT'),
-        ('DOGE', 'USDT'),
+        # ('DOGE', 'USDT'),
         # ('UNI', 'USDT'),
         # ('DAI', 'USDT'),
     ],
@@ -221,11 +221,10 @@ NOBITEX = {
         'TAKER': .0015,
         'MAKER': .0015,
     },
-    'JOURNAL_ROTATE_PERIOD':{
+    'JOURNAL_ROTATE_PERIOD': {
         'marketdata_journal': 60,
         'trade_journal': 60*5,
     },
-    'JOURNAL_ROTATE_PERIOD': 60,
     'TASK_PERIODS': {
         'collect_market_data': 2,
         'collect_market_trades': 30,
