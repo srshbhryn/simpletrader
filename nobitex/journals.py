@@ -128,9 +128,9 @@ trade_journal = JournalManger(
     ],
     FILE_NAME='trades',
     FILE_ROTATE_PRERIOD=settings.NOBITEX[
-        'JOURNAL_ROTATE_PERIOD',
+        'JOURNAL_ROTATE_PERIOD'
     ][
-        'trade_journal',
+        'trade_journal'
     ],
     BASE_DIR=settings.NOBITEX['DATA_DIR_PATH'],
 )

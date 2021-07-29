@@ -1,5 +1,5 @@
 import os, json
-from pathlib import Path, WindowsPath
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
