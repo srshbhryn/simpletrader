@@ -75,7 +75,7 @@ class JournalManger:
         os.system(f'rm {filepath}')
 
     def _get_old_files(self):
-        return [
+        old_files = [
             os.path.join(self.BASE_DIR,file)
             for file in os.listdir(self.BASE_DIR)
             if (
@@ -88,7 +88,10 @@ class JournalManger:
                     file.split('__')[1].split('.csv')[0]
                 ) < self._current_file_time
             )
-        ]
+        ].reverse()
+        # current file and one file before it will always
+        # be availabe for trading purposes:
+        return old_files[:-1]
 
     def bulk_create_old_files(self):
         for filepath in self._get_old_files():
@@ -106,7 +109,11 @@ marketdata_journal = JournalManger(
         'time',
     ],
     FILE_NAME='marketdata',
-    FILE_ROTATE_PRERIOD=settings.NOBITEX['JOURNAL_ROTATE_PERIOD'],
+    FILE_ROTATE_PRERIOD=settings.NOBITEX[
+        'JOURNAL_ROTATE_PERIOD'
+    ][
+        'marketdata_journal'
+    ],
     BASE_DIR=settings.NOBITEX['DATA_DIR_PATH'],
 )
 
@@ -120,6 +127,10 @@ trade_journal = JournalManger(
         'is_buy',
     ],
     FILE_NAME='trades',
-    FILE_ROTATE_PRERIOD=settings.NOBITEX['JOURNAL_ROTATE_PERIOD'],
+    FILE_ROTATE_PRERIOD=settings.NOBITEX[
+        'JOURNAL_ROTATE_PERIOD',
+    ][
+        'trade_journal',
+    ],
     BASE_DIR=settings.NOBITEX['DATA_DIR_PATH'],
 )
