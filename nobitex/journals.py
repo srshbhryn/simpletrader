@@ -88,7 +88,8 @@ class JournalManger:
                     file.split('__')[1].split('.csv')[0]
                 ) < self._current_file_time
             )
-        ].reverse()
+        ]
+        old_files.reverse()
         # current file and one file before it will always
         # be availabe for trading purposes:
         return old_files[:-1]
