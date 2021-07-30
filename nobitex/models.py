@@ -15,7 +15,6 @@ class Market(models.Model):
 class MarketData(models.Model):
     market = models.ForeignKey(Market, on_delete=models.CASCADE)
     time = models.PositiveBigIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
     price = models.FloatField()
     volume = models.FloatField()
     is_buy =models.BooleanField()
@@ -28,7 +27,6 @@ class MarketData(models.Model):
 
 class MarketTrades(models.Model):
     market = models.ForeignKey(Market, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
     time = models.PositiveBigIntegerField()
     price = models.FloatField()
     volume = models.FloatField()
@@ -36,3 +34,11 @@ class MarketTrades(models.Model):
 
     def __str__(self):
         return f'{self.market.symbol} {self.created_at}'
+    class Meta:
+        unique_together = [
+            'market',
+            'time',
+            'price',
+            'volume',
+            'is_buy',
+        ]

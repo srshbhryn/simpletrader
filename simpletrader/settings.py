@@ -223,13 +223,11 @@ NOBITEX = {
     },
     'JOURNAL_ROTATE_PERIOD': {
         'marketdata_journal': 60,
-        'trade_journal': 60*5,
     },
     'TASK_PERIODS': {
         'collect_market_data': 2,
         'collect_market_trades': 30,
         'store_market_data': 60*2,
-        'store_trades': 60*5*2,
     }
 }
 

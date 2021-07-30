@@ -80,20 +80,6 @@ class Command(BaseCommand):
             start_time = start_time,
         )
 
-        ####  nobitex.tasks.store_trades  ####
-        schedule, _ = IntervalSchedule.objects.get_or_create(
-            every = settings.NOBITEX['TASK_PERIODS']['store_trades'],
-            period = 'seconds',
-        )
-        start_time = timezone.now()
-        PeriodicTask.objects.create(
-            name = f'store trades.',
-            task =  'nobitex.tasks.store_trades',
-            interval = schedule,
-            args = '[]',
-            start_time = start_time,
-        )
-
         self.stdout.write('DONE\n')
 
 

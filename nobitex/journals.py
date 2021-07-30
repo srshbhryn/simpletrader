@@ -117,21 +117,3 @@ marketdata_journal = JournalManger(
     ],
     BASE_DIR=settings.NOBITEX['DATA_DIR_PATH'],
 )
-
-trade_journal = JournalManger(
-    MODEL=MarketTrades,
-    FIELDS=[
-        'market_id',
-        'time',
-        'price',
-        'volume',
-        'is_buy',
-    ],
-    FILE_NAME='trades',
-    FILE_ROTATE_PRERIOD=settings.NOBITEX[
-        'JOURNAL_ROTATE_PERIOD'
-    ][
-        'trade_journal'
-    ],
-    BASE_DIR=settings.NOBITEX['DATA_DIR_PATH'],
-)
