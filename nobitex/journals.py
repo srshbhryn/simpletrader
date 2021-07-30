@@ -89,7 +89,7 @@ class JournalManger:
                 ) < self._current_file_time
             )
         ]
-        old_files.reverse()
+        old_files.sort()
         # current file and one file before it will always
         # be availabe for trading purposes:
         return old_files[:-1]
