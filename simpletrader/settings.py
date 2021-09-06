@@ -218,8 +218,8 @@ NOBITEX = {
         # ('DAI', 'USDT'),
     ],
     'FEES': {
-        'TAKER': .0015,
-        'MAKER': .0015,
+        'TAKER': .001,
+        'MAKER': .001,
     },
     'JOURNAL_ROTATE_PERIOD': {
         'marketdata_journal': 60,
