@@ -61,12 +61,12 @@ WSGI_APPLICATION = 'simpletrader.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': CONFIGS.get('DB_NAME', 'simpletrader'),
         'USER': CONFIGS.get('DB_USER', 'simpletrader'),
         'PASSWORD': CONFIGS.get('DB_PASSWORD'),
         'HOST': CONFIGS.get('DB_HOST', '127.0.0.1'),
-        'PORT': CONFIGS.get('DB_PORT', '3306'),
+        'PORT': CONFIGS.get('DB_PORT', '5432'),
     }
 }
 
