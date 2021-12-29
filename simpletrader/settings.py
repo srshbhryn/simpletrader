@@ -22,6 +22,9 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_celery_beat',
     #
+    'timescale',
+    'base',
+    #
     'nobitex',
 ]
 
@@ -61,7 +64,7 @@ WSGI_APPLICATION = 'simpletrader.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'timescale.db.backends.postgresql',
         'NAME': CONFIGS.get('DB_NAME', 'simpletrader'),
         'USER': CONFIGS.get('DB_USER', 'simpletrader'),
         'PASSWORD': CONFIGS.get('DB_PASSWORD'),
