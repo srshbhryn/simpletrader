@@ -17,13 +17,13 @@ def collect_orders(symbol, market_id):
     journal = OrderJournal()
     try:
         response = client.get_orderbook(symbol)
-        timestamp = int(time.time())
+        timestamp = int(time.time() * 1000)
         for md in response['bids']:
             journal.append_line({
                 'market_id': market_id,
                 'price': md['price'],
                 'volume': md['volume'],
-                'is_bid': 0,
+                'is_bid': False,
                 'time': timestamp,
             })
         for md in response['asks']:
@@ -31,7 +31,7 @@ def collect_orders(symbol, market_id):
                 'market_id': market_id,
                 'price': md['price'],
                 'volume': md['volume'],
-                'is_bid': 1,
+                'is_bid': True,
                 'time': timestamp,
             })
     except Exception as e:
