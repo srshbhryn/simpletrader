@@ -1,44 +1,34 @@
 from django.db import models
 
+from timescale.db.models.fields import TimescaleDateTimeField
+
+
 class Market(models.Model):
-    asset_name = models.CharField(max_length=6)
-    currency_name = models.CharField(max_length=6)
+    base_asset = models.CharField(max_length=8)
+    quote_asset = models.CharField(max_length=8)
 
     @property
     def symbol(self):
-        return self.asset_name+self.currency_name
+        return self.base_asset + self.quote_asset
 
     def __str__(self):
         return self.symbol
 
 
-class MarketData(models.Model):
+class Order(models.Model):
     market = models.ForeignKey(Market, on_delete=models.CASCADE)
-    time = models.PositiveBigIntegerField()
+    time = TimescaleDateTimeField(interval='6 hour')
     price = models.FloatField()
     volume = models.FloatField()
-    is_buy =models.BooleanField()
+    is_bid = models.BooleanField()
 
-    # def __str__(self):
-    #     return f'{self.market.symbol} {self.created_at} {"Buy" if self.is_buy else "Sell"} {self.volume}@{self.price}'
     def __str__(self):
-        return f'{self.market.symbol} {self.created_at}'
+        return f'{self.market.symbol} {self.time}'
 
 
-class MarketTrades(models.Model):
+class Trade(models.Model):
     market = models.ForeignKey(Market, on_delete=models.CASCADE)
-    time = models.PositiveBigIntegerField(db_index=True)
+    time = TimescaleDateTimeField(interval='1 hour')
     price = models.FloatField()
     volume = models.FloatField()
-    is_buy =models.BooleanField()
-
-    def __str__(self):
-        return f'{self.market.symbol} {self.created_at}'
-    class Meta:
-        unique_together = [
-            'market',
-            'time',
-            'price',
-            'volume',
-            'is_buy',
-        ]
+    is_buyer_maker =models.BooleanField()

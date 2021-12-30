@@ -119,7 +119,7 @@ LOGGING = {
             'propagate': False,
         },
         # Your own app - this assumes all your logger names start with "myapp."
-        'binance': {
+        'journal': {
             'handlers': ['logfile'],
             # 'level': 'WARNING', # Or maybe INFO or DEBUG
             'level': 'DEBUG' if DEBUG else 'WARNING',
@@ -189,48 +189,52 @@ CELERY_CACHE_BACKEND = 'django-cache'
 
 
 #########  APP settings:
+### base:
+JOURNALS = {
+    'ROTATE_PERIOD': 120,
+    'DATA_DIR': BASE_DIR / 'data/journals/'
+}
+
+### nobitex:
 NOBITEX = {
-    'DATA_DIR_PATH': BASE_DIR / 'data/nobitex',
     'MARKETS': [
         ('BTC', 'IRT'),
         ('ETH', 'IRT'),
-        # ('LTC', 'IRT'),
-        # ('XRP', 'IRT'),
-        # ('BCH', 'IRT'),
-        # ('BNB', 'IRT'),
-        # ('EOS', 'IRT'),
-        # ('XLM', 'IRT'),
-        # ('ETC', 'IRT'),
-        # ('TRX', 'IRT'),
-        # ('DOGE', 'IRT'),
-        # ('UNI', 'IRT'),
-        # ('DAI', 'IRT'),
+        ('LTC', 'IRT'),
+        ('XRP', 'IRT'),
+        ('BCH', 'IRT'),
+        ('BNB', 'IRT'),
+        ('EOS', 'IRT'),
+        ('XLM', 'IRT'),
+        ('ETC', 'IRT'),
+        ('TRX', 'IRT'),
+        ('DOGE', 'IRT'),
+        ('UNI', 'IRT'),
+        ('DAI', 'IRT'),
         ('USDT', 'IRT'),
         ('BTC', 'USDT'),
         ('ETH', 'USDT'),
-        # ('LTC', 'USDT'),
-        # ('XRP', 'USDT'),
-        # ('BCH', 'USDT'),
-        # ('BNB', 'USDT'),
-        # ('EOS', 'USDT'),
-        # ('XLM', 'USDT'),
-        # ('ETC', 'USDT'),
-        # ('TRX', 'USDT'),
-        # ('DOGE', 'USDT'),
-        # ('UNI', 'USDT'),
-        # ('DAI', 'USDT'),
+        ('LTC', 'USDT'),
+        ('XRP', 'USDT'),
+        ('BCH', 'USDT'),
+        ('BNB', 'USDT'),
+        ('EOS', 'USDT'),
+        ('XLM', 'USDT'),
+        ('ETC', 'USDT'),
+        ('TRX', 'USDT'),
+        ('DOGE', 'USDT'),
+        ('UNI', 'USDT'),
+        ('DAI', 'USDT'),
     ],
     'FEES': {
-        'TAKER': .001,
-        'MAKER': .001,
-    },
-    'JOURNAL_ROTATE_PERIOD': {
-        'marketdata_journal': 60,
+        'TAKER': .0013,
+        'MAKER': .0013,
     },
     'TASK_PERIODS': {
-        'collect_market_data': 2,
-        'collect_market_trades': 30,
-        'store_market_data': 60*2,
+        'nobitex.collect.orders': 10,
+        'nobitex.collect.trades': 20,
+        'nobitex.store.orders': 60,
+        'nobitex.store.trades': 60*2,
     }
 }
 
