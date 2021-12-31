@@ -1,6 +1,4 @@
-
-from typing import Dict, Optional, List, Tuple
-
+import random
 import requests
 import json
 
@@ -19,7 +17,7 @@ class BaseClient:
     def _init_session(self):
         self.session = requests.Session()
 
-    def _init_headers(self) -> Dict:
+    def _init_headers(self):
         headers = {
             'Accept': 'application/json',
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',  # noqa
@@ -83,3 +81,12 @@ class Client(
         MarketDataMixIn,
     ):
         pass
+
+clients = [
+    Client()
+    for _ in range(100)
+]
+
+def get_client():
+    return clients[random.randrange(100)]
+    # return random.choice(clients)

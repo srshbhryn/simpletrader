@@ -4,16 +4,17 @@ import logging
 from celery import shared_task
 
 
-from nobitex.client import Client
+from nobitex.client import get_client
 from nobitex.journals import OrderJournal, TradeJournal
 
 log = logging.getLogger('django')
-client = Client()
+# client = Client()
 
 
 @shared_task(name='nobitex.collect.orders', ignore_result=True, store_errors_even_if_ignored=True)
 def collect_orders(symbol, market_id):
     log.info(f'getting market data for {symbol}.')
+    client = get_client()
     journal = OrderJournal()
     try:
         response = client.get_orderbook(symbol)
@@ -43,8 +44,8 @@ def collect_orders(symbol, market_id):
 
 @shared_task(name='nobitex.collect.trades', ignore_result=True, store_errors_even_if_ignored=True)
 def collect_trades(symbol, market_id):
-
     log.info(f'getting trades for {symbol}.')
+    client = get_client()
     journal = TradeJournal()
     try:
         response = client.get_trades(symbol)
