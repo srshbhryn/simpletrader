@@ -64,15 +64,29 @@ WSGI_APPLICATION = 'simpletrader.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': CONFIGS.get('DEFAULT_DB_NAME', 'simpletrader_default'),
+        'USER': CONFIGS.get('DEFAULT_DB_USER', 'simpletrader_default'),
+        'PASSWORD': CONFIGS.get('DEFAULT_DB_PASSWORD'),
+        'HOST': CONFIGS.get('DEFAULT_DB_HOST', '127.0.0.1'),
+        'PORT': CONFIGS.get('DEFAULT_DB_PORT', '5432'),
+    },
+    'timescale': {
         'ENGINE': 'timescale.db.backends.postgresql',
-        'NAME': CONFIGS.get('DB_NAME', 'simpletrader'),
-        'USER': CONFIGS.get('DB_USER', 'simpletrader'),
-        'PASSWORD': CONFIGS.get('DB_PASSWORD'),
-        'HOST': CONFIGS.get('DB_HOST', '127.0.0.1'),
-        'PORT': CONFIGS.get('DB_PORT', '5432'),
+        'NAME': CONFIGS.get('TIMESCALE_DB_NAME', 'simpletrader_ts'),
+        'USER': CONFIGS.get('TIMESCALE_DB_USER', 'simpletrader_ts'),
+        'PASSWORD': CONFIGS.get('TIMESCALE_DB_PASSWORD'),
+        'HOST': CONFIGS.get('TIMESCALE_DB_HOST', '127.0.0.1'),
+        'PORT': CONFIGS.get('TIMESCALE_DB_PORT', '5432'),
     }
 }
-
+DB_ROUTING = {
+    'timescale': [
+        'nobitex',
+    ],
+}
+DEFAULT_DB = 'default'
+DATABASE_ROUTERS = ['simpletrader.db_router.Router',]
 
 LOGGING = {
     'version': 1,
