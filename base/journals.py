@@ -172,7 +172,7 @@ class Journal:
             new_l = []
             for d in fk_sets_objs:
                 if d[self.sort_field] <= fk_set_to_max_time_map.get(
-                    fk_key, datetime.datetime(1900, 1, 1)):
+                    fk_key, unix_timestamp_ms_to_datetime(0)):
                     continue
                 t = tuple(d.items())
                 if t not in seen:
