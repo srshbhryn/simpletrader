@@ -252,14 +252,10 @@ NOBITEX = {
         'MAKER': .0013,
     },
     'TASK_PERIODS': {
-        # 'nobitex.collect.orders': 10,
-        # 'nobitex.collect.trades': 20,
-        # 'nobitex.store.orders': 60,
-        # 'nobitex.store.trades': 60*2,
-        'nobitex.collect.orders': 2,
-        'nobitex.collect.trades': 2,
-        'nobitex.store.orders': 20,
-        'nobitex.store.trades': 20,
+        'nobitex.collect.orders': 10,
+        'nobitex.collect.trades': 20,
+        'nobitex.store.orders': 60,
+        'nobitex.store.trades': 60*2,
     }
 }
 
