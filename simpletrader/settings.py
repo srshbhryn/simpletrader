@@ -188,11 +188,18 @@ CACHES = {
     },
 }
 
-CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_NO}'
+
 CELERY_BROKER = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_NO}'
 CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_NO}'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_TASK_ROUTES = {
+    'nobitex.collect.*': {'queue': 'api_call'},
+    'nobitex.collect.*': {'queue': 'api_call'},
+    'nobitex.store.*': {'queue': 'db_insert'},
+    'nobitex.store.*': {'queue': 'db_insert'},
+}
+
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = CONFIGS.get('EMAIL_HOST', 'smtp.gmail.com')
@@ -245,10 +252,14 @@ NOBITEX = {
         'MAKER': .0013,
     },
     'TASK_PERIODS': {
-        'nobitex.collect.orders': 10,
-        'nobitex.collect.trades': 20,
-        'nobitex.store.orders': 60,
-        'nobitex.store.trades': 60*2,
+        # 'nobitex.collect.orders': 10,
+        # 'nobitex.collect.trades': 20,
+        # 'nobitex.store.orders': 60,
+        # 'nobitex.store.trades': 60*2,
+        'nobitex.collect.orders': 2,
+        'nobitex.collect.trades': 2,
+        'nobitex.store.orders': 20,
+        'nobitex.store.trades': 20,
     }
 }
 
