@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'base',
     #
     'nobitex',
+    'kucoin_data',
 ]
 
 MIDDLEWARE = [
@@ -83,6 +84,7 @@ DATABASES = {
 DB_ROUTING = {
     'timescale': [
         'nobitex',
+        'kucoin_data'
     ],
 }
 DEFAULT_DB = 'default'
@@ -247,4 +249,15 @@ NOBITEX = {
         'nobitex.store.orders': 60,
         'nobitex.store.trades': 60*2,
     }
+}
+
+#### Kucoin:
+KUCOIN = {
+    'ASSETS': [
+        ('BTC', 'XBT'),
+        ('ETH', 'ETH'),
+        ('XRP', 'XRP'),
+        ('DOGE', 'DOGE'),
+        ('AAVE', 'AAVE'),
+    ]
 }
