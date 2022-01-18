@@ -187,9 +187,9 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_TASK_ROUTES = {
     'nobitex.collect.*': {'queue': 'api_call'},
-    'nobitex.collect.*': {'queue': 'api_call'},
     'nobitex.store.*': {'queue': 'db_insert'},
-    'nobitex.store.*': {'queue': 'db_insert'},
+    'kucoin_data.collect.*': {'queue': 'api_call'},
+    'kucoin_data.store.*': {'queue': 'db_insert'},
 }
 
 
@@ -257,7 +257,24 @@ KUCOIN = {
         ('BTC', 'XBT'),
         ('ETH', 'ETH'),
         ('XRP', 'XRP'),
-        ('DOGE', 'DOGE'),
-        ('AAVE', 'AAVE'),
-    ]
+        ('USDT', 'USDTM'),
+    ],
+    'SPOT_MARKETS': [
+        ('BTC', 'USDT'),
+        ('ETH', 'USDT'),
+        ('XRP', 'USDT'),
+    ],
+    'FUTURES_CONTRACTS': [
+        ('XBT', 'USDTM'),
+        ('ETH', 'USDTM'),
+        ('XRP', 'USDTM'),
+    ],
+    'TASK_PERIODS': {
+        'kucoin_data.collect.spot_orders': 4,
+        'kucoin_data.collect.spot_trades': 3,
+        'kucoin_data.collect.futures_orders': 4,
+        'kucoin_data.collect.futures_trades': 3,
+        'kucoin_data.store.orders_and_trades': 60*2,
+    }
+
 }
