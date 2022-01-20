@@ -204,7 +204,7 @@ CELERY_TASK_ROUTES = {
 #########  APP settings:
 ### base:
 JOURNALS = {
-    'ROTATE_PERIOD': 120,
+    'ROTATE_PERIOD': 1,
     'DATA_DIR': BASE_DIR / 'data/journals/'
 }
 
@@ -270,11 +270,11 @@ KUCOIN = {
         ('XRP', 'USDTM'),
     ],
     'TASK_PERIODS': {
-        'kucoin_data.collect.spot_orders': 4,
-        'kucoin_data.collect.spot_trades': 3,
-        'kucoin_data.collect.futures_orders': 4,
-        'kucoin_data.collect.futures_trades': 3,
-        'kucoin_data.store.orders_and_trades': 60*2,
+        # 'kucoin_data.collect.spot_orders': 2,
+        'kucoin_data.collect.spot_trades': 2,
+        # 'kucoin_data.collect.futures_orders': 2,
+        'kucoin_data.collect.futures_trades': 2,
+        'kucoin_data.store.orders_and_trades': 2,
     }
 
 }

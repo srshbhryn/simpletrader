@@ -1,4 +1,4 @@
-import os, time, logging, datetime
+import os, time, logging
 
 from django.conf import settings
 from django.db.models import fields
@@ -21,10 +21,15 @@ class Journal:
             for field in self.Meta.model._meta.fields
             if not field.name == 'id'
         ]
-        self.serializers = {}
+        self.serializers = {
+            fieldname: func
+            for fieldname, func in self.Meta.__dict__.get('serializers', {}).items()
+        }
 
         for field in self.Meta.model._meta.fields:
             if field.name == 'id':
+                continue
+            if field.name in self.serializers.keys():
                 continue
             if type(field) == fields.related.ForeignKey:
                 self.serializers[field.name + '_id'] = int
@@ -131,24 +136,20 @@ class Journal:
             )
         ]
         old_files.sort()
-        # current file and one file before it will always
-        # be availabe for trading purposes:
-        return old_files[:-1]
+        return old_files
 
-    def bulk_create_old_files(self):
-        old_files = self._get_old_files()
+    def _bulk_create_file(self, filepath):
         fk_key_objs_map = {}
-        for filepath in old_files:
-            with open(filepath, 'r') as f:
-                lines = f.readlines()
-            for line in lines:
-                obj = self._get_obj_from_line(line)
-                fk_key = tuple([
-                    obj.get(key) for key in self.foreign_key_set
-                ])
-                if not fk_key in fk_key_objs_map.keys():
-                    fk_key_objs_map[fk_key] = []
-                fk_key_objs_map[fk_key].append(obj)
+        with open(filepath, 'r') as f:
+            lines = f.readlines()
+        for line in lines:
+            obj = self._get_obj_from_line(line)
+            fk_key = tuple([
+                obj.get(key) for key in self.foreign_key_set
+            ])
+            if not fk_key in fk_key_objs_map.keys():
+                fk_key_objs_map[fk_key] = []
+            fk_key_objs_map[fk_key].append(obj)
 
         # sort
         for _, fk_sets_objs in fk_key_objs_map.items():
@@ -193,5 +194,27 @@ class Journal:
         if got_warning:
             return
 
-        for file in old_files:
-            self._remove_file(file)
+    ## insert to db lock
+    _locked = False
+    @classmethod
+    def _lock(cls):
+        cls.locked = True
+
+    @classmethod
+    def _unlock(cls):
+        cls.locked = False
+
+    def insert_to_db(self):
+        if self._locked:
+            return
+        self._lock()
+        try:
+            old_files = self._get_old_files()
+            for filepath in old_files:
+                self._bulk_create_file(filepath)
+                self._remove_file(filepath)
+        except Exception as e:
+            self._unlock()
+            log.error(f'journal: insert db failed: error: {e}.')
+            raise e
+        self._unlock()

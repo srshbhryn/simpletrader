@@ -63,7 +63,7 @@ class Command(BaseCommand):
     def _reinit_tasks(self):
         self.stdout.write(self.style.WARNING('Reiniting tasks...'))
         for task_key in [
-            'kucoin_data.collect.spot_orders',
+            # 'kucoin_data.collect.spot_orders',
             'kucoin_data.collect.spot_trades',
         ]:
             for base_name, quote_name in settings.KUCOIN['SPOT_MARKETS']:
@@ -101,7 +101,7 @@ class Command(BaseCommand):
                 )
                 self.stdout.write(f'Task Added: {name}.')
         for task_key in [
-            'kucoin_data.collect.futures_orders',
+            # 'kucoin_data.collect.futures_orders',
             'kucoin_data.collect.futures_trades',
         ]:
             for base_name, quote_name in settings.KUCOIN['FUTURES_CONTRACTS']:

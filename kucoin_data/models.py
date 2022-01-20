@@ -23,7 +23,7 @@ class SpotMarket(models.Model):
 
     @property
     def symbol(self):
-        return self.base_asset.spot_name + self.quote_asset.spot_name
+        return self.base_asset.spot_name + '-' + self.quote_asset.spot_name
 
 
 class FuturesContractManager(models.Manager):
@@ -38,7 +38,7 @@ class FuturesContract(models.Model):
 
     @property
     def symbol(self):
-        return self.base_asset.spot_name + self.quote_asset.spot_name
+        return self.base_asset.futures_name + self.quote_asset.futures_name
 
 
 class SpotOrderBook(models.Model):
