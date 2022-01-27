@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'timescale',
     'base',
     #
-    'nobitex',
+    # 'nobitex',
     'kucoin_data',
 ]
 
