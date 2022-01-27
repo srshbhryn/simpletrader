@@ -46,6 +46,7 @@ def collect_spot_trades(symbol, market_id):
             journal.append_line({
                 'market_id': market_id,
                 'time': int(trade['time'] / 10**6),
+                'sort_field': int(trade['sequence']),
                 'price': trade['price'],
                 'volume': trade['size'],
                 'is_buyer_maker': trade['side'] == 'sell',
@@ -94,6 +95,7 @@ def collect_futures_trades(symbol, market_id):
             journal.append_line({
                 'market_id': market_id,
                 'time': int(trade['ts'] / 10**6),
+                'sort_field': int(trade['sequence']),
                 'price': trade['price'],
                 'volume': trade['size'],
                 'is_buyer_maker': trade['side'] == 'sell',
@@ -117,6 +119,6 @@ def store_orders_and_trades():
     for journal_idx, _ in enumerate(journals):
         _store.delay(journal_idx)
 
-@shared_task(name='kucoin_data.store._store')
+@shared_task(name='kucoin_data.store._store', ignore_result=True, store_errors_even_if_ignored=True)
 def _store(journal_idx):
     journals[journal_idx]().insert_to_db()

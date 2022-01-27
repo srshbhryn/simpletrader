@@ -1,6 +1,7 @@
-import os, time, logging
+import os, uuid, logging
 
 from django.conf import settings
+from django.core.cache import cache
 from django.db.models import fields
 from django.db.models import Max
 
@@ -21,11 +22,13 @@ class Journal:
             for field in self.Meta.model._meta.fields
             if not field.name == 'id'
         ]
+        self.sort_field = self.Meta.__dict__.get('sort_field', 'sort_field')
+        self.FIELDS.append(self.sort_field)
         self.serializers = {
             fieldname: func
             for fieldname, func in self.Meta.__dict__.get('serializers', {}).items()
         }
-
+        self.serializers[self.sort_field] = int
         for field in self.Meta.model._meta.fields:
             if field.name == 'id':
                 continue
@@ -45,9 +48,6 @@ class Journal:
                         self.serializers[field.name] = serializer
 
         self.FILE_NAME = self.MODEL._meta.db_table
-        self.FILE_ROTATE_PERIOD = self.Meta.__dict__.get(
-            'rotate_period', settings.JOURNALS.get('ROTATE_PERIOD', 120)
-        )
         self.BASE_DIR = settings.JOURNALS.get('DATA_DIR', '/var/simpletrader/journals/')
         self.BASE_DIR = str(self.BASE_DIR)
         self.BASE_DIR += '' if self.BASE_DIR[-1]=='/' else '/'
@@ -57,43 +57,33 @@ class Journal:
             for field in self.Meta.model._meta.fields
             if type(field) == fields.related.ForeignKey
         ]
-        self.sort_field = 'time'
         self.template = self._DELIMITER.join(['{'+key+'}' for key in self.FIELDS]) + '\n'
-        self.filename_tamplate = self.BASE_DIR + self.FILE_NAME + '__{time}.csv'
-        self._current_fp = None
-        self._current_fp_open_time = None
-        self._current_fp = open(
-            self.filename_tamplate.format(time=self._current_file_time),
+        self.filename = self.BASE_DIR + self.FILE_NAME + '.csv'
+        self._last_sequence_cache_key = 'journal:' + self.filename + ':ltsq'
+        self._db_insert_lock_key = 'journals:' + self.filename + ':lock'
+        self.fp = open(
+            self.filename,
             'a',
         )
-        self._current_fp_open_time = self._current_file_time
 
-    def _open_new_file(self):
-        self._current_fp.close()
-        self._current_fp = open(
-            self.filename_tamplate.format(time=self._current_file_time),
-            'a',
-        )
-        self._current_fp_open_time = self._current_file_time
+    def foreign_keys_key_from_obj(self, obj):
+        foreign_key_values = [
+            obj[key]
+            for key in self.foreign_key_set
+        ]
+        return tuple(foreign_key_values)
 
-    @property
-    def _is_current_file_expired(self):
-        return not self._current_fp_open_time == self._current_file_time
+    def get_last_sequences(self):
+        return cache.get(self._last_sequence_cache_key) or {}
 
-    @property
-    def _current_file_time(self):
-        return int(
-                time.time()/self.FILE_ROTATE_PERIOD
-            )*self.FILE_ROTATE_PERIOD
+    def set_last_sequence(self, values):
+        return cache.set(self._last_sequence_cache_key, values)
 
-    @property
-    def _current_file(self):
-        if self._is_current_file_expired:
-            self._open_new_file()
-        return self._current_fp
+    def __del__(self):
+        self.fp.close()
 
     def append_line(self, obj):
-        self._current_fp.write(self.template.format(**obj))
+        self.fp.write(self.template.format(**obj))
 
     def _get_obj_from_line(self, line):
         return {
@@ -104,115 +94,51 @@ class Journal:
             )
         }
 
-    def _bulk_create_file(self, filepath):
-        with open(filepath, 'r') as f:
-            lines = f.readlines()
-        try:
-            self.MODEL.objects.bulk_create([
-                self.MODEL(**self._get_obj_from_line(line))
-                for line in lines
-            ])
-            return True
-        except Exception as e:
-            log.warning(f'bulk_create failed. file {filepath}, error: {e}')
-            return False
-
-    def _remove_file(self, filepath):
-        os.system(f'rm {filepath}')
-
-    def _get_old_files(self):
-        old_files = [
-            os.path.join(self.BASE_DIR,file)
-            for file in os.listdir(self.BASE_DIR)
-            if (
-                os.path.isfile(
-                    os.path.join(self.BASE_DIR, file)
-                ) and
-                '__' in file and
-                self.FILE_NAME in file.split('__')[0] and
-                int(
-                    file.split('__')[1].split('.csv')[0]
-                ) < self._current_file_time
-            )
-        ]
-        old_files.sort()
-        return old_files
-
-    def _bulk_create_file(self, filepath):
-        fk_key_objs_map = {}
-        with open(filepath, 'r') as f:
-            lines = f.readlines()
+    def _bulk_create(self):
+        number_of_lines = int(os.popen(f'cat {self.filename} | wc -l').read()[:-1])
+        with open(self.filename, 'r') as f:
+            lines = [
+                f.readline()
+                for _ in range(number_of_lines)
+            ]
+        last_sequences = self.get_last_sequences()
+        fk_to_new_sequences = {}
+        new_objects = []
         for line in lines:
             obj = self._get_obj_from_line(line)
-            fk_key = tuple([
-                obj.get(key) for key in self.foreign_key_set
-            ])
-            if not fk_key in fk_key_objs_map.keys():
-                fk_key_objs_map[fk_key] = []
-            fk_key_objs_map[fk_key].append(obj)
+            fk_key = self.foreign_keys_key_from_obj(obj)
+            sort_field = obj[self.sort_field]
+            del obj[self.sort_field]
+            if last_sequences.get(fk_key, -1) > sort_field:
+                continue
+            if sort_field in fk_to_new_sequences.get(fk_key, set()):
+                continue
+            new_objects.append(obj)
+            if not fk_key in fk_to_new_sequences.keys():
+                fk_to_new_sequences[fk_key] = set()
+            fk_to_new_sequences[fk_key].add(sort_field)
 
-        # sort
-        for _, fk_sets_objs in fk_key_objs_map.items():
-            fk_sets_objs.sort(key=lambda x: x[self.sort_field])
+        self.MODEL.objects.bulk_create([
+            self.MODEL(**obj)
+            for obj in new_objects
+        ])
+        for k, v in fk_to_new_sequences.items():
+            last_sequences[k] = max(v)
+        self.set_last_sequence(last_sequences)
+        os.system(f'sed -i \'1,{number_of_lines}d\' {self.filename}')
 
-        # remove duplicate and old entries
-        db_max_times = self.MODEL.objects.values(
-            *self.foreign_key_set
-        ).annotate(max_time=Max(self.sort_field))
-        fk_set_to_max_time_map = {}
-        for db_max_time in db_max_times:
-            fk_key = {k: v for k, v in db_max_time.items()}
-            del fk_key['max_time']
-            fk_set_to_max_time_map[tuple([
-                fk_key.get(k)
-                for k in self.foreign_key_set
-            ])] = db_max_time['max_time']
+    def _lock(self):
+        uid = str(uuid.uuid4())
+        return cache.get_or_set(self._db_insert_lock_key, uid) == uid
 
-        for fk_key, fk_sets_objs in fk_key_objs_map.items():
-            seen = set()
-            new_l = []
-            for d in fk_sets_objs:
-                if d[self.sort_field] <= fk_set_to_max_time_map.get(
-                    fk_key, unix_timestamp_ms_to_datetime(0)):
-                    continue
-                t = tuple(d.items())
-                if t not in seen:
-                    seen.add(t)
-                    new_l.append(d)
-            fk_key_objs_map[fk_key] = new_l
-
-        got_warning = False
-        for fk_key, fk_sets_objs in fk_key_objs_map.items():
-            try:
-                self.MODEL.objects.bulk_create([
-                    self.MODEL(**obj)
-                    for obj in fk_sets_objs
-                ])
-            except Exception as e:
-                got_warning = True
-                log.warning(f'journal: Failed to bulk_create: error: {e}, model: {self.MODEL.db_table}')
-        if got_warning:
-            return
-
-    ## insert to db lock
-    _locked = False
-    @classmethod
-    def _lock(cls):
-        cls.locked = True
-
-    @classmethod
-    def _unlock(cls):
-        cls.locked = False
+    def _unlock(self):
+        cache.delete(self._db_insert_lock_key)
 
     def insert_to_db(self):
-        if self._locked:
+        if not self._lock():
             return
-        self._lock()
         try:
-            old_files = self._get_old_files()
-            for filepath in old_files:
-                self._bulk_create_file(filepath)
-                self._remove_file(filepath)
+            self._bulk_create()
         except Exception as e:
             self._unlock()
             log.error(f'journal: insert db failed: error: {e}.')

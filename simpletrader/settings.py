@@ -204,7 +204,6 @@ CELERY_TASK_ROUTES = {
 #########  APP settings:
 ### base:
 JOURNALS = {
-    'ROTATE_PERIOD': 2,
     'DATA_DIR': BASE_DIR / 'data/journals/'
 }
 
