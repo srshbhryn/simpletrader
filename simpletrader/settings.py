@@ -318,9 +318,9 @@ KUCOIN = {
     ],
     'TASK_PERIODS': {
         # 'kucoin_data.collect.spot_orders': 2,
-        'kucoin_data.collect.spot_trades': 5,
+        'kucoin_data.collect.spot_trades': 4,
         # 'kucoin_data.collect.futures_orders': 2,
-        'kucoin_data.collect.futures_trades': 5,
+        'kucoin_data.collect.futures_trades': 4,
         'kucoin_data.store.orders_and_trades': 1,
     }
 }
