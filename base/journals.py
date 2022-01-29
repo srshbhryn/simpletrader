@@ -8,6 +8,7 @@ from django.db.models import Max
 from timescale.db.models.fields import TimescaleDateTimeField
 
 from base.utils import unix_timestamp_ms_to_datetime
+from base.clients import get_redis_clients
 
 log = logging.getLogger('journal')
 
@@ -48,23 +49,16 @@ class Journal:
                         self.serializers[field.name] = serializer
 
         self.FILE_NAME = self.MODEL._meta.db_table
-        self.BASE_DIR = settings.JOURNALS.get('DATA_DIR', '/var/simpletrader/journals/')
-        self.BASE_DIR = str(self.BASE_DIR)
-        self.BASE_DIR += '' if self.BASE_DIR[-1]=='/' else '/'
 
         self.foreign_key_set = [
             field.name + '_id'
             for field in self.Meta.model._meta.fields
             if type(field) == fields.related.ForeignKey
         ]
-        self.template = self._DELIMITER.join(['{'+key+'}' for key in self.FIELDS]) + '\n'
-        self.filename = self.BASE_DIR + self.FILE_NAME + '.csv'
-        self._last_sequence_cache_key = 'journal:' + self.filename + ':ltsq'
-        self._db_insert_lock_key = 'journals:' + self.filename + ':lock'
-        self.fp = open(
-            self.filename,
-            'a',
-        )
+        self.template = self._DELIMITER.join(['{'+key+'}' for key in self.FIELDS])
+        self._last_sequence_cache_key = 'journal:' + self.FILE_NAME + ':ltsq'
+        self._db_insert_lock_key = 'journals:' + self.FILE_NAME + ':lock'
+        self.redis_client = get_redis_clients()
 
     def foreign_keys_key_from_obj(self, obj):
         foreign_key_values = [
@@ -79,28 +73,29 @@ class Journal:
     def set_last_sequence(self, values):
         return cache.set(self._last_sequence_cache_key, values)
 
-    def __del__(self):
-        self.fp.close()
-
     def append_line(self, obj):
-        self.fp.write(self.template.format(**obj))
+        self.redis_client.rpush(self.FILE_NAME, self.template.format(**obj))
 
     def _get_obj_from_line(self, line):
         return {
             key: value if not key in self.serializers.keys() else self.serializers[key](value)
             for key, value in zip(
                 self.FIELDS,
-                line[:-1].split(self._DELIMITER)
+                line.split(self._DELIMITER)
             )
         }
 
     def _bulk_create(self):
-        number_of_lines = int(os.popen(f'cat {self.filename} | wc -l').read()[:-1])
-        with open(self.filename, 'r') as f:
-            lines = [
-                f.readline()
-                for _ in range(number_of_lines)
-            ]
+
+        def read_lines():
+            lines = []
+            while True:
+                line = self.redis_client.lpop(self.FILE_NAME)
+                if line is None:
+                    return lines
+                lines.append(line.decode())
+
+        lines = read_lines()
         last_sequences = self.get_last_sequences()
         fk_to_new_sequences = {}
         new_objects = []
@@ -109,7 +104,7 @@ class Journal:
             fk_key = self.foreign_keys_key_from_obj(obj)
             sort_field = obj[self.sort_field]
             del obj[self.sort_field]
-            if last_sequences.get(fk_key, -1) > sort_field:
+            if last_sequences.get(fk_key, -1) >= sort_field:
                 continue
             if sort_field in fk_to_new_sequences.get(fk_key, set()):
                 continue
@@ -125,7 +120,6 @@ class Journal:
         for k, v in fk_to_new_sequences.items():
             last_sequences[k] = max(v)
         self.set_last_sequence(last_sequences)
-        os.system(f'sed -i \'1,{number_of_lines}d\' {self.filename}')
 
     def _lock(self):
         uid = str(uuid.uuid4())
