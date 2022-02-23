@@ -18,6 +18,11 @@ class SpotMarketManager(models.Manager):
 class SpotMarket(models.Model):
     base_asset = models.ForeignKey(Asset, related_name='+', on_delete=models.CASCADE)
     quote_asset = models.ForeignKey(Asset, related_name='+', on_delete=models.CASCADE)
+    base_min_size = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
+    quote_min_size = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
+    base_increment = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
+    quote_increment = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
+    price_increment = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
 
     objects = SpotMarketManager()
 
@@ -34,6 +39,12 @@ class FuturesContractManager(models.Manager):
 class FuturesContract(models.Model):
     base_asset = models.ForeignKey(Asset, related_name='+',  on_delete=models.CASCADE)
     quote_asset = models.ForeignKey(Asset, related_name='+',  on_delete=models.CASCADE)
+    lot_multiplier = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
+    lot_size = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
+    tick_size = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
+    index_price_tick_size = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
+    max_leverage = models.IntegerField(null=True, default=None)
+
     objects = FuturesContractManager()
 
     @property
