@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     #
     # 'nobitex',
     'kucoin_data',
+    'kucoin_index',
 ]
 
 MIDDLEWARE = [
