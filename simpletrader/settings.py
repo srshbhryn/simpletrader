@@ -179,6 +179,15 @@ CACHES = {
             'PICKLE_VERSION': 4,
         },
     },
+    'index_manager': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_NO}',
+        'TIMEOUT': None,
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'PICKLE_VERSION': 4,
+        },
+    },
 }
 
 
