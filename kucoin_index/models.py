@@ -13,5 +13,5 @@ class Measure(models.Model):
 
 class Measurement(models.Model):
     measure = models.ForeignKey(Measure, on_delete=models.CASCADE)
-    timestamp = TimescaleDateTimeField(interval='4 hour')
+    time = TimescaleDateTimeField(interval='4 hour')
     values = models.JSONField(default=dict)
