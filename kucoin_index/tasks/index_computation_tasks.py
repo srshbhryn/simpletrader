@@ -29,7 +29,7 @@ def compute_spottrade_entropy(measure_id, time):
             output_field=FloatField(),
         ),
         output_field=FloatField(),
-    )).values('is_buyer_maker', 'rounded_price').annotate(
+    )).values('rounded_price').annotate(
         volume_sum=Sum('volume'),
         is_buyer_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=True)),
         is_seller_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=False)),
@@ -69,7 +69,7 @@ def compute_futurestrade_entropy(measure_id, time):
             output_field=FloatField(),
         ),
         output_field=FloatField(),
-    )).values('is_buyer_maker', 'rounded_price').annotate(
+    )).values('rounded_price').annotate(
         volume_sum=Sum('volume'),
         is_buyer_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=True)),
         is_seller_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=False)),
