@@ -19,11 +19,11 @@ class register_task(object):
     def __call__(self, task_func):
         task_names = get_task_names(self.task_type)
 
-        @shared_task(name=task_names['hp'])
+        @shared_task(name=task_names['hp'], ignore_result=True, store_errors_even_if_ignored=True)
         def temp(*args, **kwargs):
             task_func(*args, **kwargs)
 
-        @shared_task(name=task_names['lp'])
+        @shared_task(name=task_names['lp'], ignore_result=True, store_errors_even_if_ignored=True)
         def temp(*args, **kwargs):
             task_func(*args, **kwargs)
         return None
