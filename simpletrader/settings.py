@@ -85,7 +85,8 @@ DATABASES = {
 DB_ROUTING = {
     'timescale': [
         'nobitex',
-        'kucoin_data'
+        'kucoin_data',
+        'kucoin_index',
     ],
 }
 DEFAULT_DB = 'default'
