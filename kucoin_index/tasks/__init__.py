@@ -1,0 +1,1 @@
+from kucoin_index.tasks.index_computation_tasks import *

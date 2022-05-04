@@ -201,6 +201,9 @@ CELERY_TASK_ROUTES = {
     'nobitex.store.*': {'queue': 'db_insert'},
     'kucoin_data.collect.*': {'queue': 'api_call'},
     'kucoin_data.store.*': {'queue': 'db_insert'},
+    'kucoin_index.manage.*': {'queue': 'idx_man'},
+    'kucoin_index.hp_compute.*': {'queue': 'idx_hp'},
+    'kucoin_index.lp_compute.*': {'queue': 'idx_lp'},
 }
 
 

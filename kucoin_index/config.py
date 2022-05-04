@@ -8,10 +8,12 @@ class Type(models.IntegerChoices):
     spot_trade_entropy = 1
     futures_trade_entropy = 2
 
-taskname_map = {
-    Type.spot_trade_entropy: 'kucoin_index.compute.spottrade_entropy',
-    Type.futures_trade_entropy: 'kucoin_index.compute.futurestrade_entropy',
-}
+def get_task_names(task_type):
+    name = Type._value2member_map_[task_type].name
+    return {
+        'hp': f'kucoin_index.hp_compute.{name}',
+        'lp': f'kucoin_index.lp_compute.{name}',
+    }
 
 entropy_periods = [
     timedelta(minutes=1),
@@ -29,12 +31,12 @@ periods_map = {
 }
 
 params_map = {
-    Type.spot_trade_entropy: {
-        'price_rounding_factor': [10,],
-    },
-    Type.futures_trade_entropy: {
-        'price_rounding_factor': [10,],
-    },
+    Type.spot_trade_entropy: [
+        {'price_rounding_factor': 10,},
+    ],
+    Type.futures_trade_entropy: [
+        {'price_rounding_factor': 10,},
+    ],
 }
 
 related_ids_map = {
