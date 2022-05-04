@@ -1,3 +1,5 @@
+from celery import states
+
 from django.core.cache import caches
 from django.db import models
 
@@ -37,9 +39,7 @@ class Measurement(models.Model):
 
     @property
     def _task_id(self):
-        print(type(self.time))
-        print(type(self.time.timestamp()))
-        return f'{self.measure_id}_{str(self.time.timestamp()).replace(".", "")}'
+        return f'measurementaskid{self.measure_id}_{str(self.time.timestamp()).replace(".", "")}'
 
     @property
     def is_done(self):
@@ -56,6 +56,13 @@ class Measurement(models.Model):
         return result.state
 
     def run_task(self, is_high_priority=False):
+        task_state = self.task_status
+        if task_state in [
+            states.RECEIVED,
+            states.STARTED,
+            states.SUCCESS,
+        ] or self.is_done:
+            return
         task_name = get_task_names(self.measure.type)[
             'hp' if is_high_priority else 'lp'
         ]
