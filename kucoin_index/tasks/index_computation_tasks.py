@@ -115,7 +115,7 @@ def compute_spot_candle(measure_id, time):
         is_buyer_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=True)),
         is_seller_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=False)),
     )
-    open_and_close = SpotTrade.objects.aggregate(
+    open_and_close = SpotTrade.objects.filter(market_id=related_id).aggregate(
         opening_price=Avg('price', filter=Q(time=values['first_time'])),
         closing_price=Avg('price', filter=Q(time=values['last_time'])),
     )
@@ -163,7 +163,7 @@ def compute_spot_candle(measure_id, time):
         is_buyer_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=True)),
         is_seller_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=False)),
     )
-    open_and_close = FuturesTrade.objects.aggregate(
+    open_and_close = FuturesTrade.objects.filter(market_id=related_id).aggregate(
         opening_price=Avg('price', filter=Q(time=values['first_time'])),
         closing_price=Avg('price', filter=Q(time=values['last_time'])),
     )
