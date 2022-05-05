@@ -16,6 +16,7 @@ class Command(BaseCommand):
         self._reinit_management_tasks()
 
     def _reload_indices(self):
+        self.stdout.write(self.style.WARNING('Reiniting measures...'))
         indices = []
         for type in Type:
             for period in periods_map[type]:
@@ -28,19 +29,44 @@ class Command(BaseCommand):
                             'params': params,
                         })
         for index in indices:
-            _, created = Measure.objects.get_or_create(**index)
-            #print things...
+            measure, created = Measure.objects.get_or_create(**index)
+            description = f'Measure {Type._value2member_map_[measure.type].name} '
+            description += f'with period \'{measure.period}\', '
+            description += f'with related_id \'{measure.related_id}\', '
+            description += f'with params \'{measure.params}\', '
+            if created:
+                self.stdout.write(description + ', has been CREATED.')
+            else:
+                self.stdout.write(description + ', already EXISTS')
+        self.stdout.write(self.style.SUCCESS('Reiniting measures: DONE'))
 
     def _reinit_management_tasks(self):
-        return
-        self.stdout.write(self.style.WARNING('Reiniting assets...'))
-        for spot_name, futures_name in settings.KUCOIN['ASSETS']:
-            _, is_created = Asset.objects.get_or_create(
-                spot_name=spot_name,
-                futures_name=futures_name,
-            )
-            if is_created:
-                self.stdout.write(f'Asset\'{spot_name}\'|\'{futures_name}\' added.')
+        self.stdout.write(self.style.WARNING('Reiniting tasks...'))
+        task_key = 'kucoin_index.manage.fire_recent'
+        name = task_key
+        schedule, _ = IntervalSchedule.objects.get_or_create(
+            every=10,
+            period='seconds',
+        )
+        periodic_task = PeriodicTask.objects.filter(
+            name=name,
+            task=task_key,
+        ).first()
+        if periodic_task:
+            if periodic_task.interval == schedule:
+                self.stdout.write(f'Task Already exists: \'{name}\'.')
             else:
-                self.stdout.write(f'Asset\'{spot_name}\'|\'{futures_name}\' already exists.')
-        self.stdout.write(self.style.SUCCESS('Reiniting assets: DONE.'))
+                periodic_task.interval = schedule
+                periodic_task.save()
+                self.stdout.write(f'Task schedule changed: \'{name}\'.')
+        else:
+            PeriodicTask.objects.create(
+                name=name,
+                task=task_key,
+                interval=schedule,
+                start_time = timezone.now(),
+            )
+            self.stdout.write(f'Task created: \'{name}\'.')
+        self.stdout.write(self.style.SUCCESS('Reiniting tasks: DONE'))
+
+
