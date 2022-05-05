@@ -17,10 +17,6 @@ class Measure(models.Model):
     related_id = models.IntegerField()
     params = models.JSONField(default=dict)
 
-    @classmethod
-    def clean_up_tasks_cache(self):
-        pass
-
 
 class Measurement(models.Model):
     measure = models.ForeignKey(Measure, on_delete=models.CASCADE)
