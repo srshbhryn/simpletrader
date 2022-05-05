@@ -15,10 +15,12 @@ log = logging.getLogger('django')
 
 
 class FireRecent:
+    def __init__(self, measure_type):
+        self.measures = Measure.objects.filter(type=measure_type)
+
     def run(self):
         log.info('started')
-        measures = Measure.objects.all()
-        for measure in measures:
+        for measure in self.measures:
             try:
                 self.index_manager(measure)
             except Exception as e:
@@ -66,6 +68,6 @@ class FireRecent:
 
 @shared_task(name='kucoin_index.manage.fire_recent', ignore_result=True, store_errors_even_if_ignored=True)
 @locked_proccess
-def fire_recent():
-    manager = FireRecent()
+def fire_recent(measure_type):
+    manager = FireRecent(measure_type)
     manager.run()

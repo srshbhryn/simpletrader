@@ -42,31 +42,33 @@ class Command(BaseCommand):
 
     def _reinit_management_tasks(self):
         self.stdout.write(self.style.WARNING('Reiniting tasks...'))
-        task_key = 'kucoin_index.manage.fire_recent'
-        name = task_key
         schedule, _ = IntervalSchedule.objects.get_or_create(
             every=10,
             period='seconds',
         )
-        periodic_task = PeriodicTask.objects.filter(
-            name=name,
-            task=task_key,
-        ).first()
-        if periodic_task:
-            if periodic_task.interval == schedule:
-                self.stdout.write(f'Task Already exists: \'{name}\'.')
-            else:
-                periodic_task.interval = schedule
-                periodic_task.save()
-                self.stdout.write(f'Task schedule changed: \'{name}\'.')
-        else:
-            PeriodicTask.objects.create(
+        for type in Type:
+            task_key = 'kucoin_index.manage.fire_recent'
+            name = task_key + ' for ' + Type._value2member_map_[type].name
+            periodic_task = PeriodicTask.objects.filter(
                 name=name,
                 task=task_key,
-                interval=schedule,
-                start_time = timezone.now(),
-            )
-            self.stdout.write(f'Task created: \'{name}\'.')
+            ).first()
+            if periodic_task:
+                if periodic_task.interval == schedule:
+                    self.stdout.write(f'Task Already exists: \'{name}\'.')
+                else:
+                    periodic_task.interval = schedule
+                    periodic_task.save()
+                    self.stdout.write(f'Task schedule changed: \'{name}\'.')
+            else:
+                PeriodicTask.objects.create(
+                    name=name,
+                    task=task_key,
+                    interval=schedule,
+                    args=f'[{type}]',
+                    start_time = timezone.now(),
+                )
+                self.stdout.write(f'Task created: \'{name}\'.')
         self.stdout.write(self.style.SUCCESS('Reiniting tasks: DONE'))
 
 
