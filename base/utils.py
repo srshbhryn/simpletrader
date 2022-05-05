@@ -38,3 +38,4 @@ def locked_proccess(func):
         finally:
             lock.unlock()
         return result
+    return inner
