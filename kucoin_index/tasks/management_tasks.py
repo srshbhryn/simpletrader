@@ -30,6 +30,10 @@ class FireRecent:
             market_id=related_id).aggregate(max_time=Max('time')).get('max_time'),
         Type.futures_trade_entropy: lambda related_id: FuturesTrade.objects.filter(
             market_id=related_id).aggregate(max_time=Max('time')).get('max_time'),
+        Type.spot_candle: lambda related_id: SpotTrade.objects.filter(
+            market_id=related_id).aggregate(max_time=Max('time')).get('max_time'),
+        Type.futures_candle: lambda related_id: FuturesTrade.objects.filter(
+            market_id=related_id).aggregate(max_time=Max('time')).get('max_time'),
     }
 
     def index_manager(self, measure):
