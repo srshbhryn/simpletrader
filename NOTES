@@ -1,1 +1,12 @@
+
+what should i do next?
+    which one is more important?
+
+IMPROVE LOGS
+ADD LOGROTATE Config
+
+More efficient and safe updates
+    Change celery multi to separated worker systemd files
+    Change celery beat periodic task to management command
+
 adding more market (such as eth-btc need using websocket instead of api call)
