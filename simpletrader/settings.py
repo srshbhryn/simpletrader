@@ -136,6 +136,18 @@ LOGGING = {
     },
 }
 
+if DEBUG:
+    LOGGING['handlers']['console'] = {
+            'level': 'DEBUG',
+            # 'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+        }
+
+    LOGGING['loggers']['django.db.backends'] = {
+            'level': 'DEBUG',
+            'handlers': ['console',],
+    }
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
