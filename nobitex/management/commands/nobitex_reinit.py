@@ -3,20 +3,19 @@ import json
 import random
 
 from django.core.management.base import BaseCommand
-from django.conf import settings
 from django.utils import timezone
 from django.db.models import Q
 
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
 from nobitex.models import Market
-
+from nobitex import configs
 
 class Command(BaseCommand):
 
 
     def _reinit_markets(self):
-        list_market = settings.NOBITEX['MARKETS']
+        list_market = configs.MARKETS
         active_markets = []
         for base_asset, quote_asset in list_market:
             market, _ = Market.objects.get_or_create(
@@ -32,7 +31,7 @@ class Command(BaseCommand):
         ).all()
         markets_with_tasks_ids = []
         schedule, _ = IntervalSchedule.objects.get_or_create(
-            every = settings.NOBITEX['TASK_PERIODS'][task_key],
+            every = configs.TASK_PERIODS[task_key],
             period = 'seconds',
         )
         for task in tasks:
@@ -55,7 +54,7 @@ class Command(BaseCommand):
                     continue
                 periodic_task.delete()
             time_offset_step = datetime.timedelta(
-               seconds=settings.NOBITEX['TASK_PERIODS'][task_key] / 10
+               seconds=configs.TASK_PERIODS[task_key] / 10
             )
             PeriodicTask.objects.create(
                 name = f'{task_key} for {market.symbol}',
@@ -71,7 +70,7 @@ class Command(BaseCommand):
         self._reinit_tasks('nobitex.collect.trades')
         for task_key in ['nobitex.store.orders', 'nobitex.store.trades']:
             schedule, _ = IntervalSchedule.objects.get_or_create(
-                every = settings.NOBITEX['TASK_PERIODS'][task_key],
+                every = configs.TASK_PERIODS[task_key],
                 period = 'seconds',
             )
             periodic_task = PeriodicTask.objects.filter(
