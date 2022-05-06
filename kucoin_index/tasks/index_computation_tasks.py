@@ -115,13 +115,17 @@ def compute_spot_candle(measure_id, time):
         is_buyer_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=True)),
         is_seller_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=False)),
     )
-    open_and_close = SpotTrade.objects.filter(market_id=related_id).aggregate(
-        opening_price=Avg('price', filter=Q(time=values['first_time'])),
-        closing_price=Avg('price', filter=Q(time=values['last_time'])),
-    )
+    opening_price = SpotTrade.objects.filter(
+        market_id=related_id,
+        time=values['first_time'],
+    ).aggregate(Avg('price')).get('opening_price')
+    closing_price = SpotTrade.objects.filter(
+        market_id=related_id,
+        time=values['last_time']
+    ).aggregate(Avg('price')).get('closing_price')
     candle_data = {
-        'o': open_and_close['opening_price'],
-        'c': open_and_close['closing_price'],
+        'o': opening_price,
+        'c': closing_price,
         'M': values['max_price'],
         'm': values['min_price'],
         'v': values['volume_sum'] or 0,
@@ -163,13 +167,17 @@ def compute_futures_candle(measure_id, time):
         is_buyer_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=True)),
         is_seller_maker_volume_sum=Sum('volume', filter=Q(is_buyer_maker=False)),
     )
-    open_and_close = FuturesTrade.objects.filter(market_id=related_id).aggregate(
-        opening_price=Avg('price', filter=Q(time=values['first_time'])),
-        closing_price=Avg('price', filter=Q(time=values['last_time'])),
-    )
+    opening_price = FuturesTrade.objects.filter(
+        market_id=related_id,
+        time=values['first_time'],
+    ).aggregate(Avg('price')).get('opening_price')
+    closing_price = FuturesTrade.objects.filter(
+        market_id=related_id,
+        time=values['last_time']
+    ).aggregate(Avg('price')).get('closing_price')
     candle_data = {
-        'o': open_and_close['opening_price'],
-        'c': open_and_close['closing_price'],
+        'o': opening_price,
+        'c': closing_price,
         'M': values['max_price'],
         'm': values['min_price'],
         'v': values['volume_sum'] or 0,
