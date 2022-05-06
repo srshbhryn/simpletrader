@@ -27,8 +27,6 @@ periods = [
     timedelta(hours=6),
     timedelta(hours=12),
     timedelta(hours=24),
-    timedelta(days=2),
-    timedelta(days=7),
 ]
 
 periods_map = {
