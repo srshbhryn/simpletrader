@@ -1,12 +1,8 @@
 from decimal import Decimal
 
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
-from django.utils import timezone
+from django.core.management.base import BaseCommand
 
-from django_celery_beat.models import IntervalSchedule, PeriodicTask
-
-from kucoin_data.models import Asset, SpotMarket, FuturesContract
+from kucoin_data.models import SpotMarket, FuturesContract
 from kucoin_data.clients import get_futures_client, get_spot_client
 
 class Command(BaseCommand):
