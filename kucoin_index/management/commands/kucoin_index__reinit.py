@@ -43,7 +43,7 @@ class Command(BaseCommand):
     def _reinit_management_tasks(self):
         self.stdout.write(self.style.WARNING('Reiniting tasks...'))
         schedule, _ = IntervalSchedule.objects.get_or_create(
-            every=10,
+            every=5,
             period='seconds',
         )
         for type in Type:

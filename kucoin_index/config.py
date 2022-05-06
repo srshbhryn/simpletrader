@@ -18,15 +18,11 @@ def get_task_names(task_type):
     }
 
 periods = [
+    timedelta(seconds=30),
     timedelta(minutes=1),
+    timedelta(minutes=2),
     timedelta(minutes=5),
-    timedelta(minutes=15),
-    timedelta(minutes=30),
-    timedelta(hours=1),
-    timedelta(hours=4),
-    timedelta(hours=6),
-    timedelta(hours=12),
-    timedelta(hours=24),
+    timedelta(minutes=10),
 ]
 
 periods_map = {
