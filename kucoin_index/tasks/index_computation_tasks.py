@@ -141,7 +141,7 @@ def compute_spot_candle(measure_id, time):
 
 
 @register_task(Type.futures_candle)
-def compute_spot_candle(measure_id, time):
+def compute_futures_candle(measure_id, time):
     time = datetime.datetime.fromisoformat(time)
     measure = Measure.objects.get(pk=measure_id)
     related_id = measure.related_id
