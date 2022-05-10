@@ -23,11 +23,11 @@ INSTALLED_APPS = [
     'django_celery_beat',
     #
     'timescale',
-    'base',
+    'simpletrader.base',
     #
-    # 'nobitex',
-    'kucoin_data',
-    'kucoin_index',
+    'simpletrader.nobitex',
+    'simpletrader.kucoin',
+    'simpletrader.indices',
 ]
 
 MIDDLEWARE = [
@@ -84,9 +84,9 @@ DATABASES = {
 }
 DB_ROUTING = {
     'timescale': [
-        'nobitex',
-        'kucoin_data',
-        'kucoin_index',
+        'simpletrader.nobitex',
+        'simpletrader.kucoin_data',
+        'simpletrader.kucoin_index',
     ],
 }
 DEFAULT_DB = 'default'
@@ -97,11 +97,11 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '{asctime}::{levelname}::{name}::{filename}::{module}::{funcName}::{message}',
+            'format': '{asctime}\t{levelname}\t{name}\t{filename}\t{module}\t{funcName}\t{message}',
             'style': '{',
         },
         'simple': {
-            'format': '{levelname}::{message}',
+            'format': '{asctime}\t{levelname}\t{message}',
             'style': '{',
         },
     },
