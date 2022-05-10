@@ -113,7 +113,12 @@ LOGGING = {
         },
         'logfile': {
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': CONFIGS.get('LOGFILE','/var/log/simpletrader/django.log'),
+            'filename': CONFIGS.get('LOGDIR','/var/log/simpletrader/simpletrader.log'),
+            'formatter': 'verbose'
+        },
+        'logfile_q': {
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': CONFIGS.get('LOGDIR','/var/log/simpletrader/simpletrader_q.log'),
             'formatter': 'verbose'
         },
     },
@@ -128,25 +133,13 @@ LOGGING = {
             'level': 'DEBUG' if DEBUG else 'WARNING',
             'propagate': False,
         },
-        'journal': {
-            'handlers': ['logfile'],
+        'django.db.backends': {
+            'handlers': ['logfile_q'],
             'level': 'DEBUG' if DEBUG else 'WARNING',
-            'propagate': False
+            'propagate': False,
         },
     },
 }
-
-if DEBUG:
-    LOGGING['handlers']['console'] = {
-            'level': 'DEBUG',
-            # 'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-        }
-
-    LOGGING['loggers']['django.db.backends'] = {
-            'level': 'DEBUG',
-            'handlers': ['console',],
-    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
