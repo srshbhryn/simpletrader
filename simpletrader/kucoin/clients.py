@@ -1,7 +1,7 @@
 import random
 
-from simpletrader.kucoin.client import Market as SpotMarket
-from simpletrader.kucoin_futures.client import Market as FuturesMarket
+from kucoin.client import Market as SpotMarket
+from kucoin_futures.client import Market as FuturesMarket
 
 # General keys should be from diffrent accounts in order to
 # mitigate API restrictions.
