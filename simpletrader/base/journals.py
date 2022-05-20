@@ -1,19 +1,17 @@
-import os, uuid, logging
+import uuid, logging
 
-from django.conf import settings
 from django.core.cache import cache
 from django.db.models import fields
-from django.db.models import Max
 
 from timescale.db.models.fields import TimescaleDateTimeField
 
 from simpletrader.base.utils import unix_timestamp_ms_to_datetime
-from simpletrader.base.clients import get_redis_clients
+from simpletrader.base.clients import get_redis, get_async_redis
 
 log = logging.getLogger('journal')
 
 
-class Journal:
+class BaseJournal:
     _DELIMITER = ','
 
     def __init__(self):
@@ -58,7 +56,7 @@ class Journal:
         self.template = self._DELIMITER.join(['{'+key+'}' for key in self.FIELDS])
         self._last_sequence_cache_key = 'journal:' + self.FILE_NAME + ':ltsq'
         self._db_insert_lock_key = 'journals:' + self.FILE_NAME + ':lock'
-        self.redis_client = get_redis_clients()
+        self.redis_client = get_redis()
 
     def foreign_keys_key_from_obj(self, obj):
         foreign_key_values = [
@@ -138,3 +136,18 @@ class Journal:
             log.error(f'journal: insert db failed: error: {e}.')
             raise e
         self._unlock()
+
+
+class Journal(BaseJournal):
+    def __init__(self):
+        super().__init__()
+        self.redis_client = get_redis()
+
+
+class AsyncJournal(BaseJournal):
+    def __init__(self):
+        super().__init__()
+        self.redis_client = get_async_redis()
+
+    async def append_line(self, obj):
+        await self.redis_client.rpush(self.FILE_NAME, self.template.format(**obj))
