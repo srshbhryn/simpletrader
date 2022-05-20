@@ -84,9 +84,9 @@ DATABASES = {
 }
 DB_ROUTING = {
     'timescale': [
-        'simpletrader.nobitex',
-        'simpletrader.kucoin_data',
-        'simpletrader.kucoin_index',
+        'nobitex',
+        'kucoin',
+        'indices',
     ],
 }
 DEFAULT_DB = 'default'
