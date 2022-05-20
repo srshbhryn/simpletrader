@@ -44,8 +44,8 @@ params_map = {
 }
 
 related_ids_map = {
-    Type.spot_trade_entropy: list(SpotMarket.objects.all().values_list('id', flat=True)),
-    Type.futures_trade_entropy: list(FuturesContract.objects.all().values_list('id', flat=True)),
-    Type.spot_candle: list(SpotMarket.objects.all().values_list('id', flat=True)),
-    Type.futures_candle: list(FuturesContract.objects.all().values_list('id', flat=True)),
+    Type.spot_trade_entropy: SpotMarket.objects.all().values_list('id', flat=True),
+    Type.futures_trade_entropy: FuturesContract.objects.all().values_list('id', flat=True),
+    Type.spot_candle: SpotMarket.objects.all().values_list('id', flat=True),
+    Type.futures_candle: FuturesContract.objects.all().values_list('id', flat=True),
 }
