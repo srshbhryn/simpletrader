@@ -4,6 +4,8 @@
         "AVAX",
         "distro",
         "gevent",
+        "httpclient",
+        "ioloop",
         "kucoin",
         "logfile",
         "nobitex",
