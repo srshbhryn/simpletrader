@@ -83,17 +83,18 @@ class BaseJournal:
             )
         }
 
+    def _read_lines(self):
+        lines = []
+        while True:
+            line = self.redis_client.lpop(self.FILE_NAME)
+            if line is None:
+                return lines
+            lines.append(line.decode())
+
+
     def _bulk_create(self):
 
-        def read_lines():
-            lines = []
-            while True:
-                line = self.redis_client.lpop(self.FILE_NAME)
-                if line is None:
-                    return lines
-                lines.append(line.decode())
-
-        lines = read_lines()
+        lines = self._read_lines()
         last_sequences = self.get_last_sequences()
         fk_to_new_sequences = {}
         new_objects = []
