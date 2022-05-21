@@ -35,7 +35,10 @@ class BaseCollector:
         self.http_client = AsyncHTTPClient()
         self.loop = loop
         self.is_ws_healthy = False
-        self.symbols = ['ETH-USDT', 'BTC-USDT']
+        self.symbol_to_market_id_map = {
+            'ETH-USDT': 1,
+            'BTC-USDT': 1,
+        }
         self.journal = SpotTradeJournal()
         self.connection = None
         self.last_msg_time = None
@@ -78,7 +81,7 @@ class BaseCollector:
 
     @restart_on_exception
     async def subscribe(self):
-        topic = '/market/match:' + ','.join(self.symbols)
+        topic = '/market/match:' + ','.join(self.symbol_to_market_id_map)
         id = (lambda ts: ts + (17 - len(ts)) * '0')(str(time.time()).replace('.', ''))
         await self.connection.write_message(json.dumps({
             'id': id,
@@ -100,27 +103,19 @@ class BaseCollector:
             if message is None:
                 raise Exception('closed connection')
             self.last_msg_time = self.loop.time()
-            # self.loop.add_callback(self.journal.append_line, )
+            message = json.loads(message)
+            self.loop.add_callback(self.journal.append_line, self.serialize_data(message['data']))
             print(message)
-    # def serialize_data(self, message):
-    #     return {
-    #             'market_id': market_id,
-    #             'time': int(trade['time'] / 10**6),
-    #             'sort_field': int(trade['sequence']),
-    #             'price': trade['price'],
-    #             'volume': trade['size'],
-    #             'is_buyer_maker': trade['side'] == 'sell',
-    #         })
 
-    # {
-    #   "type":"message",
-    #   topic":"/market/match:BTC-USDT",
-    #   "subject":"trade.l3match",
-    #   "data":{
-    #       "symbol":"BTC-USDT",
-    #       "side":"sell",
-    #       "type":"match",
-    #         "makerOrderId":"6289570819b43000013983ae","sequence":"1629863091969","size":"0.0006658","price":"29409.9","takerOrderId":"6289570e7b1b720001fe85a1","time":"1653167886422553108","tradeId":"6289570e2e113d2923dfad6b"}}
+    def serialize_data(self, data):
+        return {
+            'market_id': self.symbol_to_market_id_map[data['symbol']],
+            'time': int(int(data['time']) / 10**6),
+            'sort_field': int(data['sequence']),
+            'price': data['price'],
+            'volume': data['size'],
+            'is_buyer_maker': data['side'] == 'sell',
+        }
 
     @restart_on_exception
     async def fetch_rest_apis(self):
