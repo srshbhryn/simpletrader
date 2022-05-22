@@ -92,6 +92,11 @@ DB_ROUTING = {
 DEFAULT_DB = 'default'
 DATABASE_ROUTERS = ['simpletrader.db_router.Router',]
 
+
+LOGDIR = CONFIGS.get('LOGDIR','/var/log/simpletrader/')
+if not LOGDIR[-1] == '/':
+    LOGDIR += '/'
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -113,12 +118,12 @@ LOGGING = {
         },
         'logfile': {
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': CONFIGS.get('LOGDIR','/var/log/simpletrader/simpletrader.log'),
+            'filename': LOGDIR + 'simpletrader.log',
             'formatter': 'verbose'
         },
         'logfile_q': {
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': CONFIGS.get('LOGDIR','/var/log/simpletrader/simpletrader_q.log'),
+            'filename': LOGDIR + 'simpletrader_q.log',
             'formatter': 'verbose'
         },
     },
@@ -140,7 +145,6 @@ LOGGING = {
         },
     },
 }
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
