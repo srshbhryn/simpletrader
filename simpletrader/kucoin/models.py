@@ -1,84 +1,113 @@
 from django.db import models
 
 from timescale.db.models.fields import TimescaleDateTimeField
+from timescale.db.models.managers import TimescaleManager
 
-class Asset(models.Model):
-    spot_name = models.CharField(unique=True, max_length=8)
-    futures_name = models.CharField(unique=True, max_length=8, blank=True, null=True)
+class Asset(models.IntegerChoices):
+    usdt = 0
+    btc = 1
+    eth = 2
+    ltc = 3
+    xrp = 4
+    bch = 5
+    bnb = 6
+    eos = 7
+    xlm = 8
+    etc = 9
+    trx = 10
+    doge = 11
+    uni = 12
+    link = 13
+    dot = 14
+    aave = 15
+    ada = 16
+    shib = 17
+    ftm = 18
+    matic = 19
+    axs = 20
+    mana = 21
+    sand = 22
 
-    def delete(self):
-        pass
+    @classmethod
+    def spot_symbol(cls, asset):
+        if isinstance(asset, int):
+            asset = Asset(asset)
+        return asset.label.upper()
 
-
-class SpotMarketManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().select_related('base_asset', 'quote_asset')
+    @classmethod
+    def futures_symbol(cls, asset):
+        if isinstance(asset, int):
+            asset = Asset(asset)
+        if asset.value == Asset.usdt:
+            return 'USDTM'
+        if asset.value == Asset.btc:
+            return 'XBT'
+        return Asset.spot_symbol(asset)
 
 
 class SpotMarket(models.Model):
-    base_asset = models.ForeignKey(Asset, related_name='+', on_delete=models.CASCADE)
-    quote_asset = models.ForeignKey(Asset, related_name='+', on_delete=models.CASCADE)
+    base_asset = models.IntegerField(choices=Asset.choices)
+    quote_asset = models.IntegerField(choices=Asset.choices)
     base_min_size = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
     quote_min_size = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
     base_increment = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
     quote_increment = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
     price_increment = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
 
-    objects = SpotMarketManager()
-
     @property
     def symbol(self):
-        return self.base_asset.spot_name + '-' + self.quote_asset.spot_name
-
-
-class FuturesContractManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().select_related('base_asset', 'quote_asset')
+        return Asset.futures_symbol(self.base_asset) + '-' + Asset.futures_symbol(self.quote_asset)
 
 
 class FuturesContract(models.Model):
-    base_asset = models.ForeignKey(Asset, related_name='+',  on_delete=models.CASCADE)
-    quote_asset = models.ForeignKey(Asset, related_name='+',  on_delete=models.CASCADE)
+    base_asset = models.IntegerField(choices=Asset.choices)
+    quote_asset = models.IntegerField(choices=Asset.choices)
     lot_multiplier = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
     lot_size = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
     tick_size = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
     index_price_tick_size = models.DecimalField(max_digits=32, decimal_places=16, null=True, default=None)
     max_leverage = models.IntegerField(null=True, default=None)
 
-    objects = FuturesContractManager()
-
     @property
     def symbol(self):
-        return self.base_asset.futures_name + self.quote_asset.futures_name
+        return Asset.futures_symbol(self.base_asset) + Asset.futures_symbol(self.quote_asset)
 
 
 class SpotOrderBook(models.Model):
     market = models.ForeignKey(SpotMarket, on_delete=models.CASCADE)
-    time = TimescaleDateTimeField(interval='1 hour')
+    time = TimescaleDateTimeField(interval='12 hour')
     price = models.FloatField()
     volume = models.FloatField()
     is_bid = models.BooleanField()
+
+    objects = TimescaleManager()
 
 
 class SpotTrade(models.Model):
     market = models.ForeignKey(SpotMarket, on_delete=models.CASCADE)
-    time = TimescaleDateTimeField(interval='4 hour')
+    time = TimescaleDateTimeField(interval='24 hour')
     price = models.FloatField()
     volume = models.FloatField()
     is_buyer_maker = models.BooleanField()
+
+    objects = TimescaleManager()
 
 
 class FuturesOrderBook(models.Model):
     market = models.ForeignKey(FuturesContract, on_delete=models.CASCADE)
-    time = TimescaleDateTimeField(interval='1 hour')
+    time = TimescaleDateTimeField(interval='12 hour')
     price = models.FloatField()
     volume = models.FloatField()
     is_bid = models.BooleanField()
 
+    objects = TimescaleManager()
+
 
 class FuturesTrade(models.Model):
     market = models.ForeignKey(FuturesContract, on_delete=models.CASCADE)
-    time = TimescaleDateTimeField(interval='4 hour')
+    time = TimescaleDateTimeField(interval='24 hour')
     price = models.FloatField()
     volume = models.FloatField()
     is_buyer_maker = models.BooleanField()
+
+    objects = TimescaleManager()
