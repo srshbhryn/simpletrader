@@ -56,7 +56,7 @@ class SpotMarket(models.Model):
 
     @property
     def symbol(self):
-        return Asset.futures_symbol(self.base_asset) + '-' + Asset.futures_symbol(self.quote_asset)
+        return Asset.spot_symbol(self.base_asset) + '-' + Asset.spot_symbol(self.quote_asset)
 
 
 class FuturesContract(models.Model):
