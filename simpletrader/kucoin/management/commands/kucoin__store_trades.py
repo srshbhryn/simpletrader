@@ -12,7 +12,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         journal = SpotTradeJournal()
         while True:
-            time.sleep(1)
+            time.sleep(.4)
             lines = journal._read_lines()
             # if len(lines):
             if True:

@@ -31,14 +31,11 @@ def restart_on_exception(func):
 
 
 class BaseCollector:
-    def __init__(self, loop: tornado.ioloop.IOLoop):
+    def __init__(self, loop: tornado.ioloop.IOLoop, symbol_to_market_id_map):
         self.http_client = AsyncHTTPClient()
         self.loop = loop
         self.is_ws_healthy = False
-        self.symbol_to_market_id_map = {
-            'ETH-USDT': 1,
-            'BTC-USDT': 1,
-        }
+        self.symbol_to_market_id_map = symbol_to_market_id_map
         self.journal = SpotTradeJournal()
         self.connection = None
         self.last_msg_time = None
