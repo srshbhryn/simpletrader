@@ -2,20 +2,16 @@ import time
 
 from django.core.management.base import BaseCommand
 
-
-from simpletrader.kucoin.journals import SpotTradeJournal
+from simpletrader.kucoin.journals import SpotTradeJournal, FuturesTradeJournal
 
 
 class Command(BaseCommand):
-    help = '######################'
+    help = 'read journals and store trades in database'
 
     def handle(self, *args, **options):
-        journal = SpotTradeJournal()
+        spot_journal = SpotTradeJournal()
+        futures_journal = FuturesTradeJournal()
         while True:
-            time.sleep(.4)
-            lines = journal._read_lines()
-            # if len(lines):
-            if True:
-                print(f'fetched {len(lines)} trades')
-            # for l in lines:
-            #     print(l)
+            time.sleep(.5)
+            spot_journal.insert_to_db()
+            futures_journal.insert_to_db()
