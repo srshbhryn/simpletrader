@@ -1,6 +1,7 @@
 import time
 import asyncio
 import json
+import logging
 
 import tornado.ioloop
 from tornado.websocket import websocket_connect, WebSocketClientConnection
@@ -9,6 +10,7 @@ from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPResponse
 from simpletrader.base.journals import AsyncJournal
 from simpletrader.kucoin.models import SpotTrade
 
+logger = logging.getLogger('django')
 
 class SpotTradeJournal(AsyncJournal):
     class Meta:
@@ -16,13 +18,12 @@ class SpotTradeJournal(AsyncJournal):
 
 def restart_on_exception(func):
     async def wrapper(*args, **kwargs):
-        print(f'calling {func.__name__}')
+        logger.info(f'restart_on_exception: calling {func.__name__}')
         self = args[0]
         try:
             response = await func(*args, **kwargs)
         except Exception as e:
-            print(f'error in \'{func.__name__}\': {e}')
-            #log exception
+            logger.warning(f'restart_on_exception: error in \'{func.__name__}\': {e}')
             await asyncio.sleep(.5)
             self.loop.add_callback(self.restart)
             raise e
@@ -49,10 +50,9 @@ class BaseCollector:
         await self.fetch_rest_apis()
         await self.connect_to_socket()
         await self.subscribe()
+        logger.info('connected to ws')
         self.loop.add_callback(self.ws_msg_callback)
         self.loop.add_callback(self.run_health_check)
-        # await self.ws_msg_callback()
-        # await self.run_health_check()
 
     async def _get_socket_url(self):
         response: HTTPResponse  = await self.http_client.fetch(HTTPRequest(
@@ -88,7 +88,6 @@ class BaseCollector:
             'response': True,
         }))
         message = await self.connection.read_message()
-        print(message)
         message = json.loads(message)
         assert message.get('type') == 'ack'
         assert message.get('id') == id
@@ -99,10 +98,10 @@ class BaseCollector:
             message = await self.connection.read_message()
             if message is None:
                 raise Exception('closed connection')
+            logger.debug(message)
             self.last_msg_time = self.loop.time()
             message = json.loads(message)
             self.loop.add_callback(self.journal.append_line, self.serialize_data(message['data']))
-            print(message)
 
     def serialize_data(self, data):
         return {
@@ -114,12 +113,20 @@ class BaseCollector:
             'is_buyer_maker': data['side'] == 'sell',
         }
 
-    @restart_on_exception
     async def fetch_rest_apis(self):
-        pass
+        for symbol in self.symbol_to_market_id_map:
+            self.loop.add_callback(self._fetch_rest_api, symbol)
 
     async def _fetch_rest_api(self, symbol):
-        pass
+        response: HTTPResponse  = await self.http_client.fetch(HTTPRequest(
+            url='https://api.kucoin.com/api/v1/market/histories?symbol=BTC-USDT',
+            method='GET',
+            body=None,
+        ))
+        trades = json.loads(response.body).get('data')
+        for trade in trades:
+            trade['symbol'] = symbol
+            self.loop.add_callback(self.journal.append_line, self.serialize_data(trade))
 
     @restart_on_exception
     async def run_health_check(self):
