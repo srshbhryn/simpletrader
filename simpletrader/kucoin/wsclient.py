@@ -8,13 +8,18 @@ from tornado.websocket import websocket_connect, WebSocketClientConnection
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPResponse
 
 from simpletrader.base.journals import AsyncJournal
-from simpletrader.kucoin.models import SpotTrade, SpotMarket
+from simpletrader.kucoin.models import SpotTrade, SpotMarket, FuturesTrade, FuturesContract
 
 logger = logging.getLogger('django')
 
 class SpotTradeJournal(AsyncJournal):
     class Meta:
         model = SpotTrade
+
+class FuturesTradeJournal(AsyncJournal):
+    class Meta:
+        model = FuturesTrade
+
 
 def restart_on_exception(func):
     async def wrapper(*args, **kwargs):
@@ -43,17 +48,21 @@ class BaseCollector:
         assert self.symbol_to_market_id_map is not None
         assert self.journal is not None
         assert self.base_url is not None
+        assert self.topic_template is not None
+        assert self.fetch_api_path_template is not None
+        self.fetch_api_url_template = self.base_url + self.fetch_api_path_template
 
     def initialize(self):
         raise NotImplementedError
 
     async def restart(self):
+        await asyncio.sleep(.1)
         try:
             self.connection.close()
             del self.connection
         except:
             pass
-        await self.fetch_rest_apis()
+        self.loop.add_callback(self.fetch_rest_apis)
         await self.connect_to_socket()
         await self.subscribe()
         logger.info('connected to ws')
@@ -62,6 +71,7 @@ class BaseCollector:
 
     async def _get_socket_url(self):
         response: HTTPResponse  = await self.http_client.fetch(HTTPRequest(
+            # url=f'{self.base_url}/api/v1/bullet-public',
             url=f'{self.base_url}/api/v1/bullet-public',
             method='POST',
             body=None,
@@ -84,7 +94,7 @@ class BaseCollector:
 
     @restart_on_exception
     async def subscribe(self):
-        topic = '/market/match:' + ','.join(self.symbol_to_market_id_map)
+        topic = self.topic_template.format(','.join(self.symbol_to_market_id_map))
         id = (lambda ts: ts + (17 - len(ts)) * '0')(str(time.time()).replace('.', ''))
         await self.connection.write_message(json.dumps({
             'id': id,
@@ -118,7 +128,7 @@ class BaseCollector:
 
     async def _fetch_rest_api(self, symbol):
         response: HTTPResponse  = await self.http_client.fetch(HTTPRequest(
-            url='https://api.kucoin.com/api/v1/market/histories?symbol=BTC-USDT',
+            url=self.fetch_api_url_template.format(symbol),
             method='GET',
             body=None,
         ))
@@ -130,7 +140,7 @@ class BaseCollector:
     @restart_on_exception
     async def run_health_check(self):
         while True:
-            await asyncio.sleep(2)
+            await asyncio.sleep(5)
             assert self.loop.time() - self.last_msg_time <= 4
 
 
@@ -142,11 +152,35 @@ class SpotTradesCollector(BaseCollector):
             for market in SpotMarket.objects.all()
         }
         self.base_url = 'https://api.kucoin.com'
+        self.fetch_api_path_template = '/api/v1/market/histories?symbol={}'
+        self.topic_template = '/market/match:{}'
 
     def serialize_data(self, data):
         return {
             'market_id': self.symbol_to_market_id_map[data['symbol']],
             'time': int(int(data['time']) / 10**6),
+            'sort_field': int(data['sequence']),
+            'price': data['price'],
+            'volume': data['size'],
+            'is_buyer_maker': data['side'] == 'sell',
+        }
+
+
+class FuturesTradesCollector(BaseCollector):
+    def initialize(self):
+        self.journal = FuturesTradeJournal()
+        self.symbol_to_market_id_map = {
+            market.symbol: market.id
+            for market in FuturesContract.objects.all()
+        }
+        self.base_url = 'https://api-futures.kucoin.com'
+        self.fetch_api_path_template = '/api/v1/trade/history?symbol={}'
+        self.topic_template = '/contractMarket/execution:{}'
+
+    def serialize_data(self, data):
+        return {
+            'market_id': self.symbol_to_market_id_map[data['symbol']],
+            'time': int(int(data['ts']) / 10**6),
             'sort_field': int(data['sequence']),
             'price': data['price'],
             'volume': data['size'],

@@ -12,6 +12,6 @@ class Command(BaseCommand):
         spot_journal = SpotTradeJournal()
         futures_journal = FuturesTradeJournal()
         while True:
-            time.sleep(.5)
+            time.sleep(1)
             spot_journal.insert_to_db()
             futures_journal.insert_to_db()
