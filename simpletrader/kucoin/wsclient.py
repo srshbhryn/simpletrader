@@ -8,7 +8,7 @@ from tornado.websocket import websocket_connect, WebSocketClientConnection
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPResponse
 
 from simpletrader.base.journals import AsyncJournal
-from simpletrader.kucoin.models import SpotTrade
+from simpletrader.kucoin.models import SpotTrade, SpotMarket
 
 logger = logging.getLogger('django')
 
@@ -32,14 +32,20 @@ def restart_on_exception(func):
 
 
 class BaseCollector:
-    def __init__(self, loop: tornado.ioloop.IOLoop, symbol_to_market_id_map):
+
+    def __init__(self):
         self.http_client = AsyncHTTPClient()
-        self.loop = loop
+        self.loop = tornado.ioloop.IOLoop.current()
         self.is_ws_healthy = False
-        self.symbol_to_market_id_map = symbol_to_market_id_map
-        self.journal = SpotTradeJournal()
         self.connection = None
         self.last_msg_time = None
+        self.initialize()
+        assert self.symbol_to_market_id_map is not None
+        assert self.journal is not None
+        assert self.base_url is not None
+
+    def initialize(self):
+        raise NotImplementedError
 
     async def restart(self):
         try:
@@ -56,7 +62,7 @@ class BaseCollector:
 
     async def _get_socket_url(self):
         response: HTTPResponse  = await self.http_client.fetch(HTTPRequest(
-            url='https://api.kucoin.com/api/v1/bullet-public',
+            url=f'{self.base_url}/api/v1/bullet-public',
             method='POST',
             body=None,
             allow_nonstandard_methods=True,
@@ -104,14 +110,7 @@ class BaseCollector:
             self.loop.add_callback(self.journal.append_line, self.serialize_data(message['data']))
 
     def serialize_data(self, data):
-        return {
-            'market_id': self.symbol_to_market_id_map[data['symbol']],
-            'time': int(int(data['time']) / 10**6),
-            'sort_field': int(data['sequence']),
-            'price': data['price'],
-            'volume': data['size'],
-            'is_buyer_maker': data['side'] == 'sell',
-        }
+        raise NotImplementedError
 
     async def fetch_rest_apis(self):
         for symbol in self.symbol_to_market_id_map:
@@ -133,3 +132,23 @@ class BaseCollector:
         while True:
             await asyncio.sleep(2)
             assert self.loop.time() - self.last_msg_time <= 4
+
+
+class SpotTradesCollector(BaseCollector):
+    def initialize(self):
+        self.journal = SpotTradeJournal()
+        self.symbol_to_market_id_map = {
+            market.symbol: market.id
+            for market in SpotMarket.objects.all()
+        }
+        self.base_url = 'https://api.kucoin.com'
+
+    def serialize_data(self, data):
+        return {
+            'market_id': self.symbol_to_market_id_map[data['symbol']],
+            'time': int(int(data['time']) / 10**6),
+            'sort_field': int(data['sequence']),
+            'price': data['price'],
+            'volume': data['size'],
+            'is_buyer_maker': data['side'] == 'sell',
+        }
