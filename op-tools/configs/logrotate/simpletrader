@@ -1,9 +1,0 @@
-/var/log/simpletrader/*.log {
-    daily
-    rotate 60
-    compress
-    delaycompress
-    missingok
-    postrotate
-    copytruncate
-}
