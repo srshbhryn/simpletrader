@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  kucoin__store_trades:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.kucoin__store_trades
+    restart: always
+    environment:
+      - DEBUG=true
+      - TIMESCALE_DB_PASSWORD=simpletrader_ts
+      - DEFAULT_DB_PASSWORD=simpletrader_default
+    depends_on:
+      - journal_redis
+      - timescale_db
+  kucoin__collect_trades:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.kucoin__collect_trades
+    restart: always
+    environment:
+      - DEBUG=true
+      - TIMESCALE_DB_PASSWORD=simpletrader_ts
+      - DEFAULT_DB_PASSWORD=simpletrader_default
+    depends_on:
+      - journal_redis
+      - timescale_db
+
+  journal_redis:
+    image: redis
+    restart: always
+
+  default_db:
+    image: postgres:13.0-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=simpletrader_default
+      - POSTGRES_PASSWORD=simpletrader_default
+      - POSTGRES_DB=simpletrader_default
+
+  timescale_db:
+    image: timescale/timescaledb:latest-pg14
+    restart: always
+    volumes:
+      - timescale_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=simpletrader_ts
+      - POSTGRES_PASSWORD=simpletrader_ts
+      - POSTGRES_DB=simpletrader_ts
+
+volumes:
+  postgres_data:
+  timescale_data:

@@ -3,13 +3,11 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-with open(os.getenv('CONFPATH', '/etc/simpletrader/conf.json'), 'r') as f:
-    CONFIGS = json.load(f)
 
-SECRET_KEY = CONFIGS.get('SECRET_KEY', 'asfiug23bi2u3bg23')
-DEBUG = CONFIGS.get('DEBUG', False)
+SECRET_KEY = os.getenv('SECRET_KEY', 'asfiug23bi2u3bg23')
+DEBUG = os.getenv('DEBUG', False)
 
-ALLOWED_HOSTS = ['*'] if DEBUG else CONFIGS.get('ALLOWED_HOSTS')
+ALLOWED_HOSTS = ['*'] if DEBUG else os.getenv('ALLOWED_HOSTS')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -67,19 +65,19 @@ WSGI_APPLICATION = 'simpletrader.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': CONFIGS.get('DEFAULT_DB_NAME', 'simpletrader_default'),
-        'USER': CONFIGS.get('DEFAULT_DB_USER', 'simpletrader_default'),
-        'PASSWORD': CONFIGS.get('DEFAULT_DB_PASSWORD'),
-        'HOST': CONFIGS.get('DEFAULT_DB_HOST', '127.0.0.1'),
-        'PORT': CONFIGS.get('DEFAULT_DB_PORT', '5432'),
+        'NAME': os.getenv('DEFAULT_DB_NAME', 'simpletrader_default'),
+        'USER': os.getenv('DEFAULT_DB_USER', 'simpletrader_default'),
+        'PASSWORD': os.getenv('DEFAULT_DB_PASSWORD'),
+        'HOST': os.getenv('DEFAULT_DB_HOST', 'default_db'),
+        'PORT': os.getenv('DEFAULT_DB_PORT', '5432'),
     },
     'timescale': {
         'ENGINE': 'timescale.db.backends.postgresql',
-        'NAME': CONFIGS.get('TIMESCALE_DB_NAME', 'simpletrader_ts'),
-        'USER': CONFIGS.get('TIMESCALE_DB_USER', 'simpletrader_ts'),
-        'PASSWORD': CONFIGS.get('TIMESCALE_DB_PASSWORD'),
-        'HOST': CONFIGS.get('TIMESCALE_DB_HOST', '127.0.0.1'),
-        'PORT': CONFIGS.get('TIMESCALE_DB_PORT', '5432'),
+        'NAME': os.getenv('TIMESCALE_DB_NAME', 'simpletrader_ts'),
+        'USER': os.getenv('TIMESCALE_DB_USER', 'simpletrader_ts'),
+        'PASSWORD': os.getenv('TIMESCALE_DB_PASSWORD'),
+        'HOST': os.getenv('TIMESCALE_DB_HOST', 'timescale_db'),
+        'PORT': os.getenv('TIMESCALE_DB_PORT', '5432'),
     }
 }
 DB_ROUTING = {
@@ -93,7 +91,7 @@ DEFAULT_DB = 'default'
 DATABASE_ROUTERS = ['simpletrader.db_router.Router',]
 
 
-LOGDIR = CONFIGS.get('LOGDIR','/var/log/simpletrader/')
+LOGDIR = os.getenv('LOGDIR','/var/log/simpletrader/')
 if not LOGDIR[-1] == '/':
     LOGDIR += '/'
 
@@ -171,13 +169,13 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = CONFIGS.get('STATIC_ROOT', '/srv/www/simpletrader/static/')
+STATIC_ROOT = os.getenv('STATIC_ROOT', '/srv/www/simpletrader/static/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-REDIS_HOST = CONFIGS.get('REDIS_HOST', '127.0.0.1')
-REDIS_PORT = CONFIGS.get('REDIS_PORT', '6379')
-REDIS_DB_NO = CONFIGS.get('REDIS_DB_NO', '10')
+REDIS_HOST = os.getenv('REDIS_HOST', 'journal_redis')
+REDIS_PORT = os.getenv('REDIS_PORT', '6379')
+REDIS_DB_NO = '0'
 
 CACHES = {
     'default': {
@@ -217,11 +215,11 @@ CELERY_TASK_ROUTES = {
 
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = CONFIGS.get('EMAIL_HOST', 'smtp.gmail.com')
+# EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 # EMAIL_USE_TLS = True
-# EMAIL_PORT = CONFIGS.get('EMAIL_PORT', 587)
-# EMAIL_HOST_USER = CONFIGS.get('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = CONFIGS.get('EMAIL_HOST_PASSWORD')
+# EMAIL_PORT = os.getenv('EMAIL_PORT', 587)
+# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 
 #########  APP settings:
