@@ -30,6 +30,14 @@ services:
     image: redis
     restart: always
 
+  cache_redis:
+    image: redis
+    restart: always
+
+  celery_redis:
+    image: redis
+    restart: always
+
   default_db:
     image: postgres:13.0-alpine
     restart: always

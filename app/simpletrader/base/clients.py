@@ -5,14 +5,14 @@ from django.conf import settings
 
 def get_redis():
     return redis.Redis(
-        host=settings.REDIS_HOST,
-        port=int(settings.REDIS_PORT),
-        db=int(settings.REDIS_DB_NO),
+        host=settings.JOURNAL_REDIS_HOST,
+        port=int(settings.JOURNAL_REDIS_PORT),
+        db=int(settings.JOURNAL_REDIS_DB_NO),
     )
 
 def get_async_redis():
     return async_redis.Redis(
-        host=settings.REDIS_HOST,
-        port=int(settings.REDIS_PORT),
-        db=int(settings.REDIS_DB_NO),
+        host=settings.JOURNAL_REDIS_HOST,
+        port=int(settings.JOURNAL_REDIS_PORT),
+        db=int(settings.JOURNAL_REDIS_DB_NO),
     )
