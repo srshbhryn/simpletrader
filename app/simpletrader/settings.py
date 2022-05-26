@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'asfiug23bi2u3bg23')
-DEBUG = os.getenv('DEBUG', False)
+DEBUG = os.getenv('DEBUG', '0') == '1'
 
 ALLOWED_HOSTS = ['*'] if DEBUG else os.getenv('ALLOWED_HOSTS')
 
@@ -173,16 +173,16 @@ STATIC_ROOT = os.getenv('STATIC_ROOT', '/srv/www/simpletrader/static/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-JOURNAL_REDIS_HOST = os.getenv('REDIS_HOST', 'journal_redis')
-JOURNAL_REDIS_PORT = os.getenv('REDIS_PORT', '6379')
+JOURNAL_REDIS_HOST = os.getenv('JOURNAL_REDIS_HOST', 'journal_redis')
+JOURNAL_REDIS_PORT = os.getenv('JOURNAL_REDIS_PORT', '6379')
 JOURNAL_REDIS_DB_NO = '0'
 
-CELERY_REDIS_HOST = os.getenv('REDIS_HOST', 'celery_redis')
-CELERY_REDIS_PORT = os.getenv('REDIS_PORT', '6379')
+CELERY_REDIS_HOST = os.getenv('CELERY_REDIS_HOST', 'celery_redis')
+CELERY_REDIS_PORT = os.getenv('CELERY_REDIS_PORT', '6379')
 CELERY_REDIS_DB_NO = '0'
 
-CACHE_REDIS_HOST = os.getenv('REDIS_HOST', 'cache_redis')
-CACHE_REDIS_PORT = os.getenv('REDIS_PORT', '6379')
+CACHE_REDIS_HOST = os.getenv('CACHE_REDIS_HOST', 'cache_redis')
+CACHE_REDIS_PORT = os.getenv('CACHE_REDIS_PORT', '6379')
 CACHE_REDIS_DB_NO = '0'
 
 CACHES = {
