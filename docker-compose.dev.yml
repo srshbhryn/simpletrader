@@ -1,6 +1,50 @@
 version: '3.8'
 
 services:
+  kucoin__store_trades:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.kucoin__store_trades
+    restart: always
+    environment:
+      - DEBUG=0
+      - TIMESCALE_DB_PASSWORD=simpletrader_ts
+      - DEFAULT_DB_PASSWORD=simpletrader_default
+    depends_on:
+      - journal_redis
+      - timescale_db
+
+  kucoin__collect_trades:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.kucoin__collect_trades
+    restart: always
+    environment:
+      - DEBUG=0
+      - TIMESCALE_DB_PASSWORD=simpletrader_ts
+      - DEFAULT_DB_PASSWORD=simpletrader_default
+    depends_on:
+      - journal_redis
+      - timescale_db
+
+  journal_redis:
+    image: redis
+    restart: always
+    ports:
+      - 6380:6379
+
+  cache_redis:
+    image: redis
+    restart: always
+    ports:
+      - 6381:6379
+
+  celery_redis:
+    image: redis
+    restart: always
+    ports:
+      - 6382:6379
+
   default_db:
     image: postgres:13.0-alpine
     restart: always
