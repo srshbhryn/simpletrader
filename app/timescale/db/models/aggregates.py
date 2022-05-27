@@ -27,14 +27,8 @@ class Last(models.Aggregate):
     name = 'last'
     output_field = FloatField()
 
-    def __init__(self, expression, bucket):
-        super().__init__(expression, bucket)
-
 
 class First(models.Aggregate):
     function = 'first'
     name = 'first'
     output_field = FloatField()
-
-    def __init__(self, expression, bucket):
-        super().__init__(expression, bucket)
