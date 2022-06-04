@@ -85,11 +85,12 @@ class BaseJournal:
 
     def _read_lines(self):
         lines = []
-        while True:
+        for _ in range(1000):
             line = self.redis_client.lpop(self.FILE_NAME)
             if line is None:
                 return lines
             lines.append(line.decode())
+        return lines
 
 
     def _bulk_create(self):
