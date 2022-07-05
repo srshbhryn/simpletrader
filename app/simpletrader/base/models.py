@@ -7,3 +7,9 @@ class Country(models.IntegerChoices):
     FRANCE = 4
     CHINA = 5
     INDIA = 6
+
+
+class Exchange(models.IntegerChoices):
+    nobitex = 1
+    kucoin_spot = 2
+    kucoin_futures = 3

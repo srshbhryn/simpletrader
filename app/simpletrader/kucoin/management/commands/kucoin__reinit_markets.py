@@ -1,7 +1,8 @@
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
-from simpletrader.kucoin.models import Asset, SpotMarket, FuturesContract
+from simpletrader.base.models import Exchange
+from simpletrader.kucoin.models import Asset, SpotMarket, FuturesContract, Market
 
 class Command(BaseCommand):
 
@@ -37,3 +38,9 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f'Futures Contract\'{market.symbol}\' already exists.')
         self.stdout.write(self.style.SUCCESS('Reiniting Futures Contracts: DONE'))
+        self.stdout.write(self.style.WARNING('Creating generic markets...'))
+        for market_id in SpotMarket.objects.all().values_list('id', flat=True):
+            _, _ = Market.objects.get_or_create(related_id=market_id, type=Exchange.kucoin_spot)
+        for market_id in FuturesContract.objects.all().values_list('id', flat=True):
+            _, _ = Market.objects.get_or_create(related_id=market_id, type=Exchange.kucoin_futures)
+        self.stdout.write(self.style.SUCCESS('Creating generic markets: DONE'))

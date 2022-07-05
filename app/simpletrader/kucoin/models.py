@@ -3,6 +3,8 @@ from django.db import models
 from timescale.db.models.fields import TimescaleDateTimeField
 from timescale.db.models.managers import TimescaleManager
 
+from simpletrader.base.models import Exchange
+
 class Asset(models.IntegerChoices):
     usdt = 0
     btc = 1
@@ -73,16 +75,6 @@ class FuturesContract(models.Model):
         return Asset.futures_symbol(self.base_asset) + Asset.futures_symbol(self.quote_asset)
 
 
-class SpotOrderBook(models.Model):
-    market = models.ForeignKey(SpotMarket, on_delete=models.CASCADE)
-    time = TimescaleDateTimeField(interval='12 hour')
-    price = models.FloatField()
-    volume = models.FloatField()
-    is_bid = models.BooleanField()
-
-    objects = TimescaleManager()
-
-
 class SpotTrade(models.Model):
     market = models.ForeignKey(SpotMarket, on_delete=models.CASCADE)
     time = TimescaleDateTimeField(interval='24 hour')
@@ -93,18 +85,22 @@ class SpotTrade(models.Model):
     objects = TimescaleManager()
 
 
-class FuturesOrderBook(models.Model):
+class FuturesTrade(models.Model):
     market = models.ForeignKey(FuturesContract, on_delete=models.CASCADE)
-    time = TimescaleDateTimeField(interval='12 hour')
+    time = TimescaleDateTimeField(interval='24 hour')
     price = models.FloatField()
     volume = models.FloatField()
-    is_bid = models.BooleanField()
+    is_buyer_maker = models.BooleanField()
 
     objects = TimescaleManager()
 
 
-class FuturesTrade(models.Model):
-    market = models.ForeignKey(FuturesContract, on_delete=models.CASCADE)
+class Market(models.Model):
+    type = models.IntegerField(choices=Exchange.choices)
+    related_id = models.IntegerField()
+
+class Trade(models.Model):
+    market = models.ForeignKey(Market, on_delete=models.CASCADE)
     time = TimescaleDateTimeField(interval='24 hour')
     price = models.FloatField()
     volume = models.FloatField()
