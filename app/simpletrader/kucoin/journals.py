@@ -1,9 +1,5 @@
 from simpletrader.base.journals import Journal
-from simpletrader.kucoin.models import SpotOrderBook, SpotTrade, FuturesOrderBook, FuturesTrade
-
-class SpotOrderBookJournal(Journal):
-    class Meta:
-        model = SpotOrderBook
+from simpletrader.kucoin.models import Trade, SpotTrade, FuturesTrade
 
 
 class SpotTradeJournal(Journal):
@@ -11,12 +7,11 @@ class SpotTradeJournal(Journal):
         model = SpotTrade
 
 
-class FuturesOrderBookJournal(Journal):
-    class Meta:
-        model = FuturesOrderBook
-
-
 class FuturesTradeJournal(Journal):
     class Meta:
         model = FuturesTrade
 
+
+class TradeJournal(Journal):
+    class Meta:
+        model = Trade

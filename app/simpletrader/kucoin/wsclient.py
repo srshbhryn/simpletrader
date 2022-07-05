@@ -7,8 +7,9 @@ import tornado.ioloop
 from tornado.websocket import websocket_connect, WebSocketClientConnection
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPResponse
 
+from simpletrader.base.models import Exchange
 from simpletrader.base.journals import AsyncJournal
-from simpletrader.kucoin.models import SpotTrade, SpotMarket, FuturesTrade, FuturesContract
+from simpletrader.kucoin.models import SpotTrade, SpotMarket, FuturesTrade, FuturesContract, Trade, Market
 
 logger = logging.getLogger('django')
 
@@ -19,6 +20,10 @@ class SpotTradeJournal(AsyncJournal):
 class FuturesTradeJournal(AsyncJournal):
     class Meta:
         model = FuturesTrade
+
+class TradeJournal(AsyncJournal):
+    class Meta:
+        model = Trade
 
 
 def restart_on_exception(func):
@@ -48,7 +53,6 @@ class BaseCollector:
         assert self.symbol_to_market_id_map is not None
         assert self.journal is not None
         assert self.base_url is not None
-        assert self.topic_template is not None
         assert self.fetch_api_path_template is not None
         self.fetch_api_url_template = self.base_url + self.fetch_api_path_template
 
@@ -94,11 +98,10 @@ class BaseCollector:
 
     @restart_on_exception
     async def subscribe(self):
-        topic = self.topic_template.format(','.join(self.symbol_to_market_id_map))
         id = (lambda ts: ts + (17 - len(ts)) * '0')(str(time.time()).replace('.', ''))
         await self.connection.write_message(json.dumps({
             'id': id,
-            'topic': topic,
+            'topic': self.topic,
             'type': 'subscribe',
             'privateChannel': False,
             'response': True,
@@ -140,20 +143,25 @@ class BaseCollector:
     @restart_on_exception
     async def run_health_check(self):
         while True:
-            await asyncio.sleep(5)
+            await asyncio.sleep(8)
             assert self.loop.time() - self.last_msg_time <= 4
 
 
 class SpotTradesCollector(BaseCollector):
     def initialize(self):
-        self.journal = SpotTradeJournal()
+        self.journal = TradeJournal()
+        spot_markets = SpotMarket.objects.all()
+        symbols = [market.symbol for market in spot_markets]
+        self.topic = f'/market/match:{",".join(symbols)}'
+        markets = Market.objects.filter(type=Exchange.kucoin_spot).values_list('id', 'related_id')
         self.symbol_to_market_id_map = {
-            market.symbol: market.id
-            for market in SpotMarket.objects.all()
+            market.symbol: next(
+                (mr[0] for mr in markets if mr[1] == market.id)
+            )
+            for market in spot_markets
         }
         self.base_url = 'https://api.kucoin.com'
         self.fetch_api_path_template = '/api/v1/market/histories?symbol={}'
-        self.topic_template = '/market/match:{}'
 
     def serialize_data(self, data):
         return {
@@ -168,14 +176,19 @@ class SpotTradesCollector(BaseCollector):
 
 class FuturesTradesCollector(BaseCollector):
     def initialize(self):
-        self.journal = FuturesTradeJournal()
+        self.journal = TradeJournal()
+        futures_markets = FuturesContract.objects.all()
+        symbols = [futures_market.symbol for futures_market in futures_markets]
+        self.topic = f'/contractMarket/execution:{",".join(symbols)}'
+        markets = Market.objects.filter(type=Exchange.kucoin_futures).values_list('id', 'related_id')
         self.symbol_to_market_id_map = {
-            market.symbol: market.id
-            for market in FuturesContract.objects.all()
+            market.symbol: next(
+                (mr[0] for mr in markets if mr[1] == market.id)
+            )
+            for market in futures_markets
         }
         self.base_url = 'https://api-futures.kucoin.com'
         self.fetch_api_path_template = '/api/v1/trade/history?symbol={}'
-        self.topic_template = '/contractMarket/execution:{}'
 
     def serialize_data(self, data):
         return {
