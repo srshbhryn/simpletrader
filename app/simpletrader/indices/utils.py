@@ -3,14 +3,6 @@ from math import log2
 from celery import shared_task
 from simpletrader.indices.config import get_task_names
 
-from django.db.models import Func
-
-
-class Round(Func):
-    function = 'ROUND'
-    name = 'round'
-    template='%(function)s(%(expressions)s)'
-
 
 class register_task(object):
     def __init__(self, task_type):
