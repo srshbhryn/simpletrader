@@ -11,33 +11,34 @@ class BaseClient:
 
     API_URL = 'https://api.nobitex.ir/v2'
 
-    def __init__(self):
+    def __init__(self, token=None):
+        self.token = token
         self._init_session()
 
     def _init_session(self):
-        self.session = requests.Session()
+        self.public_session = requests.Session()
+        self.public_session.headers = self._public_headers
+        if self.token is not None:
+            self.private_session = requests.Session()
+            self.private_session.headers = {
+                **self._public_headers,
+                'Authorization': f'Token {self.token}',
 
-    def _init_headers(self):
-        headers = {
+            }
+        else:
+            self.private_session = None
+
+    @property
+    def _public_headers(self):
+        return {
             'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',  # noqa
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
         }
-        # if self.API_KEY:
-        #     assert self.API_KEY
-        #     headers['X-MBX-APIKEY'] = self.API_KEY
-        return headers
 
-
-    # def _create_api_uri(self, path: str, signed: bool = True, version: str = PUBLIC_API_VERSION) -> str:
-    #     url = self.API_URL
-    #     if self.testnet:
-    #         url = self.API_TESTNET_URL
-    #     v = self.PRIVATE_API_VERSION if signed else version
-    #     return url + '/' + v + '/' + path
 
 class MarketDataMixIn:
     def get_orderbook(self, symbol):
-        response  = self.session.get(self.API_URL+f'/orderbook/{symbol}')
+        response  = self.public_session.get(self.API_URL+f'/orderbook/{symbol}')
         response_json = json.loads(response.text)
         return {
             'bids': [
@@ -61,7 +62,7 @@ class MarketDataMixIn:
             limit 15 req/m
             no token required
         '''
-        response  = self.session.get(self.API_URL+f'/trades/{symbol}')
+        response  = self.public_session.get(self.API_URL+f'/trades/{symbol}')
         response_json = json.loads(response.text)
         return {
             'trades': [
