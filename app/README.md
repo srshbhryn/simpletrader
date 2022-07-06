@@ -17,3 +17,6 @@ celery multi start wrk_api db_ins -A simpletrader -l WARNING \
     -P:wrk_api gevent \
     --pidfile=/tmp/%n.pid --logfile=/tmp/%n%I.log \
     -Q:wrk_api api_call -Q:db_ins db_insert
+
+
+docker-compose up -d --force-recreate --no-deps --build service_name
