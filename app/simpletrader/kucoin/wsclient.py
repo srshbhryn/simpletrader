@@ -9,17 +9,9 @@ from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPResponse
 
 from simpletrader.base.models import Exchange
 from simpletrader.base.journals import AsyncJournal
-from simpletrader.kucoin.models import SpotTrade, SpotMarket, FuturesTrade, FuturesContract, Trade, Market
+from simpletrader.kucoin.models import SpotMarket, FuturesContract, Trade, Market
 
 logger = logging.getLogger('django')
-
-class SpotTradeJournal(AsyncJournal):
-    class Meta:
-        model = SpotTrade
-
-class FuturesTradeJournal(AsyncJournal):
-    class Meta:
-        model = FuturesTrade
 
 class TradeJournal(AsyncJournal):
     class Meta:
