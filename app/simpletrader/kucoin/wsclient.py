@@ -135,8 +135,8 @@ class BaseCollector:
     @restart_on_exception
     async def run_health_check(self):
         while True:
-            await asyncio.sleep(8)
-            assert self.loop.time() - self.last_msg_time <= 4
+            await asyncio.sleep(20)
+            assert self.loop.time() - self.last_msg_time <= 10
 
 
 class SpotTradesCollector(BaseCollector):
