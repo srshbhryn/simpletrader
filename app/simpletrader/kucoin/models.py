@@ -75,26 +75,6 @@ class FuturesContract(models.Model):
         return Asset.futures_symbol(self.base_asset) + Asset.futures_symbol(self.quote_asset)
 
 
-class SpotTrade(models.Model):
-    market = models.ForeignKey(SpotMarket, on_delete=models.CASCADE)
-    time = TimescaleDateTimeField(interval='24 hour')
-    price = models.FloatField()
-    volume = models.FloatField()
-    is_buyer_maker = models.BooleanField()
-
-    objects = TimescaleManager()
-
-
-class FuturesTrade(models.Model):
-    market = models.ForeignKey(FuturesContract, on_delete=models.CASCADE)
-    time = TimescaleDateTimeField(interval='24 hour')
-    price = models.FloatField()
-    volume = models.FloatField()
-    is_buyer_maker = models.BooleanField()
-
-    objects = TimescaleManager()
-
-
 class Market(models.Model):
     type = models.IntegerField(choices=Exchange.choices)
     related_id = models.IntegerField()
