@@ -1,10 +1,21 @@
 version: '3.8'
 
 services:
-  kucoin__store_trades:
+  simpletrader_base_image:
     build:
       context: ./app
-      dockerfile: Dockerfile.kucoin__store_trades
+      dockerfile: Dockerfile.simpletrader_base_image
+    image: simpletrader_base_image
+
+  simpletrader_image:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.simpletrader_image
+    image: simpletrader_image
+
+  kucoin__store_trades:
+    image: simpletrader_image
+    command: "./entrypoint.kucoin_store_trades.sh"
     restart: always
     environment:
       - DEBUG=true
@@ -13,10 +24,10 @@ services:
     depends_on:
       - journal_redis
       - timescale_db
+
   kucoin__collect_trades:
-    build:
-      context: ./app
-      dockerfile: Dockerfile.kucoin__collect_trades
+    image: simpletrader_image
+    command: "./entrypoint.kucoin_collect_trades.sh"
     restart: always
     environment:
       - DEBUG=true
