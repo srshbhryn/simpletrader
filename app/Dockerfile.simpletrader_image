@@ -1,5 +1,8 @@
 FROM simpletrader_base_image
 
+RUN mkdir
+WORKDIR /app
+
 COPY . .
 RUN pip install -r requirements.txt
 RUN chmod +x ./entrypoint.*.sh
