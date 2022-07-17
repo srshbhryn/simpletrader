@@ -1,11 +1,5 @@
 from simpletrader.base.journals import Journal
-from simpletrader.nobitex.models import Order, Trade
 
-class OrderJournal(Journal):
-    class Meta:
-        model = Order
-        rotate_period = 40
+from simpletrader.kucoin.models import Trade
+from simpletrader.kucoin.journals import TradeJournal
 
-class TradeJournal(Journal):
-    class Meta:
-        model = Trade

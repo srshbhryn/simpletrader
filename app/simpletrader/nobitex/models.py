@@ -1,7 +1,5 @@
 from django.db import models
 
-from timescale.db.models.fields import TimescaleDateTimeField
-
 
 class Market(models.Model):
     base_asset = models.CharField(max_length=8)
@@ -14,21 +12,3 @@ class Market(models.Model):
     def __str__(self):
         return self.symbol
 
-
-class Order(models.Model):
-    market = models.ForeignKey(Market, on_delete=models.CASCADE)
-    time = TimescaleDateTimeField(interval='6 hour')
-    price = models.FloatField()
-    volume = models.FloatField()
-    is_bid = models.BooleanField()
-
-    def __str__(self):
-        return f'{self.market.symbol} {self.time}'
-
-
-class Trade(models.Model):
-    market = models.ForeignKey(Market, on_delete=models.CASCADE)
-    time = TimescaleDateTimeField(interval='1 hour')
-    price = models.FloatField()
-    volume = models.FloatField()
-    is_buyer_maker =models.BooleanField()
