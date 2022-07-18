@@ -37,6 +37,18 @@ services:
       - journal_redis
       - timescale_db
 
+  nobitex__collect_trades:
+    image: simpletrader_image
+    command: "./entrypoint.nobitex_collect_trades.sh"
+    restart: always
+    environment:
+      - DEBUG=true
+      - TIMESCALE_DB_PASSWORD=simpletrader_ts
+      - DEFAULT_DB_PASSWORD=simpletrader_default
+    depends_on:
+      - journal_redis
+      - timescale_db
+
   journal_redis:
     image: redis
     restart: always
