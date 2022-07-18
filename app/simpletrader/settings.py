@@ -1,4 +1,4 @@
-import os, json
+import os, json, sys
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -114,6 +114,11 @@ LOGGING = {
             'level': 'ERROR',
             'include_html': True,
         },
+        'console':{
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout
+        },
         'logfile': {
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': LOGDIR + 'simpletrader.log',
@@ -132,12 +137,12 @@ LOGGING = {
             'propagate': True,
         },
         'django': {
-            'handlers': ['logfile'],
+            'handlers': ['console'] if not DEBUG else ['logfile'],
             'level': 'DEBUG' if DEBUG else 'WARNING',
             'propagate': False,
         },
         'django.db.backends': {
-            'handlers': ['logfile_q'],
+            'handlers': ['console'] if not DEBUG else ['logfile_q'],
             'level': 'DEBUG' if DEBUG else 'WARNING',
             'propagate': False,
         },
