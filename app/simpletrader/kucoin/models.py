@@ -6,6 +6,7 @@ from timescale.db.models.managers import TimescaleManager
 from simpletrader.base.models import Exchange
 
 class Asset(models.IntegerChoices):
+    irt = -1
     usdt = 0
     btc = 1
     eth = 2
