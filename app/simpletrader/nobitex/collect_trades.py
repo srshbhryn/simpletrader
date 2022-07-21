@@ -32,7 +32,10 @@ class TradeCollector:
     def run(self):
         sleep_time = 5 / len(self.nbx_market_id_to_market_id_maps)
         for nmid in self.nbx_market_id_to_market_id_maps:
-            self.collect_trades(nmid)
+            try:
+                self.collect_trades(nmid)
+            except Exception as e:
+                logger.info(e)
             time.sleep(sleep_time)
 
     def _serialize_trade(self, obj):

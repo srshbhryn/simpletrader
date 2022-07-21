@@ -16,5 +16,3 @@ class Command(BaseCommand):
                 tc.run()
             except KeyboardInterrupt:
                 return
-            except Exception as e:
-                logger.error(e)
