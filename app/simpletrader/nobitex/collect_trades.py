@@ -39,9 +39,16 @@ class TradeCollector:
             time.sleep(sleep_time)
 
     def _serialize_trade(self, obj):
+        price_parts = str(obj['price']).split('.')
+        if len(price_parts) == 0:
+            price_parts.append(['0'])
+        if len(price_parts[0]) < 10:
+            price_parts[0] = price_parts[0] + (10 - len(price_parts[0])) * '0'
+        if len(price_parts[1]) < 10:
+            price_parts[1] = (10 - len(price_parts[1])) * '0' + price_parts[1]
         sort_field = str(obj['time']) + (
             '0' if obj['is_buy'] else '1'
-        ) + str(obj['price']).replace('.', '')
+        ) + price_parts[1] + price_parts[0]
         return({
             'market_id': obj['market_id'],
             'time': obj['time'],
