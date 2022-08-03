@@ -1,6 +1,14 @@
 version: '3.8'
 
 services:
+  autoheal:
+    restart: always
+    image: willfarrell/autoheal
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
   simpletrader_base_image:
     build:
       context: ./app
@@ -48,6 +56,12 @@ services:
     depends_on:
       - journal_redis
       - timescale_db
+    healthcheck:
+      test: ["CMD", "/app/manage.py", "nobitex__collect_trades_healthcheck"]
+      interval: 10s
+      timeout: 2s
+      retries: 1
+      start_period: 10s
 
   journal_redis:
     image: redis
