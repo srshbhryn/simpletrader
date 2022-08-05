@@ -26,7 +26,6 @@ class Command(BaseCommand):
         max_trade_time = Trade.objects.filter(
             market_id=market_id
         ).aggregate(max_trade_time=Max('time'))['max_trade_time']
-        logger.info(now() - max_trade_time)
         if now() - max_trade_time > timedelta(seconds=60):
             sys.exit(1)
         sys.exit(0)
