@@ -13,3 +13,8 @@ kucoin_spot_markets = [
     Market('3', 'BTC-USDT'),
     Market('4', 'ETH-USDT'),
 ]
+
+kucoin_futures_markets = [
+    Market('5', 'XBTUSDTM'),
+    Market('6', 'ETHUSDTM'),
+]

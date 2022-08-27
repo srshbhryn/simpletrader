@@ -6,12 +6,14 @@ import tornado.ioloop
 from tornado.websocket import websocket_connect, WebSocketClientConnection
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPResponse
 
-from bookwatch.markets import kucoin_spot_markets
+from bookwatch.markets import kucoin_spot_markets, kucoin_futures_markets
 from bookwatch.clients.redis import redis
 from bookwatch.clients.utils import restart_on_exception
 
 class BaseKucoin:
     base_url = None
+    topic_template = None
+    markets = None
 
     def __init__(self):
         self.http_client = AsyncHTTPClient()
@@ -21,9 +23,9 @@ class BaseKucoin:
         self.last_msg_time = None
         self.symbol_to_id_map = {
             m.symbol: m.id
-            for m in kucoin_spot_markets
+            for m in self.markets
         }
-        self.topic = ','.join([m.symbol for m in kucoin_spot_markets])
+        self.topic = self.topic_template.format(','.join([m.symbol for m in self.markets]))
 
     async def restart(self):
         await asyncio.sleep(.1)
@@ -39,7 +41,6 @@ class BaseKucoin:
 
     async def _get_socket_url(self):
         response: HTTPResponse  = await self.http_client.fetch(HTTPRequest(
-            # url=f'{self.base_url}/api/v1/bullet-public',
             url=f'{self.base_url}/api/v1/bullet-public',
             method='POST',
             body=None,
@@ -65,7 +66,7 @@ class BaseKucoin:
         id = (lambda ts: ts + (17 - len(ts)) * '0')(str(time.time()).replace('.', ''))
         await self.connection.write_message(json.dumps({
             'id': id,
-            'topic': '/market/ticker:' + self.topic,
+            'topic': self.topic,
             'type': 'subscribe',
             'privateChannel': False,
             'response': True,
@@ -85,19 +86,17 @@ class BaseKucoin:
             message = json.loads(message)
             symbol = message['topic'].split(':')[1]
             data = message['data']
-            data = ','.join([
-                    str(data['time']),
-                    data['bestAsk'],
-                    data['bestAskSize'],
-                    data['bestBid'],
-                    data['bestBidSize'],
-                ])
+            print(message)
+            data = self.serialize(data)
 
             self.loop.add_callback(
                 redis.set,
                 name=self.symbol_to_id_map[symbol],
                 value=data,
             )
+
+    def serialize(self, data):
+        raise NotImplementedError()
 
     @restart_on_exception
     async def run_health_check(self):
@@ -108,3 +107,28 @@ class BaseKucoin:
 
 class KucoinSpot(BaseKucoin):
     base_url = 'https://api.kucoin.com'
+    topic_template = '/market/ticker:{}'
+    markets = kucoin_spot_markets
+    def serialize(self, data):
+        return ','.join([
+            str(data['time']),
+            data['bestAsk'],
+            data['bestAskSize'],
+            data['bestBid'],
+            data['bestBidSize'],
+        ])
+
+class KucoinFutures(BaseKucoin):
+    base_url = 'https://api-futures.kucoin.com'
+    topic_template = '/contractMarket/tickerV2:{}'
+    markets = kucoin_futures_markets
+
+    def serialize(self, data):
+        ts = str(data['ts'])[:13]
+        return ','.join([
+            ts,
+            data['bestAskPrice'],
+            str(data['bestAskSize']),
+            data['bestBidPrice'],
+            str(data['bestBidSize']),
+        ])
