@@ -2,7 +2,6 @@ import json
 from asyncio import sleep
 
 import tornado.ioloop
-from tornado import httpserver
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPResponse
 
 from bookwatch.markets import nobitex_markets

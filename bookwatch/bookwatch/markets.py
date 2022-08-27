@@ -9,3 +9,7 @@ nobitex_markets = [
     Market('2', 'BTCUSDT'),
 ]
 
+kucoin_spot_markets = [
+    Market('3', 'BTC-USDT'),
+    Market('4', 'ETH-USDT'),
+]
