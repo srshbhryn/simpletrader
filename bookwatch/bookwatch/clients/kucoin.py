@@ -86,7 +86,6 @@ class BaseKucoin:
             message = json.loads(message)
             symbol = message['topic'].split(':')[1]
             data = message['data']
-            print(message)
             data = self.serialize(data)
 
             self.loop.add_callback(
