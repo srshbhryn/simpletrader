@@ -21,6 +21,18 @@ services:
       dockerfile: Dockerfile.simpletrader_image
     image: simpletrader_image
 
+  bookwatch_base_image:
+    build:
+      context: ./bookwatch
+      dockerfile: Dockerfile.bookwatch_base_image
+    image: bookwatch_base_image
+
+  bookwatch_image:
+    build:
+      context: ./bookwatch
+      dockerfile: Dockerfile.bookwatch_image
+    image: bookwatch_image
+
   kucoin__store_trades:
     image: simpletrader_image
     command: "./entrypoint.kucoin_store_trades.sh"
@@ -45,6 +57,15 @@ services:
       - journal_redis
       - timescale_db
 
+  bookwatch:
+    image: bookwatch_image
+    command: "python main.py"
+    environment:
+      - ENV=PROD
+    restart: always
+    depends_on:
+      - bookwatch_redis
+
   nobitex__collect_trades:
     image: simpletrader_image
     command: "./entrypoint.nobitex_collect_trades.sh"
@@ -64,15 +85,19 @@ services:
       start_period: 60s
 
   journal_redis:
-    image: redis
+    image: redis:7.0.4-alpine
     restart: always
 
   cache_redis:
-    image: redis
+    image: redis:7.0.4-alpine
     restart: always
 
   celery_redis:
-    image: redis
+    image: redis:7.0.4-alpine
+    restart: always
+
+  bookwatch_redis:
+    image: redis:7.0.4-alpine
     restart: always
 
   default_db:
