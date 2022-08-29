@@ -120,6 +120,18 @@ services:
       - POSTGRES_PASSWORD=simpletrader_ts
       - POSTGRES_DB=simpletrader_ts
 
+  traderdb:
+    image: timescale/timescaledb:latest-pg14
+    restart: always
+    volumes:
+      - traderdb_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=traderdb
+      - POSTGRES_PASSWORD=traderdb
+      - POSTGRES_DB=traderdb
+
+
 volumes:
   postgres_data:
   timescale_data:
+  traderdb_data:

@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'simpletrader.nobitex',
     'simpletrader.kucoin',
     # 'simpletrader.indices',
+    'simpletrader.trader',
 ]
 
 MIDDLEWARE = [
@@ -78,7 +79,15 @@ DATABASES = {
         'PASSWORD': os.getenv('TIMESCALE_DB_PASSWORD'),
         'HOST': os.getenv('TIMESCALE_DB_HOST', 'timescale_db'),
         'PORT': os.getenv('TIMESCALE_DB_PORT', '5432'),
-    }
+    },
+    'traderdb': {
+        'ENGINE': 'timescale.db.backends.postgresql',
+        'NAME': 'traderdb',
+        'USER': 'traderdb',
+        'PASSWORD': 'traderdb',
+        'HOST': 'traderdb',
+        'PORT': '5432',
+    },
 }
 DB_ROUTING = {
     'timescale': [
@@ -86,6 +95,9 @@ DB_ROUTING = {
         'kucoin',
         'indices',
     ],
+    'traderdb': [
+        'trader',
+    ]
 }
 DEFAULT_DB = 'default'
 DATABASE_ROUTERS = ['simpletrader.db_router.Router',]
