@@ -8,6 +8,8 @@ from timescale.db.models.fields import TimescaleDateTimeField
 from simpletrader.celery import app
 from simpletrader.indices.config import Type, get_task_names
 
+from .materialized_models import CandleStick_05m
+
 cache = caches['index_manager']
 
 

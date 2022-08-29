@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     #
     'simpletrader.nobitex',
     'simpletrader.kucoin',
-    'simpletrader.indices',
+    # 'simpletrader.indices',
 ]
 
 MIDDLEWARE = [
