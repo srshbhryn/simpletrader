@@ -1,20 +1,24 @@
+from bookwatch.sharedconfigs import MARKETS, Exchange
 
-class Market:
+class WatchMarket:
     def __init__(self, id: str, symbol: str) -> None:
         self.id = id
         self.symbol = symbol
 
 nobitex_markets = [
-    Market('1', 'BTCIRT'),
-    Market('2', 'BTCUSDT'),
+    WatchMarket(str(m.id), m.symbol)
+    for m in MARKETS
+    if m.exchange == Exchange.get_by('name', 'nobitex')
 ]
 
 kucoin_spot_markets = [
-    Market('3', 'BTC-USDT'),
-    Market('4', 'ETH-USDT'),
+    WatchMarket(str(m.id), m.symbol)
+    for m in MARKETS
+    if m.exchange == Exchange.get_by('name', 'kucoin_spot')
 ]
 
 kucoin_futures_markets = [
-    Market('5', 'XBTUSDTM'),
-    Market('6', 'ETHUSDTM'),
+    WatchMarket(str(m.id), m.symbol)
+    for m in MARKETS
+    if m.exchange == Exchange.get_by('name', 'kucoin_futures')
 ]

@@ -62,7 +62,10 @@ services:
     command: "python main.py"
     environment:
       - ENV=PROD
+      - CONFIG_DIR=/sharedconfs/
     restart: always
+    volumes:
+      - ./configs/shared/:/sharedconfs/
     depends_on:
       - bookwatch_redis
 
