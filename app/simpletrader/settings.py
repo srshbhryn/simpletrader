@@ -259,6 +259,7 @@ CELERY_TASK_ROUTES = {
     'kucoin_index.manage.*': {'queue': 'idx_man'},
     'kucoin_index.hp_compute.*': {'queue': 'idx_hp'},
     'kucoin_index.lp_compute.*': {'queue': 'idx_lp'},
+    'trader.*': {'queue': 'trader'},
 }
 
 

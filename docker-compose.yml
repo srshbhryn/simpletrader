@@ -127,6 +127,31 @@ services:
       - POSTGRES_PASSWORD=traderdb
       - POSTGRES_DB=traderdb
 
+  goapp_base_image:
+    build:
+      context: ./goapp
+      dockerfile: Dockerfile.base_image
+    image: goapp_base_image
+
+  bot0_image:
+    build:
+      context: ./goapp
+      dockerfile: Dockerfile.bot0_image
+    image: bot0_image
+
+  bot0:
+    image: bot0_image
+    command: "./bot0"
+    # environment:
+    #   - BOOKWATCH_REDIS=
+    #   - CELERY_REDIS=
+    #   - CONFIG_DIR=/sharedconfs/
+    # restart: always
+    # volumes:
+    #   - ./configs/shared/:/sharedconfs/
+    # depends_on:
+    #   - bookwatch_redis
+
 
 volumes:
   postgres_data:
