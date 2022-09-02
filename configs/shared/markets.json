@@ -1,0 +1,427 @@
+[{
+    "id": 1,
+    "exchange_id": 2,
+    "base_asset_id": 1,
+    "quote_asset_id": 0,
+    "symbol": "BTC-USDT"
+}, {
+    "id": 2,
+    "exchange_id": 2,
+    "base_asset_id": 2,
+    "quote_asset_id": 0,
+    "symbol": "ETH-USDT"
+}, {
+    "id": 3,
+    "exchange_id": 2,
+    "base_asset_id": 3,
+    "quote_asset_id": 0,
+    "symbol": "LTC-USDT"
+}, {
+    "id": 4,
+    "exchange_id": 2,
+    "base_asset_id": 4,
+    "quote_asset_id": 0,
+    "symbol": "XRP-USDT"
+}, {
+    "id": 5,
+    "exchange_id": 2,
+    "base_asset_id": 5,
+    "quote_asset_id": 0,
+    "symbol": "BCH-USDT"
+}, {
+    "id": 7,
+    "exchange_id": 2,
+    "base_asset_id": 6,
+    "quote_asset_id": 0,
+    "symbol": "BNB-USDT"
+}, {
+    "id": 9,
+    "exchange_id": 2,
+    "base_asset_id": 7,
+    "quote_asset_id": 0,
+    "symbol": "EOS-USDT"
+}, {
+    "id": 11,
+    "exchange_id": 2,
+    "base_asset_id": 8,
+    "quote_asset_id": 0,
+    "symbol": "XLM-USDT"
+}, {
+    "id": 13,
+    "exchange_id": 2,
+    "base_asset_id": 9,
+    "quote_asset_id": 0,
+    "symbol": "ETC-USDT"
+}, {
+    "id": 15,
+    "exchange_id": 2,
+    "base_asset_id": 10,
+    "quote_asset_id": 0,
+    "symbol": "TRX-USDT"
+}, {
+    "id": 17,
+    "exchange_id": 2,
+    "base_asset_id": 11,
+    "quote_asset_id": 0,
+    "symbol": "DOGE-USDT"
+}, {
+    "id": 19,
+    "exchange_id": 2,
+    "base_asset_id": 12,
+    "quote_asset_id": 0,
+    "symbol": "UNI-USDT"
+}, {
+    "id": 21,
+    "exchange_id": 2,
+    "base_asset_id": 13,
+    "quote_asset_id": 0,
+    "symbol": "LINK-USDT"
+}, {
+    "id": 23,
+    "exchange_id": 2,
+    "base_asset_id": 14,
+    "quote_asset_id": 0,
+    "symbol": "DOT-USDT"
+}, {
+    "id": 25,
+    "exchange_id": 2,
+    "base_asset_id": 15,
+    "quote_asset_id": 0,
+    "symbol": "AAVE-USDT"
+}, {
+    "id": 27,
+    "exchange_id": 2,
+    "base_asset_id": 16,
+    "quote_asset_id": 0,
+    "symbol": "ADA-USDT"
+}, {
+    "id": 29,
+    "exchange_id": 2,
+    "base_asset_id": 17,
+    "quote_asset_id": 0,
+    "symbol": "SHIB-USDT"
+}, {
+    "id": 31,
+    "exchange_id": 2,
+    "base_asset_id": 18,
+    "quote_asset_id": 0,
+    "symbol": "FTM-USDT"
+}, {
+    "id": 33,
+    "exchange_id": 2,
+    "base_asset_id": 19,
+    "quote_asset_id": 0,
+    "symbol": "MATIC-USDT"
+}, {
+    "id": 35,
+    "exchange_id": 2,
+    "base_asset_id": 20,
+    "quote_asset_id": 0,
+    "symbol": "AXS-USDT"
+}, {
+    "id": 37,
+    "exchange_id": 2,
+    "base_asset_id": 21,
+    "quote_asset_id": 0,
+    "symbol": "MANA-USDT"
+}, {
+    "id": 39,
+    "exchange_id": 2,
+    "base_asset_id": 22,
+    "quote_asset_id": 0,
+    "symbol": "SAND-USDT"
+}, {
+    "id": 41,
+    "exchange_id": 3,
+    "base_asset_id": 1,
+    "quote_asset_id": 0,
+    "symbol": "XBTUSDTM"
+}, {
+    "id": 43,
+    "exchange_id": 3,
+    "base_asset_id": 2,
+    "quote_asset_id": 0,
+    "symbol": "ETHUSDTM"
+}, {
+    "id": 45,
+    "exchange_id": 3,
+    "base_asset_id": 3,
+    "quote_asset_id": 0,
+    "symbol": "LTCUSDTM"
+}, {
+    "id": 47,
+    "exchange_id": 3,
+    "base_asset_id": 4,
+    "quote_asset_id": 0,
+    "symbol": "XRPUSDTM"
+}, {
+    "id": 49,
+    "exchange_id": 3,
+    "base_asset_id": 5,
+    "quote_asset_id": 0,
+    "symbol": "BCHUSDTM"
+}, {
+    "id": 51,
+    "exchange_id": 3,
+    "base_asset_id": 6,
+    "quote_asset_id": 0,
+    "symbol": "BNBUSDTM"
+}, {
+    "id": 53,
+    "exchange_id": 3,
+    "base_asset_id": 7,
+    "quote_asset_id": 0,
+    "symbol": "EOSUSDTM"
+}, {
+    "id": 55,
+    "exchange_id": 3,
+    "base_asset_id": 8,
+    "quote_asset_id": 0,
+    "symbol": "XLMUSDTM"
+}, {
+    "id": 57,
+    "exchange_id": 3,
+    "base_asset_id": 9,
+    "quote_asset_id": 0,
+    "symbol": "ETCUSDTM"
+}, {
+    "id": 59,
+    "exchange_id": 3,
+    "base_asset_id": 10,
+    "quote_asset_id": 0,
+    "symbol": "TRXUSDTM"
+}, {
+    "id": 61,
+    "exchange_id": 3,
+    "base_asset_id": 11,
+    "quote_asset_id": 0,
+    "symbol": "DOGEUSDTM"
+}, {
+    "id": 63,
+    "exchange_id": 3,
+    "base_asset_id": 12,
+    "quote_asset_id": 0,
+    "symbol": "UNIUSDTM"
+}, {
+    "id": 65,
+    "exchange_id": 3,
+    "base_asset_id": 13,
+    "quote_asset_id": 0,
+    "symbol": "LINKUSDTM"
+}, {
+    "id": 67,
+    "exchange_id": 3,
+    "base_asset_id": 14,
+    "quote_asset_id": 0,
+    "symbol": "DOTUSDTM"
+}, {
+    "id": 69,
+    "exchange_id": 3,
+    "base_asset_id": 15,
+    "quote_asset_id": 0,
+    "symbol": "AAVEUSDTM"
+}, {
+    "id": 71,
+    "exchange_id": 3,
+    "base_asset_id": 16,
+    "quote_asset_id": 0,
+    "symbol": "ADAUSDTM"
+}, {
+    "id": 73,
+    "exchange_id": 3,
+    "base_asset_id": 17,
+    "quote_asset_id": 0,
+    "symbol": "SHIBUSDTM"
+}, {
+    "id": 75,
+    "exchange_id": 3,
+    "base_asset_id": 18,
+    "quote_asset_id": 0,
+    "symbol": "FTMUSDTM"
+}, {
+    "id": 77,
+    "exchange_id": 3,
+    "base_asset_id": 19,
+    "quote_asset_id": 0,
+    "symbol": "MATICUSDTM"
+}, {
+    "id": 79,
+    "exchange_id": 3,
+    "base_asset_id": 20,
+    "quote_asset_id": 0,
+    "symbol": "AXSUSDTM"
+}, {
+    "id": 81,
+    "exchange_id": 3,
+    "base_asset_id": 21,
+    "quote_asset_id": 0,
+    "symbol": "MANAUSDTM"
+}, {
+    "id": 83,
+    "exchange_id": 3,
+    "base_asset_id": 22,
+    "quote_asset_id": 0,
+    "symbol": "SANDUSDTM"
+}, {
+    "id": 84,
+    "exchange_id": 1,
+    "base_asset_id": 1,
+    "quote_asset_id": -1,
+    "symbol": "BTCIRT"
+}, {
+    "id": 85,
+    "exchange_id": 1,
+    "base_asset_id": 2,
+    "quote_asset_id": -1,
+    "symbol": "ETHIRT"
+}, {
+    "id": 86,
+    "exchange_id": 1,
+    "base_asset_id": 3,
+    "quote_asset_id": -1,
+    "symbol": "LTCIRT"
+}, {
+    "id": 87,
+    "exchange_id": 1,
+    "base_asset_id": 4,
+    "quote_asset_id": -1,
+    "symbol": "XRPIRT"
+}, {
+    "id": 88,
+    "exchange_id": 1,
+    "base_asset_id": 5,
+    "quote_asset_id": -1,
+    "symbol": "BCHIRT"
+}, {
+    "id": 89,
+    "exchange_id": 1,
+    "base_asset_id": 6,
+    "quote_asset_id": -1,
+    "symbol": "BNBIRT"
+}, {
+    "id": 90,
+    "exchange_id": 1,
+    "base_asset_id": 7,
+    "quote_asset_id": -1,
+    "symbol": "EOSIRT"
+}, {
+    "id": 91,
+    "exchange_id": 1,
+    "base_asset_id": 8,
+    "quote_asset_id": -1,
+    "symbol": "XLMIRT"
+}, {
+    "id": 92,
+    "exchange_id": 1,
+    "base_asset_id": 9,
+    "quote_asset_id": -1,
+    "symbol": "ETCIRT"
+}, {
+    "id": 93,
+    "exchange_id": 1,
+    "base_asset_id": 10,
+    "quote_asset_id": -1,
+    "symbol": "TRXIRT"
+}, {
+    "id": 94,
+    "exchange_id": 1,
+    "base_asset_id": 11,
+    "quote_asset_id": -1,
+    "symbol": "DOGEIRT"
+}, {
+    "id": 95,
+    "exchange_id": 1,
+    "base_asset_id": 12,
+    "quote_asset_id": -1,
+    "symbol": "UNIIRT"
+}, {
+    "id": 96,
+    "exchange_id": 1,
+    "base_asset_id": 15,
+    "quote_asset_id": -1,
+    "symbol": "AAVEIRT"
+}, {
+    "id": 97,
+    "exchange_id": 1,
+    "base_asset_id": 0,
+    "quote_asset_id": -1,
+    "symbol": "USDTIRT"
+}, {
+    "id": 98,
+    "exchange_id": 1,
+    "base_asset_id": 1,
+    "quote_asset_id": 0,
+    "symbol": "BTCUSDT"
+}, {
+    "id": 99,
+    "exchange_id": 1,
+    "base_asset_id": 2,
+    "quote_asset_id": 0,
+    "symbol": "ETHUSDT"
+}, {
+    "id": 100,
+    "exchange_id": 1,
+    "base_asset_id": 3,
+    "quote_asset_id": 0,
+    "symbol": "LTCUSDT"
+}, {
+    "id": 101,
+    "exchange_id": 1,
+    "base_asset_id": 4,
+    "quote_asset_id": 0,
+    "symbol": "XRPUSDT"
+}, {
+    "id": 102,
+    "exchange_id": 1,
+    "base_asset_id": 5,
+    "quote_asset_id": 0,
+    "symbol": "BCHUSDT"
+}, {
+    "id": 103,
+    "exchange_id": 1,
+    "base_asset_id": 6,
+    "quote_asset_id": 0,
+    "symbol": "BNBUSDT"
+}, {
+    "id": 104,
+    "exchange_id": 1,
+    "base_asset_id": 7,
+    "quote_asset_id": 0,
+    "symbol": "EOSUSDT"
+}, {
+    "id": 105,
+    "exchange_id": 1,
+    "base_asset_id": 8,
+    "quote_asset_id": 0,
+    "symbol": "XLMUSDT"
+}, {
+    "id": 106,
+    "exchange_id": 1,
+    "base_asset_id": 9,
+    "quote_asset_id": 0,
+    "symbol": "ETCUSDT"
+}, {
+    "id": 107,
+    "exchange_id": 1,
+    "base_asset_id": 10,
+    "quote_asset_id": 0,
+    "symbol": "TRXUSDT"
+}, {
+    "id": 108,
+    "exchange_id": 1,
+    "base_asset_id": 11,
+    "quote_asset_id": 0,
+    "symbol": "DOGEUSDT"
+}, {
+    "id": 109,
+    "exchange_id": 1,
+    "base_asset_id": 12,
+    "quote_asset_id": 0,
+    "symbol": "UNIUSDT"
+}, {
+    "id": 110,
+    "exchange_id": 1,
+    "base_asset_id": 15,
+    "quote_asset_id": 0,
+    "symbol": "AAVEUSDT"
+}]

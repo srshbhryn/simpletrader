@@ -1,0 +1,13 @@
+[{
+        "id": 1,
+        "name": "nobitex"
+    },
+    {
+        "id": 2,
+        "name": "kucoin_spot"
+    },
+    {
+        "id": 3,
+        "name": "kucoin_futures"
+    }
+]

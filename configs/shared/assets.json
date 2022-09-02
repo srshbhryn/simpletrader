@@ -1,0 +1,73 @@
+[{
+    "id": -1,
+    "name": "irt"
+}, {
+    "id": 0,
+    "name": "usdt"
+}, {
+    "id": 1,
+    "name": "btc"
+}, {
+    "id": 2,
+    "name": "eth"
+}, {
+    "id": 3,
+    "name": "ltc"
+}, {
+    "id": 4,
+    "name": "xrp"
+}, {
+    "id": 5,
+    "name": "bch"
+}, {
+    "id": 6,
+    "name": "bnb"
+}, {
+    "id": 7,
+    "name": "eos"
+}, {
+    "id": 8,
+    "name": "xlm"
+}, {
+    "id": 9,
+    "name": "etc"
+}, {
+    "id": 10,
+    "name": "trx"
+}, {
+    "id": 11,
+    "name": "doge"
+}, {
+    "id": 12,
+    "name": "uni"
+}, {
+    "id": 13,
+    "name": "link"
+}, {
+    "id": 14,
+    "name": "dot"
+}, {
+    "id": 15,
+    "name": "aave"
+}, {
+    "id": 16,
+    "name": "ada"
+}, {
+    "id": 17,
+    "name": "shib"
+}, {
+    "id": 18,
+    "name": "ftm"
+}, {
+    "id": 19,
+    "name": "matic"
+}, {
+    "id": 20,
+    "name": "axs"
+}, {
+    "id": 21,
+    "name": "mana"
+}, {
+    "id": 22,
+    "name": "sand"
+}]
