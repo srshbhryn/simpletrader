@@ -38,9 +38,7 @@ services:
     command: "./entrypoint.kucoin_store_trades.sh"
     restart: always
     environment:
-      - DEBUG=true
-      - TIMESCALE_DB_PASSWORD=simpletrader_ts
-      - DEFAULT_DB_PASSWORD=simpletrader_default
+      - DEBUG=0
     depends_on:
       - journal_redis
       - timescale_db
@@ -50,9 +48,7 @@ services:
     command: "./entrypoint.kucoin_collect_trades.sh"
     restart: always
     environment:
-      - DEBUG=true
-      - TIMESCALE_DB_PASSWORD=simpletrader_ts
-      - DEFAULT_DB_PASSWORD=simpletrader_default
+      - DEBUG=0
     depends_on:
       - journal_redis
       - timescale_db
@@ -74,9 +70,7 @@ services:
     command: "./entrypoint.nobitex_collect_trades.sh"
     restart: always
     environment:
-      - DEBUG=true
-      - TIMESCALE_DB_PASSWORD=simpletrader_ts
-      - DEFAULT_DB_PASSWORD=simpletrader_default
+      - DEBUG=0
     depends_on:
       - journal_redis
       - timescale_db

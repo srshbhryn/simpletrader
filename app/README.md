@@ -20,3 +20,16 @@ celery multi start wrk_api db_ins -A simpletrader -l WARNING \
 
 
 docker-compose up -d --force-recreate --no-deps --build service_name
+
+#dev db:
+  timescale_db:
+    image: timescale/timescaledb:latest-pg14
+    restart: always
+    volumes:
+      - timescale_data:/var/lib/postgresql/data/
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=simpletrader
+      - POSTGRES_PASSWORD=simpletrader
+      - POSTGRES_DB=simpletrader

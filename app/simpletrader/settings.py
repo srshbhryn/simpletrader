@@ -1,13 +1,13 @@
-import os, json, sys
+import os
+import sys
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 SECRET_KEY = os.getenv('SECRET_KEY', 'asfiug23bi2u3bg23')
 DEBUG = os.getenv('DEBUG', '0') == '1'
 
-ALLOWED_HOSTS = ['*'] if DEBUG else os.getenv('ALLOWED_HOSTS')
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -66,19 +66,19 @@ WSGI_APPLICATION = 'simpletrader.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('DEFAULT_DB_NAME', 'simpletrader_default'),
-        'USER': os.getenv('DEFAULT_DB_USER', 'simpletrader_default'),
-        'PASSWORD': os.getenv('DEFAULT_DB_PASSWORD'),
-        'HOST': os.getenv('DEFAULT_DB_HOST', 'default_db'),
-        'PORT': os.getenv('DEFAULT_DB_PORT', '5432'),
+        'NAME': 'simpletrader_default',
+        'USER': 'simpletrader_default',
+        'PASSWORD': 'simpletrader_default',
+        'HOST': 'default_db',
+        'PORT': '5432',
     },
     'timescale': {
         'ENGINE': 'timescale.db.backends.postgresql',
-        'NAME': os.getenv('TIMESCALE_DB_NAME', 'simpletrader_ts'),
-        'USER': os.getenv('TIMESCALE_DB_USER', 'simpletrader_ts'),
-        'PASSWORD': os.getenv('TIMESCALE_DB_PASSWORD'),
-        'HOST': os.getenv('TIMESCALE_DB_HOST', 'timescale_db'),
-        'PORT': os.getenv('TIMESCALE_DB_PORT', '5432'),
+        'NAME': 'simpletrader_ts',
+        'USER': 'simpletrader_ts',
+        'PASSWORD': 'simpletrader_ts',
+        'HOST': 'timescale_db',
+        'PORT': '5432',
     },
     'traderdb': {
         'ENGINE': 'timescale.db.backends.postgresql',
@@ -89,6 +89,17 @@ DATABASES = {
         'PORT': '5432',
     },
 }
+if DEBUG:
+    for db in DATABASES:
+        DATABASES[db] = {
+            'ENGINE': 'timescale.db.backends.postgresql',
+            'NAME': 'simpletrader_ts',
+            'USER': 'simpletrader_ts',
+            'PASSWORD': 'simpletrader_ts',
+            'HOST': '127.0.0.1',
+            'PORT': '5433',
+        }
+
 DB_ROUTING = {
     'timescale': [
         'nobitex',
@@ -190,17 +201,30 @@ STATIC_ROOT = os.getenv('STATIC_ROOT', '/srv/www/simpletrader/static/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-JOURNAL_REDIS_HOST = os.getenv('JOURNAL_REDIS_HOST', 'journal_redis')
-JOURNAL_REDIS_PORT = os.getenv('JOURNAL_REDIS_PORT', '6379')
+JOURNAL_REDIS_HOST = 'journal_redis'
+JOURNAL_REDIS_PORT = '6379'
 JOURNAL_REDIS_DB_NO = '0'
 
-CELERY_REDIS_HOST = os.getenv('CELERY_REDIS_HOST', 'celery_redis')
-CELERY_REDIS_PORT = os.getenv('CELERY_REDIS_PORT', '6379')
+CELERY_REDIS_HOST = 'celery_redis'
+CELERY_REDIS_PORT = '6379'
 CELERY_REDIS_DB_NO = '0'
 
-CACHE_REDIS_HOST = os.getenv('CACHE_REDIS_HOST', 'cache_redis')
-CACHE_REDIS_PORT = os.getenv('CACHE_REDIS_PORT', '6379')
+CACHE_REDIS_HOST = 'cache_redis'
+CACHE_REDIS_PORT = '6379'
 CACHE_REDIS_DB_NO = '0'
+
+if DEBUG:
+    JOURNAL_REDIS_HOST = '127.0.0.1'
+    JOURNAL_REDIS_PORT = '6379'
+    JOURNAL_REDIS_DB_NO = '0'
+
+    CELERY_REDIS_HOST = '127.0.0.1'
+    CELERY_REDIS_PORT = '6379'
+    CELERY_REDIS_DB_NO = '1'
+
+    CACHE_REDIS_HOST = '127.0.0.1'
+    CACHE_REDIS_PORT = '6379'
+    CACHE_REDIS_DB_NO = '2'
 
 CACHES = {
     'default': {
@@ -214,7 +238,7 @@ CACHES = {
     },
     'index_manager': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f'redis://{CACHE_REDIS_HOST}:{CACHE_REDIS_PORT}/{CACHE_REDIS_HOST}',
+        'LOCATION': f'redis://{CACHE_REDIS_HOST}:{CACHE_REDIS_PORT}/10',
         'TIMEOUT': None,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
@@ -226,7 +250,7 @@ CACHES = {
 
 CELERY_BROKER = f'redis://{CELERY_REDIS_HOST}:{CELERY_REDIS_PORT}/{CELERY_REDIS_DB_NO}'
 CELERY_BROKER_URL = f'redis://{CELERY_REDIS_HOST}:{CELERY_REDIS_PORT}/{CELERY_REDIS_DB_NO}'
-CELERY_RESULT_BACKEND = 'django-db'
+CELERY_RESULT_BACKEND = f'redis://{CELERY_REDIS_HOST}:{CELERY_REDIS_PORT}/{CELERY_REDIS_DB_NO}'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_TASK_ROUTES = {
     'nobitex.collect.*': {'queue': 'api_call'},
@@ -245,10 +269,3 @@ CELERY_TASK_ROUTES = {
 # EMAIL_PORT = os.getenv('EMAIL_PORT', 587)
 # EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 # EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-
-
-#########  APP settings:
-### base:
-JOURNALS = {
-    'DATA_DIR': BASE_DIR / 'data/journals/'
-}
