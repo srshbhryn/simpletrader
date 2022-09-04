@@ -88,16 +88,21 @@ DATABASES = {
         'PORT': '5432',
     },
 }
+
 if DEBUG:
-    for db in DATABASES:
-        DATABASES[db] = {
-            'ENGINE': 'timescale.db.backends.postgresql',
-            'NAME': 'simpletrader_ts',
-            'USER': 'simpletrader_ts',
-            'PASSWORD': 'simpletrader_ts',
-            'HOST': '127.0.0.1',
-            'PORT': '5433',
-        }
+    DATABASES['default'].update({
+        'HOST': '127.0.0.1',
+        'PORT': '5435',
+    })
+    DATABASES['timescale'].update({
+        'HOST': '127.0.0.1',
+        'PORT': '5436',
+    })
+    DATABASES['traderdb'].update({
+        'HOST': '127.0.0.1',
+        'PORT': '5437',
+    })
+
 
 DB_ROUTING = {
     'timescale': [
@@ -111,11 +116,6 @@ DB_ROUTING = {
 }
 DEFAULT_DB = 'default'
 DATABASE_ROUTERS = ['simpletrader.db_router.Router',]
-
-
-LOGDIR = os.getenv('LOGDIR','/var/log/simpletrader/')
-if not LOGDIR[-1] == '/':
-    LOGDIR += '/'
 
 LOGGING = {
     'version': 1,
@@ -143,12 +143,12 @@ LOGGING = {
         },
         'logfile': {
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': LOGDIR + 'simpletrader.log',
+            'filename': '/tmp/simpletrader.log',
             'formatter': 'verbose'
         },
         'logfile_q': {
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': LOGDIR + 'simpletrader_q.log',
+            'filename': '/tmp/simpletrader_q.log',
             'formatter': 'verbose'
         },
     },
