@@ -1,0 +1,3 @@
+
+class KucoinSpot:
+    pass

@@ -1,23 +1,46 @@
 from django.db import models
+from django.utils.functional import cached_property
 
 from timescale.db.models.fields import TimescaleDateTimeField
 from timescale.db.models.managers import TimescaleManager
 
+from simpletrader.trader.clients import get_client
+from simpletrader.trader.sharedconfigs import Exchange
 
 
 class Bot(models.Model):
     token = models.BinaryField(max_length=4, unique=True)
     name = models.CharField(max_length=128)
 
+    def get_client(self, exchange_id):
+        return get_client(exchange_id, self.token)
 
 class Account(models.Model):
     exchange_id = models.IntegerField()
     credentials = models.JSONField()
 
+    _clients = {}
+
+    @cached_property
+    def exchange_name(self):
+        return Exchange.get_by('id', self.exchange_id).name
+
+    @cached_property
+    def client(self):
+        return get_client(self.exchange_id, self.credentials)
+
 
 class BotAccount(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
+
+    @classmethod
+    def get_bot_credentials(cls, exchange_id, bot_token):
+        account = cls.objects.get(
+            bot__token=bot_token,
+            account__exchange_id=exchange_id,
+        )
+        return account.credentials
 
     class Meta:
         unique_together = [

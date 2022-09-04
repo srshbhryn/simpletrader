@@ -1,3 +1,5 @@
+from typing import Dict
+
 import time
 from datetime import datetime
 import logging
@@ -20,13 +22,13 @@ def handle_exception(func):
         while True:
             try:
                 response = func(*args, **kwargs)
-                success = True
             except requests.RequestException as e:
                 if e.response and e.response.status_code == 403:
                     self.initialize()
                     continue
                 elif e.response and e.response.status_code == 400:
-                    self.
+                    logger.info(e)
+                    return None
             except Exception as e:
                 time.sleep(10)
             return response
@@ -49,7 +51,7 @@ class Nobitex:
                 self.token: str = self.get_token(credentials)
             except Exception as e:
                 logger.info(e)
-        self.sessions = {
+        self.sessions: Dict[int,requests.Session] = {
             Nobitex.TYPE.public: requests.Session(),
             Nobitex.TYPE.private: requests.Session(),
         }
@@ -90,10 +92,11 @@ class Nobitex:
         get = 'get'
         post = 'post'
 
-    def _request(self, type, method, path, body=None):
-        response = self.sessions[type].__getattribute__(method)(
-            url=f'{self.base_url}{path}'
-            json=body,
+    def _request(self, type, method, url, data=None):
+        response = self.sessions[type].request(
+            method=method,
+            url=url,
+            data=data,
         )
         response.raise_for_status()
         response = response.json()
