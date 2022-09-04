@@ -1,6 +1,8 @@
 from django.db import models
 
 from timescale.db.models.fields import TimescaleDateTimeField
+from timescale.db.models.managers import TimescaleManager
+
 
 
 class Bot(models.Model):
@@ -17,6 +19,11 @@ class BotAccount(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = [
+            ['bot', 'account',],
+        ]
+
 
 class Order(models.Model):
     placed_by = models.ForeignKey(Bot, on_delete=models.CASCADE)
@@ -29,12 +36,15 @@ class Order(models.Model):
     volume = models.DecimalField(max_digits=32, decimal_places=16)
     is_sell = models.BooleanField()
 
+    objects = TimescaleManager()
+
+    class Meta:
+        managed = False
 
 class Fill(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     exchange_id = models.BigIntegerField(db_index=True)
     exchange_order_id = models.BigIntegerField(db_index=True)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True, default=None)
     market_id = models.IntegerField(db_index=True)
     timestamp = TimescaleDateTimeField(interval='24 hour')
     price = models.DecimalField(max_digits=32, decimal_places=16, default=None, null=True)
@@ -42,3 +52,8 @@ class Fill(models.Model):
     is_sell = models.BooleanField()
     fee = models.DecimalField(max_digits=32, decimal_places=16)
     fee_asset_id = models.IntegerField()
+
+    objects = TimescaleManager()
+
+    class Meta:
+        managed = False
