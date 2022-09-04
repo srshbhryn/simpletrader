@@ -1,4 +1,5 @@
 import asyncio
+import json
 import time
 # from django.as
 from celery import shared_task
@@ -39,3 +40,26 @@ async def main(a, b):
 def test_task(*args):
     a, b = args[0]
     return async_to_sync(main)(a, b)
+
+async def place_order():
+    pass
+
+@shared_task(name='trader.place_order',)
+def place_order_task(args):
+    data = json.loads(args)
+    bot_token = data['bot_token']
+    market_id = data['market_id']
+    amount = data['amount']
+    amount = data['amount']
+    return async_to_sync(place_order)(a, b)
+
+@shared_task(name='trader.get_order_status',)
+def get_order_status_task(*args):
+    a, b = args[0]
+    return async_to_sync(main)(a, b)
+
+@shared_task(name='trader.cancel_order',)
+def cancel_order_task(*args):
+    a, b = args[0]
+    return async_to_sync(main)(a, b)
+
