@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 from django.utils.functional import cached_property
 
 from timescale.db.models.fields import TimescaleDateTimeField
@@ -7,9 +8,12 @@ from timescale.db.models.managers import TimescaleManager
 from simpletrader.trader.clients import get_client
 from simpletrader.trader.sharedconfigs import Exchange
 
+def create_bot_token():
+    return uuid.uuid4().hex[:4]
+
 
 class Bot(models.Model):
-    token = models.BinaryField(max_length=4, unique=True)
+    token = models.CharField(max_length=4, primary_key=True, default=create_bot_token)
     name = models.CharField(max_length=128)
 
     def get_client(self, exchange_id):
@@ -51,7 +55,8 @@ class BotAccount(models.Model):
 class Order(models.Model):
     placed_by = models.ForeignKey(Bot, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    client_order_id = models.CharField(db_index=True, max_length=128)
+    #
+    client_order_id = models.CharField(db_index=True, max_length=128, null=True, blank=True, default=None)
     market_id = models.IntegerField(db_index=True)
     status_id = models.IntegerField()
     timestamp = TimescaleDateTimeField(interval='24 hour')
@@ -66,6 +71,7 @@ class Order(models.Model):
 
 class Fill(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    #
     exchange_id = models.BigIntegerField(db_index=True)
     exchange_order_id = models.BigIntegerField(db_index=True)
     market_id = models.IntegerField(db_index=True)
