@@ -52,7 +52,7 @@ class LimitGuard:
     def _translate_rate(self, rate):
         count, period = rate.split('/')
         count = int(count)
-        period_value = float(period[:-1])
+        period_value = float(period[:-1] or 1)
         period_unit = period[-1]
         period_unit = {
             's': 1,
