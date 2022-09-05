@@ -52,6 +52,9 @@ class BotAccount(models.Model):
         ]
 
 
+from clients.nobitex import Nobitex
+n = Nobitex()
+# n.place_order()
 class Order(models.Model):
     placed_by = models.ForeignKey(Bot, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)

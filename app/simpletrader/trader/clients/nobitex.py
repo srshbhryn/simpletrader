@@ -7,13 +7,88 @@ import requests
 import pyotp
 from decimal import Decimal
 
-from simpletrader.trader.sharedconfigs import Market
+from simpletrader.base.utils import LimitGuard
+from simpletrader.trader.sharedconfigs import Market, Asset
+
+from .base import OrderParams
+
+
+logger = logging.getLogger('django')
+
 
 class NobitexClientError(Exception):
     pass
 
 
-logger = logging.getLogger('django')
+class Serializers:
+    @classmethod
+    def serialize_fill(self, fill: dict) -> dict:
+        market: Market = Market.get_by('symbol', fill['market'])
+        is_sell = fill['type'] == 'sell'
+        fee_asset_id = market.quote_asset.id if is_sell else market.base_asset.id
+        return {
+            'exchange_id': fill['id'],
+            'exchange_order_id': fill['orderId'],
+            'market_id': market.id,
+            'timestamp': datetime.fromisoformat(fill['timestamp']),
+            'is_sell': is_sell,
+            'price': Decimal(fill['price']),
+            'volume': Decimal(fill['price']),
+            'fee': Decimal(fill['fee']),
+            'fee_asset_id': fee_asset_id
+        }
+
+    @classmethod
+    def serialize_order(self, order: dict) -> dict:
+        "unmatchedAmount": "3.0000000000",
+        "fee": "0E-10",
+        "matchedAmount": "0E-10",
+        "partial": false,
+        "price": "8500000.0000000000",
+        "created_at": "2018-11-28T12:25:22.696029+00:00",
+        "user": "name@example.com",
+        "id": 5684,
+        "srcCurrency": "Litecoin",
+        "totalPrice": "25500000.00000000000000000000",
+        "type": "sell",
+        "dstCurrency": "\ufdfc",
+        "status": "Active",
+        "amount": "3.0000000000"
+        base_asset = Asset.get_by('name', order['srcCurrency'])
+        quote_asset = Asset.get_by('name', order['dstCurrency'])
+        markets = Market.get_by('base_asset', base_asset)
+        if isinstance(markets, list):
+            market = [
+                m for m in markets
+                if m.quote_asset == quote_asset
+            ][0]
+        else:
+            market = markets
+        return {
+            'market_id': market.id,
+            # 'status': ??
+            'volume': Decimal(order['amount']),
+
+
+        }
+
+    @classmethod
+    def deserialize_order(self, order: dict) -> dict:
+        market = Market.get_by('id', order['market_id'])
+        base_asset = market.base_asset.name
+        quote_asset = market.quote_asset.name
+        _order = {
+            'type': 'sell' if order['is_sell'] else 'buy',
+            'srcCurrency': base_asset,
+            'dstCurrency': quote_asset,
+            'amount': str(order['volume']),
+        }
+        price = order.get('price')
+        if price is None:
+            _order['execution'] = 'market'
+        else:
+            _order['price'] = price
+        return _order
 
 
 def handle_exception(func):
@@ -37,7 +112,7 @@ def handle_exception(func):
 
 
 class Nobitex:
-    base_url = 'https://api.nobitex.ir/'
+    base_url = 'https://api.nobitex.ir'
 
     def __init__(self, credentials: dict, token: str) -> None:
         self.credentials = credentials
@@ -77,7 +152,7 @@ class Nobitex:
             'x-totp': pyotp.TOTP(credentials['totp_key']).now()
         }
         response = requests.post(
-            url='https://api.nobitex.ir/auth/login/',
+            url=self.base_url+'/auth/login/',
             headers=headers,
             json=body,
         )
@@ -104,34 +179,63 @@ class Nobitex:
             raise NobitexClientError(response['message'])
         return response
 
-    def get_fills(self, from_id: int = None) -> dict:
+    @LimitGuard('20/ms')
+    def get_fills(self, from_id: int = None):
         params = ''
         if from_id:
             params = f'?from_id={from_id}'
         return [
-            self._serialize_fill(f)
+            Serializers.serialize_fill(f)
             for f in self._request(
                 self.TYPE.private,
                 self.METHOD.get,
-                self.base_url + '/' + params,
-                {}
+                self.base_url + '/market/trades/list' + params,
+                None
             )['trades']
         ]
 
-    def _serialize_fill(self, fill: dict):
-        market: Market = Market.get_by('symbol', fill['market'])
-        is_sell = fill['type'] == 'sell'
-        fee_asset_id = market.quote_asset.id if is_sell else market.base_asset.id
-        return {
-            'exchange_id': fill['id'],
-            'exchange_order_id': fill['orderId'],
-            'market_id': market.id,
-            'timestamp': datetime.fromisoformat(fill['timestamp']),
-            'is_sell': is_sell,
-            'price': Decimal(fill['price']),
-            'volume': Decimal(fill['price']),
-            'fee': Decimal(fill['fee']),
-            'fee_asset_id': fee_asset_id
+    # @LimitGuard('30/m')
+    # def get_orders(self, from_id: int = None) -> dict:
+    #     params = ''
+    #     if from_id:
+    #         params = f'?from_id={from_id}'
+    #     return [
+    #         Serializers.serialize_order(order)
+    #         for order in self._request(
+    #             self.TYPE.private,
+    #             self.METHOD.get,
+    #             self.base_url + '/market/orders/list' + params,
+    #             None
+    #         )['orders']
+    #     ]
 
-        }
+    @LimitGuard('200/10m')
+    def place_order(self, **order: OrderParams):
+        return Serializers.serialize_order(
+            self._request(
+                self.TYPE.private,
+                self.METHOD.post,
+                self.base_url + '/market/orders/add',
+                Serializers.deserialize_order(order)
+            )
+        )
 
+    @LimitGuard('60/m')
+    def get_order_detail(self, exchange_id: int):
+        return Serializers.serialize_order(
+            self._request(
+                self.TYPE.private,
+                self.METHOD.post,
+                self.base_url + '/market/orders/status',
+                Serializers.deserialize_order({'id': exchange_id})
+            )
+        )
+
+    @LimitGuard('30/m')
+    def cancel_order(self, exchange_id: int) -> None:
+        self._request(
+            self.TYPE.private,
+            self.METHOD.post,
+            self.base_url + '/market/orders/update-status',
+            Serializers.deserialize_order({'id': exchange_id, 'status': 'canceled'})
+        )
