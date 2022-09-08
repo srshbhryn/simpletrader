@@ -23,15 +23,9 @@ class Account(models.Model):
     exchange_id = models.IntegerField()
     credentials = models.JSONField()
 
-    _clients = {}
-
     @cached_property
     def exchange_name(self):
         return Exchange.get_by('id', self.exchange_id).name
-
-    @cached_property
-    def client(self):
-        return get_client(self.exchange_id, self.credentials)
 
 
 class BotAccount(models.Model):
@@ -43,7 +37,7 @@ class BotAccount(models.Model):
         account = cls.objects.get(
             bot__token=bot_token,
             account__exchange_id=exchange_id,
-        )
+        ).account
         return account.credentials
 
     class Meta:

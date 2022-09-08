@@ -113,7 +113,9 @@ class Nobitex:
 
     def __init__(self, credentials: dict, token: str) -> None:
         self.credentials = credentials
-        self.token = token
+        self.bot_token = token
+        self.token = None
+        self.initialize()
 
     def initialize(self) -> None:
         credentials: dict = self.credentials
@@ -121,6 +123,7 @@ class Nobitex:
         while self.token is None:
             try:
                 self.token: str = self.get_token(credentials)
+                print(token)
             except Exception as e:
                 logger.info(e)
         self.sessions: Dict[int,requests.Session] = {
@@ -129,7 +132,7 @@ class Nobitex:
         }
         self.sessions[Nobitex.TYPE.public].headers = {
             'content-type': 'application/json',
-            'user-agent': f'TraderBot/{token}'
+            'user-agent': f'TraderBot/{self.bot_token}'
         }
         self.sessions[Nobitex.TYPE.public].headers = {
             **self.sessions[Nobitex.TYPE.public].headers,
