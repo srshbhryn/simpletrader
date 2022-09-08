@@ -11,7 +11,7 @@ from simpletrader.base.utils import LimitGuard
 from simpletrader.trader.sharedconfigs import Market, Asset, OrderState
 
 from .base import OrderParams
-from .helpers.nobitex import translate_currency
+from .helpers.nobitex import translate_currency, translate_order_status
 
 
 logger = logging.getLogger('django')
@@ -61,8 +61,9 @@ class Serializers:
             'is_sell': order['type'] == 'sell',
             'volume': Decimal(order['amount']),
             'timestamp': datetime.fromisoformat(order['created_at']),
-            # status ???
-            # 'status_id': 
+            'status_id': OrderState.get_by('name',
+                translate_order_status(order['status'])
+            ).id,
         }
         if 'price' in order:
             _order['price'] = Decimal(order['price'])

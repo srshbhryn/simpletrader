@@ -110,3 +110,25 @@ for _, nbx_currency, translation in [
 
 def translate_currency(nbx_name: str) -> str:
     return _currencies[nbx_name]
+
+
+class OrderStates(TypedDict):
+    nbx_name: str
+    name: str
+
+
+_order_states: OrderStates = {}
+
+for name, nbx_name in [
+    ('placed', 'New'),
+    ('placed', 'Active'),
+    ('filled', 'Done'),
+    ('cancelled', 'Canceled'),
+]:
+    _order_states[nbx_name] = name
+
+
+
+def translate_order_status(nbx_name: str) -> str:
+    return _order_states[nbx_name]
+

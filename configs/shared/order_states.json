@@ -11,6 +11,9 @@
     "id": 4,
     "name": "failed"
 }, {
-    "id": 4,
+    "id": 5,
     "name": "partially_filled"
+}, {
+    "id": 6,
+    "name": "placed"
 }]
