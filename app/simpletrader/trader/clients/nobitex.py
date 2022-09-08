@@ -8,9 +8,10 @@ import pyotp
 from decimal import Decimal
 
 from simpletrader.base.utils import LimitGuard
-from simpletrader.trader.sharedconfigs import Market, Asset
+from simpletrader.trader.sharedconfigs import Market, Asset, OrderState
 
 from .base import OrderParams
+from .helpers.nobitex import translate_currency
 
 
 logger = logging.getLogger('django')
@@ -40,22 +41,12 @@ class Serializers:
 
     @classmethod
     def serialize_order(self, order: dict) -> dict:
-        "unmatchedAmount": "3.0000000000",
-        "fee": "0E-10",
-        "matchedAmount": "0E-10",
-        "partial": false,
-        "price": "8500000.0000000000",
-        "created_at": "2018-11-28T12:25:22.696029+00:00",
-        "user": "name@example.com",
-        "id": 5684,
-        "srcCurrency": "Litecoin",
-        "totalPrice": "25500000.00000000000000000000",
-        "type": "sell",
-        "dstCurrency": "\ufdfc",
-        "status": "Active",
-        "amount": "3.0000000000"
-        base_asset = Asset.get_by('name', order['srcCurrency'])
-        quote_asset = Asset.get_by('name', order['dstCurrency'])
+        base_asset = Asset.get_by('name',
+            translate_currency(order['srcCurrency']),
+        )
+        quote_asset = Asset.get_by('name',
+            translate_currency(order['dstCurrency']),
+        )
         markets = Market.get_by('base_asset', base_asset)
         if isinstance(markets, list):
             market = [
@@ -64,13 +55,18 @@ class Serializers:
             ][0]
         else:
             market = markets
-        return {
+        _order = {
+            'exchange_id': order['id'],
             'market_id': market.id,
-            # 'status': ??
+            'is_sell': order['type'] == 'sell',
             'volume': Decimal(order['amount']),
-
-
+            'timestamp': datetime.fromisoformat(order['created_at']),
+            # status ???
+            # 'status_id': 
         }
+        if 'price' in order:
+            _order['price'] = Decimal(order['price'])
+        return _order
 
     @classmethod
     def deserialize_order(self, order: dict) -> dict:
