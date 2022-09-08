@@ -40,7 +40,7 @@ class Serializers:
         }
 
     @classmethod
-    def serialize_order(self, order: dict) -> dict:
+    def serialize_order(self, order: dict) -> OrderParams:
         base_asset = Asset.get_by('name',
             translate_currency(order['srcCurrency']),
         )
@@ -70,7 +70,7 @@ class Serializers:
         return _order
 
     @classmethod
-    def deserialize_order(self, order: dict) -> dict:
+    def deserialize_order(self, order: OrderParams) -> dict:
         market = Market.get_by('id', order['market_id'])
         base_asset = market.base_asset.name
         quote_asset = market.quote_asset.name
@@ -176,7 +176,7 @@ class Nobitex:
             raise NobitexClientError(response['message'])
         return response
 
-    @LimitGuard('20/ms')
+    @LimitGuard('20/m')
     def get_fills(self, from_id: int = None):
         params = ''
         if from_id:
@@ -207,7 +207,7 @@ class Nobitex:
     #     ]
 
     @LimitGuard('200/10m')
-    def place_order(self, **order: OrderParams):
+    def place_order(self, **order: OrderParams) -> OrderParams:
         return Serializers.serialize_order(
             self._request(
                 self.TYPE.private,
@@ -218,7 +218,7 @@ class Nobitex:
         )
 
     @LimitGuard('60/m')
-    def get_order_detail(self, exchange_id: int):
+    def get_order_detail(self, exchange_id: int) -> OrderParams:
         return Serializers.serialize_order(
             self._request(
                 self.TYPE.private,
