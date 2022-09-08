@@ -27,7 +27,6 @@ class Account(models.Model):
     def exchange_name(self):
         return Exchange.get_by('id', self.exchange_id).name
 
-
 class BotAccount(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)

@@ -123,7 +123,6 @@ class Nobitex:
         while self.token is None:
             try:
                 self.token: str = self.get_token(credentials)
-                print(token)
             except Exception as e:
                 logger.info(e)
         self.sessions: Dict[int,requests.Session] = {
