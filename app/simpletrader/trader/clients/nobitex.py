@@ -97,14 +97,12 @@ def handle_exception(func):
             except requests.RequestException as e:
                 if e.response and e.response.status_code == 403:
                     self.initialize()
-                    print(e.response)
                     continue
                 elif e.response and e.response.status_code == 400:
                     logger.info(e)
-                    print(e.response)
-
                     return None
             except Exception as e:
+                logger.error(e)
                 time.sleep(10)
             return response
     return wrapper
@@ -126,7 +124,7 @@ class Nobitex:
         while self.token is None:
             try:
                 # self.token: str = self._get_token(credentials)
-                self.token: str = self.credentials['token']
+                self.token: str = credentials['token']
             except Exception as e:
                 logger.info(e)
         self.sessions: Dict[int,requests.Session] = {
@@ -137,9 +135,9 @@ class Nobitex:
             'content-type': 'application/json',
             'user-agent': f'TraderBot/{self.bot_token}'
         }
-        self.sessions[Nobitex.TYPE.public].headers = {
+        self.sessions[Nobitex.TYPE.private].headers = {
             **self.sessions[Nobitex.TYPE.public].headers,
-            'authorization': f'Token {token}'
+            'Authorization': f'Token {self.token}'
         }
 
     def _get_token(self, credentials) -> str:
