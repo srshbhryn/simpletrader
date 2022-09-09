@@ -1,3 +1,5 @@
+from ccxt.kucoin import kucoin
 
-class KucoinSpot:
+
+class KucoinSpot(kucoin):
     pass

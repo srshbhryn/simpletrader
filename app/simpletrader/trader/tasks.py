@@ -41,6 +41,15 @@ def test_task(*args):
     a, b = args[0]
     return async_to_sync(main)(a, b)
 
+
+class TaskRouter
+
+@shared_task(name='trader.run',)
+def run_task(func_name, bot_token, *args, **kwargs):
+    pass
+    a, b = args[0]
+    return async_to_sync(main)(a, b)
+
 async def place_order():
     pass
 
