@@ -97,9 +97,12 @@ def handle_exception(func):
             except requests.RequestException as e:
                 if e.response and e.response.status_code == 403:
                     self.initialize()
+                    print(e.response)
                     continue
                 elif e.response and e.response.status_code == 400:
                     logger.info(e)
+                    print(e.response)
+
                     return None
             except Exception as e:
                 time.sleep(10)
@@ -122,8 +125,8 @@ class Nobitex:
         token: str = self.token
         while self.token is None:
             try:
-                self.token: str = self.get_token(credentials)
-                print(token)
+                # self.token: str = self._get_token(credentials)
+                self.token: str = self.credentials['token']
             except Exception as e:
                 logger.info(e)
         self.sessions: Dict[int,requests.Session] = {
@@ -149,7 +152,8 @@ class Nobitex:
         }
         headers = {
             'content-type': 'application/json',
-            'x-totp': pyotp.TOTP(credentials['totp_key']).now()
+            'x-totp': pyotp.TOTP(credentials['totp_key']).now(),
+            'user-agent': f'TraderBot/{self.bot_token}',
         }
         response = requests.post(
             url=self.base_url+'/auth/login/',
