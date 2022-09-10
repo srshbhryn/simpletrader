@@ -45,9 +45,14 @@ def locked_proccess(func):
 
 
 class LimitGuard:
-    def __init__(self, rate='10/m'):
+    def __init__(self, rate='10/m', key=None):
+        self.key = key
+        self.key_value = None
         self._rate_count, self._rate_period = self._translate_rate(rate)
-        self._call_times = []
+        if key is not None:
+            self._call_times_map = {}
+        else:
+            self._call_times = []
 
     def _translate_rate(self, rate):
         count, period = rate.split('/')
@@ -62,8 +67,7 @@ class LimitGuard:
         period = period_unit * period_value
         return count, period
 
-    @property
-    def _last_period_call_count(self):
+    def _get_last_period_call_count(self):
         nw = time.time()
         self._call_times = [
             ts for ts in self._call_times
@@ -71,8 +75,25 @@ class LimitGuard:
         ]
         return len(self._call_times)
 
+    def _get_keyed_last_period_call_count(self, key):
+        nw = time.time()
+        call_times = self._call_times_map.get(key) or []
+        self._call_times_map[key] = [
+            ts for ts in call_times
+            if nw - ts <= self._rate_period
+        ]
+        return len(self._call_times_map[key])
+
+    @property
+    def _last_period_call_count(self):
+        if self.key is None:
+            return self._get_last_period_call_count()
+        return self._get_keyed_last_period_call_count(self.key_value)
+
     def __call__(self, fn):
         def inner(*args, **kwargs):
+            if self.key is not None:
+                self.key_value = kwargs.get(self.key)
             while self._last_period_call_count >= self._rate_count:
                 wait_time = self._rate_period - (time.time() - self._call_times[0])
                 log.info(f'LimitGuard\t{fn.__name__}\twaiting for {wait_time:.4}s.')

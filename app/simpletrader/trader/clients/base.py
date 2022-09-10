@@ -22,6 +22,7 @@ class BaseClient:
     class METHOD:
         get = 'get'
         post = 'post'
+        delete = 'delete'
 
     def __init__(self, credentials: dict, token: str) -> None:
         raise NotImplementedError()

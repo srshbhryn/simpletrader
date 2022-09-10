@@ -8,6 +8,7 @@ import logging
 import time
 
 
+from simpletrader.base.utils import LimitGuard
 from simpletrader.trader.sharedconfigs import Asset, Market
 from .base import OrderParams, ExchangeClientError, BaseClient
 
@@ -121,12 +122,14 @@ class KucoinFutures(BaseClient):
             raise KucoinFuturesError(response['code'])
         return response
 
-    def place_order(self, order: OrderParams) -> OrderParams:
+    @LimitGuard('100/s')
+    @LimitGuard('50/s', key='market_id')
+    def place_order(self, **order: OrderParams) -> OrderParams:
         return self._request(
             type=KucoinFutures.TYPE.private,
             method=KucoinFutures.METHOD.post,
             path='',
-            data=Serializer.
+            # data=Serializer
         )
         raise NotImplementedError()
 

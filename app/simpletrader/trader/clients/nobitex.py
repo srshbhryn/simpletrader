@@ -204,7 +204,7 @@ class Nobitex(BaseClient):
     #     ]
 
     @LimitGuard('200/10m')
-    def place_order(self, order: OrderParams) -> OrderParams:
+    def place_order(self, **order: OrderParams) -> OrderParams:
         return Serializers.serialize_order(
             self._request(
                 self.TYPE.private,
