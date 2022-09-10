@@ -52,7 +52,7 @@ class Order(models.Model):
     #
     exchange_id = models.CharField(max_length=32, db_index=True)
     client_order_id = models.CharField(db_index=True, max_length=128, null=True, blank=True, default=None)
-    leverage = models.SmallIntegerField(default=1)
+    leverage = models.SmallIntegerField(default=1, blank=True)
     market_id = models.IntegerField(db_index=True)
     status_id = models.IntegerField()
     timestamp = TimescaleDateTimeField(interval='24 hour')

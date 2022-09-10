@@ -26,7 +26,7 @@ CREATE TABLE public.trader_order (
 	client_order_id varchar(128) NULL,
 	market_id int4 NOT NULL,
 	status_id int4 NOT NULL,
-	leverage int4 NOT NULL DEFAULT 1,
+	leverage int4 DEFAULT 1,
 	"timestamp" timestamptz NOT NULL,
 	price numeric(32, 16) NULL,
 	volume numeric(32, 16) NOT NULL,
