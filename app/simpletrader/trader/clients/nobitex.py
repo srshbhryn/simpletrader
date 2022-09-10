@@ -10,14 +10,14 @@ from decimal import Decimal
 from simpletrader.base.utils import LimitGuard
 from simpletrader.trader.sharedconfigs import Market, Asset, OrderState
 
-from .base import OrderParams
+from .base import OrderParams, ExchangeClientError, BaseClient
 from .helpers.nobitex import translate_currency, translate_order_status
 
 
 logger = logging.getLogger('django')
 
 
-class NobitexClientError(Exception):
+class NobitexClientError(ExchangeClientError):
     pass
 
 
@@ -109,7 +109,7 @@ def handle_exception(func):
 
 
 
-class Nobitex:
+class Nobitex(BaseClient):
     base_url = 'https://api.nobitex.ir'
 
     def __init__(self, credentials: dict, token: str) -> None:
@@ -161,14 +161,6 @@ class Nobitex:
         response.raise_for_status()
         response.json()['key']
 
-    class TYPE:
-        public = 0
-        private = 1
-
-    class METHOD:
-        get = 'get'
-        post = 'post'
-
     def _request(self, type, method, url, data=None):
         response = self.sessions[type].request(
             method=method,
@@ -212,7 +204,7 @@ class Nobitex:
     #     ]
 
     @LimitGuard('200/10m')
-    def place_order(self, **order: OrderParams) -> OrderParams:
+    def place_order(self, order: OrderParams) -> OrderParams:
         return Serializers.serialize_order(
             self._request(
                 self.TYPE.private,
@@ -229,7 +221,7 @@ class Nobitex:
                 self.TYPE.private,
                 self.METHOD.post,
                 self.base_url + '/market/orders/status',
-                Serializers.deserialize_order({'id': exchange_id})
+                {'id': exchange_id},
             )
         )
 
@@ -239,5 +231,5 @@ class Nobitex:
             self.TYPE.private,
             self.METHOD.post,
             self.base_url + '/market/orders/update-status',
-            Serializers.deserialize_order({'id': exchange_id, 'status': 'canceled'})
+            {'id': exchange_id, 'status': 'canceled'},
         )
