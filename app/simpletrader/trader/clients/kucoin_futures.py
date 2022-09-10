@@ -124,14 +124,13 @@ class KucoinFutures(BaseClient):
 
     @LimitGuard('100/s')
     @LimitGuard('50/s', key='market_id')
-    def place_order(self, **order: OrderParams) -> OrderParams:
-        return self._request(
+    def place_order(self, **order: OrderParams) -> str:
+        return Serializer.serialize_order(**{**order, 'exchange_id': self._request(
             type=KucoinFutures.TYPE.private,
             method=KucoinFutures.METHOD.post,
             path='',
             # data=Serializer
-        )
-        raise NotImplementedError()
+        )})
 
     def cancel_order(self, exchange_id: int) -> None:
         raise NotImplementedError()
