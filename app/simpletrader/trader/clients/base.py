@@ -1,9 +1,17 @@
+import time
+import logging
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, TypedDict
 
+import requests
+
+logger = logging.getLogger('django')
+
+
 class ExchangeClientError(Exception):
     pass
+
 
 class OrderParams(TypedDict):
     client_order_id: int
@@ -13,6 +21,7 @@ class OrderParams(TypedDict):
     price: Optional[Decimal]
     volume: Optional[Decimal]
     is_sell: bool
+
 
 class BaseClient:
     class TYPE:
@@ -35,3 +44,23 @@ class BaseClient:
 
     def get_order_detail(self, exchange_id: int) -> OrderParams:
         raise NotImplementedError()
+
+
+def handle_exception(func):
+    def wrapper(*args, **kwargs):
+        self: BaseClient = args[0]
+        while True:
+            try:
+                response = func(*args, **kwargs)
+            except requests.RequestException as e:
+                if e.response and e.response.status_code == 403:
+                    self.initialize()
+                    continue
+                elif e.response and e.response.status_code == 400:
+                    logger.info(e)
+                    raise ExchangeClientError(e)
+            except Exception as e:
+                logger.error(e)
+                time.sleep(10)
+            return response
+    return wrapper

@@ -10,7 +10,7 @@ from decimal import Decimal
 from simpletrader.base.utils import LimitGuard
 from simpletrader.trader.sharedconfigs import Market, Asset, OrderState
 
-from .base import OrderParams, ExchangeClientError, BaseClient
+from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception
 from .helpers.nobitex import translate_currency, translate_order_status
 
 
@@ -88,27 +88,6 @@ class Serializers:
         return _order
 
 
-def handle_exception(func):
-    def wrapper(*args, **kwargs):
-        self: Nobitex = args[0]
-        while True:
-            try:
-                response = func(*args, **kwargs)
-            except requests.RequestException as e:
-                if e.response and e.response.status_code == 403:
-                    self.initialize()
-                    continue
-                elif e.response and e.response.status_code == 400:
-                    logger.info(e)
-                    return None
-            except Exception as e:
-                logger.error(e)
-                time.sleep(10)
-            return response
-    return wrapper
-
-
-
 class Nobitex(BaseClient):
     base_url = 'https://api.nobitex.ir'
 
@@ -161,6 +140,7 @@ class Nobitex(BaseClient):
         response.raise_for_status()
         response.json()['key']
 
+    @handle_exception
     def _request(self, type, method, url, data=None):
         response = self.sessions[type].request(
             method=method,
