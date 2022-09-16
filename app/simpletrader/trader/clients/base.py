@@ -13,11 +13,25 @@ class ExchangeClientError(Exception):
     pass
 
 
+class FillParams(TypedDict):
+    exchange_id: str
+    exchange_order_id: str
+    market_id: int
+    timestamp: datetime
+    price: Decimal
+    volume: Decimal
+    is_sell: bool
+    fee: Decimal
+    fee_asset_id: int
+
+
 class OrderParams(TypedDict):
-    client_order_id: int
+    exchange_id: str
+    client_order_id: Optional[str]
     market_id: int
     status_id: int
     timestamp: datetime
+    leverage: Optional[int]
     price: Optional[Decimal]
     volume: Optional[Decimal]
     is_sell: bool
@@ -35,6 +49,8 @@ class BaseClient:
 
     def __init__(self, credentials: dict, token: str) -> None:
         raise NotImplementedError()
+
+    # TODO add get fills.
 
     def place_order(self, order: OrderParams) -> OrderParams:
         raise NotImplementedError()

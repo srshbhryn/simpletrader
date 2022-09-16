@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 import time
 from datetime import datetime
@@ -10,7 +10,7 @@ from decimal import Decimal
 from simpletrader.base.utils import LimitGuard
 from simpletrader.trader.sharedconfigs import Market, Asset, OrderState
 
-from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception
+from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception, FillParams
 from .helpers.nobitex import translate_currency, translate_order_status
 
 
@@ -23,7 +23,7 @@ class NobitexClientError(ExchangeClientError):
 
 class Serializers:
     @classmethod
-    def serialize_fill(self, fill: dict) -> dict:
+    def serialize_fill(self, fill: dict) -> FillParams:
         market: Market = Market.get_by('symbol', fill['market'])
         is_sell = fill['type'] == 'sell'
         fee_asset_id = market.quote_asset.id if is_sell else market.base_asset.id
@@ -154,7 +154,7 @@ class Nobitex(BaseClient):
         return response
 
     @LimitGuard('20/m')
-    def get_fills(self, from_id: int = None):
+    def get_fills(self, from_id: int = None) -> List[FillParams]:
         params = ''
         if from_id:
             params = f'?from_id={from_id}'
@@ -184,7 +184,7 @@ class Nobitex(BaseClient):
     #     ]
 
     @LimitGuard('200/10m')
-    def place_order(self, **order: OrderParams) -> OrderParams:
+    def place_order(self, order: OrderParams) -> OrderParams:
         return Serializers.serialize_order(
             self._request(
                 self.TYPE.private,

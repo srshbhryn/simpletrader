@@ -65,6 +65,7 @@ class Order(models.Model):
     class Meta:
         managed = False
 
+
 class Fill(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     #
