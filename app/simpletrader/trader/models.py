@@ -10,6 +10,10 @@ from timescale.db.models.managers import TimescaleManager
 from simpletrader.trader.clients import get_client
 from simpletrader.trader.sharedconfigs import Exchange
 
+from .clients.base import BaseClient
+from .sharedconfigs import OrderState
+
+
 def create_bot_token():
     return uuid.uuid4().hex[:4]
 
@@ -18,7 +22,7 @@ class Bot(models.Model):
     token = models.CharField(max_length=4, primary_key=True, default=create_bot_token)
     name = models.CharField(max_length=128)
 
-    def get_client(self, exchange_id):
+    def get_client(self, exchange_id: int) -> BaseClient:
         return get_client(exchange_id, self.token)
 
 
@@ -73,6 +77,16 @@ class Order(models.Model):
     is_sell = models.BooleanField()
 
     objects = TimescaleManager()
+
+
+    FINAL_STATE_IDS = [
+        OrderState.get_by('name', state).id
+        for state in [
+            'cancelled',
+            'filled',
+            'failed',
+        ]
+    ]
 
     class Meta:
         managed = False
