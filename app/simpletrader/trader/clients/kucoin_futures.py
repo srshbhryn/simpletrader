@@ -171,6 +171,9 @@ class KucoinFutures(BaseClient):
                 )
             }
 
+    def _set_sand_box(self):
+        pass
+
     def _signed_headers(self, path: str, method: str) -> Dict:
         now = int(time.time() * 1000)
         str_to_sign = str(now) + method.upper() + path
@@ -223,3 +226,7 @@ class KucoinFutures(BaseClient):
 
     def get_order_detail(self, exchange_id: int) -> OrderParams:
         raise NotImplementedError()
+
+
+# class StreamClient:
+#     pass

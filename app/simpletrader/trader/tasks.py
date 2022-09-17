@@ -1,74 +1,36 @@
-import asyncio
 import json
-import time
-# from django.as
+
 from celery import shared_task
 
-from asgiref.sync import async_to_sync
+from .models import Bot, Order
+from .clients.base import OrderParams
 
-
-from simpletrader.trader.models import Bot
-
-class Client:
-    def __init__(self) -> None:
-        self._a = 0
-
-    @property
-    def a(self):
-        self._a += 1
-        return self._a
-
-client = Client()
-
-async def job0(a):
-    await asyncio.sleep(.5)
-    return a
-async def job1(b):
-    await asyncio.sleep(.5)
-    return b
-
-async def main(a, b):
-    sum = 0
-    for value in asyncio.as_completed([
-        job0(a),
-        job1(b),
-    ]):
-        sum += await value
-    return sum + client.a
-
-@shared_task(name='trader.test_task',)
-def test_task(*args):
-    a, b = args[0]
-    return async_to_sync(main)(a, b)
-
-
-class TaskRouter
-
-@shared_task(name='trader.run',)
-def run_task(func_name, bot_token, *args, **kwargs):
-    pass
-    a, b = args[0]
-    return async_to_sync(main)(a, b)
-
-async def place_order():
-    pass
 
 @shared_task(name='trader.place_order',)
 def place_order_task(args):
-    data = json.loads(args)
-    bot_token = data['bot_token']
-    market_id = data['market_id']
-    amount = data['amount']
-    amount = data['amount']
-    return async_to_sync(place_order)(a, b)
+    order: OrderParams = json.loads(args)
+    bot_token = order['bot_token']
+    exchange_id = order['exchange_id']
+    del order['bot_token']
+    del order['exchange_id']
+    bot: Bot  = Bot.objects.get(token=bot_token)
+    client = bot.get_client(exchange_id)
+    order = client.place_order(order)
+    Order.objects.create({
+        **order,
+        'placed_by': bot,
+        'account': bot.botaccount_set.filter(account__exchange_id=exchange_id).first(),
+    })
+    return json.dumps(order)
+
 
 @shared_task(name='trader.get_order_status',)
 def get_order_status_task(*args):
     a, b = args[0]
     return async_to_sync(main)(a, b)
 
+
 @shared_task(name='trader.cancel_order',)
 def cancel_order_task(*args):
     a, b = args[0]
     return async_to_sync(main)(a, b)
-

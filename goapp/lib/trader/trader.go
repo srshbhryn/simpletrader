@@ -33,7 +33,7 @@ func init() {
 
 }
 
-func Call(taskName string, args ...interface{}) (interface{}, error) {
+func Call(taskName string, args string) (interface{}, error) {
 	asyncResult, err := client.Delay(taskName, args)
 	if err != nil {
 		return nil, err
@@ -55,6 +55,7 @@ func GetResult(ar *gocelery.AsyncResult, timeout time.Duration) (interface{}, er
 			return nil, err
 		case <-ticker.C:
 			val, err := ar.AsyncGet()
+			// TODO: should return if task failed.
 			if err != nil {
 				continue
 			}
