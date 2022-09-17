@@ -1,3 +1,5 @@
+from typing import Dict
+
 from django.db import models
 import uuid
 from django.utils.functional import cached_property
@@ -19,6 +21,24 @@ class Bot(models.Model):
     def get_client(self, exchange_id):
         return get_client(exchange_id, self.token)
 
+
+    _bots: Dict[str, 'Bot'] = {}
+
+    @classmethod
+    def get(cls, token: str) -> 'Bot':
+        if not token in cls._bots:
+            cls._bots[token] = Bot.objects.get(token=token)
+        return cls._bots[token]
+
+    @cached_property
+    def account(self, exchange_id: int) -> 'Account':
+        account = BotAccount.objects.get(
+            bot__token=self.token,
+            account__exchange_id=exchange_id,
+        ).account
+        return account
+
+
 class Account(models.Model):
     exchange_id = models.IntegerField()
     credentials = models.JSONField()
@@ -31,14 +51,6 @@ class Account(models.Model):
 class BotAccount(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-
-    @classmethod
-    def get_bot_credentials(cls, exchange_id, bot_token):
-        account = cls.objects.get(
-            bot__token=bot_token,
-            account__exchange_id=exchange_id,
-        ).account
-        return account.credentials
 
     class Meta:
         unique_together = [

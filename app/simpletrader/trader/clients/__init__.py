@@ -9,13 +9,13 @@ from .kucoin_futures import KucoinFutures
 _clients = {}
 
 def _create_client(exchange_id, bot_token):
-    from simpletrader.trader.models import BotAccount
+    from simpletrader.trader.models import Bot
     client_class = {
         Exchange.get_by('name', 'nobitex').id: Nobitex,
         Exchange.get_by('name', 'kucoin_spot').id: KucoinSpot,
         Exchange.get_by('name', 'kucoin_futures').id: KucoinFutures,
     }[exchange_id]
-    credentials = BotAccount.get_bot_credentials(exchange_id, bot_token)
+    credentials = Bot.get(bot_token).account.credentials
     return client_class(credentials, bot_token)
 
 def get_client(exchange_id, bot_token):
