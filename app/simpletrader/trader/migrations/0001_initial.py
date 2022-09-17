@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.RunSQL('''
-        -- public.trader_order definition
+-- public.trader_order definition
 
 -- Drop table
 
@@ -83,9 +83,12 @@ class Migration(migrations.Migration):
 
 CREATE TABLE public.trader_order (
 	id bigserial NOT NULL,
+    external_id varchar(32) NOT NULL,
 	client_order_id varchar(128) NULL,
+	exchange_id int4 NOT NULL,
 	market_id int4 NOT NULL,
 	status_id int4 NOT NULL,
+	leverage int4 DEFAULT 1,
 	"timestamp" timestamptz NOT NULL,
 	price numeric(32, 16) NULL,
 	volume numeric(32, 16) NOT NULL,
@@ -96,8 +99,10 @@ CREATE TABLE public.trader_order (
 	CONSTRAINT trader_order_placed_by_id_28faa213_fk_trader_bot_token FOREIGN KEY (placed_by_id) REFERENCES public.trader_bot("token") DEFERRABLE INITIALLY DEFERRED
 );
 CREATE INDEX trader_order_account_id_09e7ecee ON public.trader_order USING btree (account_id);
+CREATE INDEX trader_order_exchange_id_dcdb1512 ON public.trader_order USING btree (exchange_id varchar_pattern_ops);
 CREATE INDEX trader_order_client_order_id_367fc77f ON public.trader_order USING btree (client_order_id);
 CREATE INDEX trader_order_client_order_id_367fc77f_like ON public.trader_order USING btree (client_order_id varchar_pattern_ops);
+CREATE INDEX trader_order_exchange_id_c1132f233 ON public.trader_order USING btree (exchange_id);
 CREATE INDEX trader_order_market_id_3e0678ac ON public.trader_order USING btree (market_id);
 CREATE INDEX trader_order_placed_by_id_28faa213 ON public.trader_order USING btree (placed_by_id);
 CREATE INDEX trader_order_placed_by_id_28faa213_like ON public.trader_order USING btree (placed_by_id varchar_pattern_ops);
@@ -119,8 +124,9 @@ insert
 
 CREATE TABLE public.trader_fill (
 	id bigserial NOT NULL,
-	exchange_id int8 NOT NULL,
-	exchange_order_id int8 NOT NULL,
+	external_id varchar(32) NOT NULL,
+	external_order_id varchar(32) NOT NULL,
+	exchange_id int4 NOT NULL,
 	market_id int4 NOT NULL,
 	"timestamp" timestamptz NOT NULL,
 	price numeric(32, 16) NULL,
@@ -132,8 +138,9 @@ CREATE TABLE public.trader_fill (
 	CONSTRAINT trader_fill_account_id_46409e97_fk_trader_account_id FOREIGN KEY (account_id) REFERENCES public.trader_account(id) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE INDEX trader_fill_account_id_46409e97 ON public.trader_fill USING btree (account_id);
-CREATE INDEX trader_fill_exchange_id_dcdb1594 ON public.trader_fill USING btree (exchange_id);
-CREATE INDEX trader_fill_exchange_order_id_c1178787 ON public.trader_fill USING btree (exchange_order_id);
+CREATE INDEX trader_fill_external_id_dcdb1594 ON public.trader_fill USING btree (external_id varchar_pattern_ops);
+CREATE INDEX trader_fill_external_order_id_c1178787 ON public.trader_fill USING btree (external_order_id varchar_pattern_ops);
+CREATE INDEX trader_fill_exchange_id_c1132r23 ON public.trader_fill USING btree (exchange_id);
 CREATE INDEX trader_fill_market_id_6e813bd0 ON public.trader_fill USING btree (market_id);
 CREATE INDEX trader_fill_timestamp_idx ON public.trader_fill USING btree ("timestamp" DESC);
 

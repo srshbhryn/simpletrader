@@ -66,9 +66,10 @@ class Order(models.Model):
     placed_by = models.ForeignKey(Bot, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     #
-    exchange_id = models.CharField(max_length=32, db_index=True)
+    external_id = models.CharField(max_length=32, db_index=True)
     client_order_id = models.CharField(db_index=True, max_length=128, null=True, blank=True, default=None)
     leverage = models.SmallIntegerField(default=1, blank=True)
+    exchange_id = models.IntegerField(db_index=True)
     market_id = models.IntegerField(db_index=True)
     status_id = models.IntegerField()
     timestamp = TimescaleDateTimeField(interval='24 hour')
@@ -95,8 +96,9 @@ class Order(models.Model):
 class Fill(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     #
-    exchange_id = models.CharField(max_length=32, db_index=True)
-    exchange_order_id = models.CharField(max_length=32, db_index=True)
+    external_id = models.CharField(max_length=32, db_index=True)
+    external_order_id = models.CharField(max_length=32, db_index=True)
+    exchange_id = models.IntegerField(db_index=True)
     market_id = models.IntegerField(db_index=True)
     timestamp = TimescaleDateTimeField(interval='24 hour')
     price = models.DecimalField(max_digits=32, decimal_places=16, default=None, null=True)
