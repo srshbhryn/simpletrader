@@ -111,3 +111,11 @@ class Fill(models.Model):
 
     class Meta:
         managed = False
+
+
+class BalanceRecord(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    asset_id = models.SmallIntegerField(db_index=True)
+    timestamp = TimescaleDateTimeField(interval='24 hour')
+    free_balance = models.DecimalField(max_digits=32, decimal_places=16)
+    blocked_balance = models.DecimalField(max_digits=32, decimal_places=16)
