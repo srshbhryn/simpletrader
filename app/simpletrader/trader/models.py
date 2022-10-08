@@ -115,6 +115,7 @@ class WalletSnapShot(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     #
     timestamp = TimescaleDateTimeField(interval='24 hour')
+    asset_id = models.SmallIntegerField(db_index=True)
     free_balance = models.DecimalField(max_digits=32, decimal_places=16)
     blocked_balance = models.DecimalField(max_digits=32, decimal_places=16)
 

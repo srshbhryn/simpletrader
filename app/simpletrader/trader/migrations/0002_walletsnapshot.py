@@ -36,10 +36,12 @@ CREATE TABLE public.trader_walletsnapshot (
 	free_balance numeric(32, 16) NOT NULL,
 	blocked_balance numeric(32, 16) NOT NULL,
 	account_id int8 NOT NULL,
+    asset_id int4 NOT NULL,
 	CONSTRAINT trader_walletsnapshot_account_id_4640aa97_fk_trader_account_id FOREIGN KEY (account_id) REFERENCES public.trader_account(id) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE INDEX trader_walletsnapshot_account_id_46409e97 ON public.trader_walletsnapshot USING btree (account_id);
 CREATE INDEX trader_walletsnapshot_timestamp_idx ON public.trader_walletsnapshot USING btree ("timestamp" DESC);
+CREATE INDEX trader_walletsnapshot_asset_id_ce132r23 ON public.trader_walletsnapshot USING btree (asset_id);
 
 -- Table Triggers
 
