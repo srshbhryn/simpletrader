@@ -79,7 +79,6 @@ class Order(models.Model):
 
     objects = TimescaleManager()
 
-
     FINAL_STATE_IDS = [
         OrderState.get_by('name', state).id
         for state in [
@@ -112,10 +111,14 @@ class Fill(models.Model):
     class Meta:
         managed = False
 
-
-class BalanceRecord(models.Model):
+class WalletSnapShot(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    asset_id = models.SmallIntegerField(db_index=True)
+    #
     timestamp = TimescaleDateTimeField(interval='24 hour')
     free_balance = models.DecimalField(max_digits=32, decimal_places=16)
     blocked_balance = models.DecimalField(max_digits=32, decimal_places=16)
+
+    objects = TimescaleManager()
+
+    class Meta:
+        managed = False
