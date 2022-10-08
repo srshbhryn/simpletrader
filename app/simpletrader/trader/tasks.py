@@ -1,10 +1,17 @@
 import json
 
+from django.db import models
 from celery import shared_task
 
 
 from .sharedconfigs import OrderState
-from .models import Bot, Order
+from .models import (
+    Bot,
+    Order,
+    Account,
+    BalanceRecord,
+    Fill
+)
 from .clients.base import OrderParams
 
 
@@ -58,3 +65,37 @@ def get_order_status_task(args):
 # def cancel_order_task(*args):
 #     a, b = args[0]
 #     return async_to_sync(main)(a, b)
+
+
+@shared_task(name='trader.cancel_order',)
+def get_balance(args):
+    args = json.loads(args)
+    bot_token = args['bot_token']
+    exchange_id = args['exchange_id']
+    asset_id = args['asset_id']
+    account: Account  = Bot.get(bot_token).account(exchange_id)
+    last_record = BalanceRecord.objects.filter(
+        account=account,
+        asset_id=asset_id,
+    ).order_by('timestamp').last()
+    if last_record is None:
+        return json.dumps({'code': 4})
+    return json.dumps({
+        'code': 0,
+        'timestamp': last_record.timestamp.isoformat(),
+        'free_balance': last_record.free_balance,
+        'blocked_balance': last_record.blocked_balance,
+    })
+
+
+@shared_task(name='trader.cancel_order',)
+def get_fills(args):
+    args = json.loads(args)
+    order_id = args['order_id']
+    fills = Fill.objects.filter(
+        external_order_id=Order.get(id=order_id).external_id
+    ).aggregate(fills=models.Sum('amount')).get('fills') or 0
+    return json.dumps({
+        'code': 0,
+        'fills': fills,
+    })

@@ -1,4 +1,5 @@
 import datetime
+import signal
 import logging
 import time
 import json
@@ -107,3 +108,18 @@ class LimitGuard:
             result = fn(*args, **kwargs)
             return result
         return inner
+
+
+
+class GracefulKiller:
+    def __init__(self):
+        self._kill_now = False
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+    @property
+    def is_alive(self):
+        return not self._kill_now
+
+    def exit_gracefully(self, *args, **kwargs):
+        self._kill_now = True

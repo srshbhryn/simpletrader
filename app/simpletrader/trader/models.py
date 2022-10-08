@@ -1,4 +1,5 @@
 from typing import Dict
+from functools import cache
 
 from django.db import models
 import uuid
@@ -34,13 +35,12 @@ class Bot(models.Model):
             cls._bots[token] = Bot.objects.get(token=token)
         return cls._bots[token]
 
-    @cached_property
+    @cache
     def account(self, exchange_id: int) -> 'Account':
-        account = BotAccount.objects.get(
+        return BotAccount.objects.get(
             bot__token=self.token,
             account__exchange_id=exchange_id,
         ).account
-        return account
 
 
 class Account(models.Model):
@@ -111,3 +111,11 @@ class Fill(models.Model):
 
     class Meta:
         managed = False
+
+
+class BalanceRecord(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    asset_id = models.SmallIntegerField(db_index=True)
+    timestamp = TimescaleDateTimeField(interval='24 hour')
+    free_balance = models.DecimalField(max_digits=32, decimal_places=16)
+    blocked_balance = models.DecimalField(max_digits=32, decimal_places=16)
