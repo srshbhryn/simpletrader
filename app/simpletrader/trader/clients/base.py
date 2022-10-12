@@ -12,6 +12,12 @@ logger = logging.getLogger('django')
 class ExchangeClientError(Exception):
     pass
 
+class WalletSnapShotParams(TypedDict):
+    asset_id: int
+    timestamp: datetime
+    free_balance: Decimal
+    blocked_balance: Decimal
+
 
 class FillParams(TypedDict):
     exchange_id: str

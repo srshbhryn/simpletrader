@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+import functools
 import time
 from datetime import datetime
 import logging
@@ -7,10 +8,13 @@ import requests
 import pyotp
 from decimal import Decimal
 
+from django.utils.timezone import now
+
 from simpletrader.base.utils import LimitGuard
 from simpletrader.trader.sharedconfigs import Market, Asset, OrderState
 
-from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception, FillParams
+from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception, FillParams, \
+    WalletSnapShotParams
 from .helpers.nobitex import translate_currency, translate_order_status
 
 
@@ -70,7 +74,20 @@ class Serializers:
         return _order
 
     @classmethod
-    def deserialize_order(self, order: OrderParams) -> dict:
+    def serialize_balances(cls,
+        currency_codename: str,
+        balances: dict,
+        timestamp: datetime,
+    ) -> WalletSnapShotParams:
+        return WalletSnapShotParams(
+            asset_id=Asset.get_by('name', currency_codename.lower()).id,
+            timestamp=timestamp,
+            blocked_balance=Decimal(balances['blocked_balance']),
+            free_balance=Decimal(balances['free_balance']),
+        )
+
+    @classmethod
+    def deserialize_order(cls, order: OrderParams) -> dict:
         market = Market.get_by('id', order['market_id'])
         base_asset = market.base_asset.name
         quote_asset = market.quote_asset.name
@@ -213,3 +230,26 @@ class Nobitex(BaseClient):
             self.base_url + '/market/orders/update-status',
             {'id': exchange_id, 'status': 'canceled'},
         )
+
+    @functools.cached_property
+    def _wallet_currencies(self):
+        return ','.join([
+            a.name
+            for a in Asset.instances
+        ])
+
+    @LimitGuard('12/m')
+    def get_balances(self) -> List[WalletSnapShotParams]:
+        timestamp: datetime = now()
+        return [
+            Serializers.serialize_balances(
+                currency_codename,
+                balances,
+                timestamp,
+            )
+            for currency_codename, balances in self._request(
+                self.TYPE.private,
+                self.METHOD.get,
+                self.base_url + f'/path?currencies={self._wallet_currencies}' #TODO: URL
+            )['balances'].items() # TODO check 'balances' key
+        ]
