@@ -30,17 +30,14 @@ class NobitexFillCollector(GracefulKiller):
         self.client: Nobitex = Nobitex(credentials=self.account.credentials)
 
     def exit_gracefully(self, *args, **kwargs):
-        print(f'bye: {self.account_id}')
         return super().exit_gracefully(*args, **kwargs)
 
     def run(self):
         while self.is_alive:
-            print(self.account_id)
             try:
                 last_fetched_id = self._fills.aggregate(
                     max_id=m.Max('external_id')
                 ).get('max_id') or -1
-
                 Fill.objects.bulk_create([
                     Fill(**{
                         'account_id': self.account_id,
@@ -48,9 +45,6 @@ class NobitexFillCollector(GracefulKiller):
                     })
                     for fill in self.client.get_fills(from_id=last_fetched_id+1)
                 ], batch_size=100)
-            except KeyboardInterrupt:
-                print('bye')
-                break
             except Exception as e:
                 log.error(e)
             time.sleep(2)

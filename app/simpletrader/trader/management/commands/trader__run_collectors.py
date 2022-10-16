@@ -1,9 +1,10 @@
-from typing import List
+from typing import List, TypedDict, Dict, Type, Any
 import sys
 import time
 import multiprocessing
 
 from django.core.management.base import BaseCommand
+from django.db import models, connections
 
 from simpletrader.base.utils import GracefulKiller
 from simpletrader.trader.sharedconfigs import Exchange
@@ -11,9 +12,9 @@ from simpletrader.trader.models import Account
 from simpletrader.trader.fill_collectors.nobitex import NobitexFillCollector
 
 
-
 class Command(BaseCommand, GracefulKiller):
     def __init__(self, *args, **kwargs) -> None:
+
         self.processes: List[multiprocessing.Process] = []
         super().__init__(*args, **kwargs)
         GracefulKiller.__init__(self)
@@ -26,7 +27,9 @@ class Command(BaseCommand, GracefulKiller):
         return super().exit_gracefully(*args, **kwargs)
 
     def handle(self, *args, **options):
+        connections.close_all()
         self.collect_nobitex_fills()
+        self.collect_nobitex_balances()
         while self.is_alive:
             time.sleep(1)
         sys.exit(0)
@@ -42,3 +45,6 @@ class Command(BaseCommand, GracefulKiller):
             )
             self.processes.append(p)
             p.start()
+
+    def collect_nobitex_balances(self):
+        pass
