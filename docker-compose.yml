@@ -127,6 +127,26 @@ services:
       - POSTGRES_PASSWORD=traderdb
       - POSTGRES_DB=traderdb
 
+  trader__celery_worker:
+    image: simpletrader_image
+    command: "./entrypoint.trader_collectors.sh"
+    restart: always
+    environment:
+      - DEBUG=0
+    depends_on:
+      - celery_redis
+      - traderdb
+
+  trader__fill_collector:
+    image: simpletrader_image
+    command: "./entrypoint.trader_celery_worker.sh"
+    restart: always
+    environment:
+      - DEBUG=0
+    depends_on:
+      - celery_redis
+      - traderdb
+
   goapp_base_image:
     build:
       context: ./goapp
