@@ -30,7 +30,6 @@ def place_order_task(args):
         'placed_by': bot,
         'account': bot.account,
     })
-    # return json.dumps(order)
     return json.dumps({'code': 0})
 
 
@@ -67,7 +66,7 @@ def get_order_status_task(args):
 #     return async_to_sync(main)(a, b)
 
 
-@shared_task(name='trader.cancel_order',)
+@shared_task(name='trader.get_balance',)
 def get_balance(args):
     args = json.loads(args)
     bot_token = args['bot_token']
