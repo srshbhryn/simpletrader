@@ -10,6 +10,7 @@ from simpletrader.base.utils import GracefulKiller
 from simpletrader.trader.sharedconfigs import Exchange
 from simpletrader.trader.models import Account
 from simpletrader.trader.fill_collectors.nobitex import NobitexFillCollector
+from simpletrader.trader.balance_collectors.nobitex import NobitexBalanceCollector
 
 
 class Command(BaseCommand, GracefulKiller):
@@ -47,4 +48,13 @@ class Command(BaseCommand, GracefulKiller):
             p.start()
 
     def collect_nobitex_balances(self):
-        pass
+        account_ids = Account.objects.filter(
+            exchange_id=Exchange.get_by('name', 'nobitex').id
+        ).values_list('id', flat=True)
+        for account_id in account_ids:
+            p = multiprocessing.Process(
+                target=NobitexBalanceCollector.create_and_run,
+                args=(account_id,)
+            )
+            self.processes.append(p)
+            p.start()

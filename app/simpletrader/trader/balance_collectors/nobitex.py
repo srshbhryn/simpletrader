@@ -4,12 +4,12 @@ import logging
 from django.db import models as m
 
 from simpletrader.base.utils import GracefulKiller
-from simpletrader.trader.models import Account, Fill
+from simpletrader.trader.models import Account, WalletSnapShot
 from simpletrader.trader.clients import Nobitex
 
 log = logging.getLogger('django')
 
-class NobitexFillCollector(GracefulKiller):
+class NobitexBalanceCollector(GracefulKiller):
 
     @classmethod
     def create_and_run(cls, account_id):
@@ -21,9 +21,6 @@ class NobitexFillCollector(GracefulKiller):
         self.account: Account = None
         super().__init__()
 
-    @property
-    def _fills(self):
-        return Fill.objects.filter(account_id=self.account_id)
 
     def _init(self):
         self.account: Account = Account.objects.get(pk=self.account_id)
@@ -32,16 +29,13 @@ class NobitexFillCollector(GracefulKiller):
     def run(self):
         while self.is_alive:
             try:
-                last_fetched_id = self._fills.aggregate(
-                    max_id=m.Max('external_id')
-                ).get('max_id') or -1
-                Fill.objects.bulk_create([
-                    Fill(**{
+                WalletSnapShot.objects.bulk_create([
+                    WalletSnapShot(**{
                         'account_id': self.account_id,
-                        **fill
+                        **wallet_balance
                     })
-                    for fill in self.client.get_fills(from_id=last_fetched_id+1)
-                ], batch_size=100)
+                    for wallet_balance in self.client.get_balances()
+                ],)
             except Exception as e:
                 log.error(e)
             time.sleep(2)
