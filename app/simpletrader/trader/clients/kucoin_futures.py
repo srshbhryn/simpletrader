@@ -26,6 +26,7 @@ class KucoinFuturesError(ExchangeClientError):
 class Symbol(str):
     pass
 
+
 class ContractInfo(TypedDict):
     symbol: str
     rootSymbol: str
@@ -218,8 +219,13 @@ class KucoinFutures(BaseClient):
             **order,
         }
 
-    def cancel_order(self, exchange_id: int) -> None:
-        raise NotImplementedError()
+    @LimitGuard('40/3s')
+    def cancel_order(self, external_id: str) -> None:
+        self._request(
+            type=KucoinFutures.TYPE.private,
+            method=KucoinFutures.METHOD.delete,
+            path=f'/api/v1/orders/{external_id}'
+        )
 
     def get_fills(self, from_timestamp: Optional[datetime] = None) -> List[FillParams]:
         raise NotImplementedError()
