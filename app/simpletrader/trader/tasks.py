@@ -9,7 +9,7 @@ from .models import (
     Bot,
     Order,
     Account,
-    BalanceRecord,
+    WalletSnapShot,
     Fill
 )
 from .clients.base import OrderParams
@@ -74,7 +74,7 @@ def get_balance(args):
     exchange_id = args['exchange_id']
     asset_id = args['asset_id']
     account: Account  = Bot.get(bot_token).account(exchange_id)
-    last_record = BalanceRecord.objects.filter(
+    last_record = WalletSnapShot.objects.filter(
         account=account,
         asset_id=asset_id,
     ).order_by('timestamp').last()
