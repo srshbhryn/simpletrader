@@ -1,5 +1,6 @@
 from typing import Dict
 from functools import cache
+import json
 
 from django.db import models
 import uuid
@@ -42,14 +43,29 @@ class Bot(models.Model):
         ).account
 
 
+class AccountManager(models.Manager):
+    def create(self, exchange_id, _credentials):
+        return super().create(exchange_id, json.dumps(_credentials))
+
 class Account(models.Model):
+    def __init__(self, id=None, exchange_id=None, _credentials=None) -> None:
+        super().__init__(id=id, exchange_id=exchange_id, _credentials=json.dumps(_credentials))
     exchange_id = models.IntegerField()
-    credentials = models.JSONField()
+    _credentials = models.TextField(default='{}')
+
+    @property
+    def credentials(self):
+        return json.loads(json.loads(self._credentials))
+
+    @credentials.setter
+    def credentials(self, value):
+        self._credentials = json.dumps(value)
 
     @cached_property
     def exchange_name(self):
         return Exchange.get_by('id', self.exchange_id).name
 
+    objects = AccountManager()
 
 class BotAccount(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
@@ -87,9 +103,6 @@ class Order(models.Model):
         ]
     ]
 
-    class Meta:
-        managed = False
-
 
 class Fill(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -107,8 +120,6 @@ class Fill(models.Model):
 
     objects = TimescaleManager()
 
-    class Meta:
-        managed = False
 
 class WalletSnapShot(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -119,6 +130,3 @@ class WalletSnapShot(models.Model):
     blocked_balance = models.DecimalField(max_digits=32, decimal_places=16)
 
     objects = TimescaleManager()
-
-    class Meta:
-        managed = False
