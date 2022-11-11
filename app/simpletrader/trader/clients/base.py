@@ -77,7 +77,7 @@ def handle_exception(func):
             except requests.RequestException as e:
                 logger.error(e)
                 if e.response:
-                    logger.error(vars(e.json()))
+                    print(e.response.text)
                 raise ExchangeClientError(e)
             return response
     return wrapper

@@ -10,12 +10,15 @@ import requests
 import logging
 import time
 
+from django.utils.timezone import now
 
 from simpletrader.base.utils import LimitGuard
-from simpletrader.trader.sharedconfigs import Asset, Market
+from simpletrader.trader.sharedconfigs import Asset, Market, Exchange
 from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception, FillParams
 from .helpers.kucoin_futures import get_symbol, translate_symbol
 
+
+exchange_id = Exchange.get_by('name', 'kucoin_futures').id
 
 logger = logging.getLogger('django')
 
@@ -80,7 +83,9 @@ class Serializer:
     @classmethod
     def serialize_order(cls, order: dict) -> OrderParams:
         return {
-            'exchange_id': order['orderId']
+            'external_id': order['orderId'],
+            'timestamp': now(),
+            'exchange_id': exchange_id,
         }
 
     @classmethod
@@ -139,6 +144,8 @@ class KucoinFutures(BaseClient):
     base_url = 'https://api-futures.kucoin.com'
 
     def __init__(self, credentials: dict, token: str):
+        print(credentials)
+        print(type(credentials))
         self.bot_token  = token
         self.api_key = credentials['api_key']
         self.api_secret = credentials['api_secret']
@@ -165,7 +172,7 @@ class KucoinFutures(BaseClient):
         }
         if not Serializer.contract_info_map:
             Serializer.contract_info_map = {
-                translate_symbol(contract_info['symbol']): Serializer.serialize_contract_info(contract_info)
+                contract_info['symbol']: Serializer.serialize_contract_info(contract_info)
                 for contract_info in self._request(
                     self.TYPE.public,
                     self.METHOD.get,
@@ -181,7 +188,6 @@ class KucoinFutures(BaseClient):
     def _signed_headers(self, path: str, method: str, data: Optional[str] = None) -> dict:
         now = int(time.time() * 1000)
         str_to_sign = str(now) + method.upper() + path + data
-        print(str_to_sign)
         signature = base64.b64encode(
             hmac.new(
                 self.api_secret.encode('utf-8'),
@@ -211,7 +217,7 @@ class KucoinFutures(BaseClient):
         response.raise_for_status()
         response = response.json()
         if not response['code'] == '200000':
-            raise KucoinFuturesError(response['code'])
+            raise KucoinFuturesError(response['code'], response)
         return response['data']
 
     @LimitGuard('30/3s')

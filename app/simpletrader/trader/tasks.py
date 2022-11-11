@@ -29,7 +29,7 @@ def place_order_task(args):
     order['volume'] = decimal.Decimal(order['volume'])
     client = bot.get_client(exchange_id)
     order = client.place_order(order)
-    Order.objects.create({
+    Order.objects.create(**{
         **order,
         'placed_by': bot,
         'account': bot.account(exchange_id),
