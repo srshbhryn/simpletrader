@@ -26,7 +26,6 @@ class Bot(models.Model):
     def get_client(self, exchange_id: int) -> BaseClient:
         return get_client(exchange_id, self.token)
 
-
     _bots: Dict[str, 'Bot'] = {}
 
     @classmethod

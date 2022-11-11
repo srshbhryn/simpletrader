@@ -15,7 +15,7 @@ def _create_client(exchange_id, bot_token):
         Exchange.get_by('name', 'kucoin_spot').id: KucoinSpot,
         Exchange.get_by('name', 'kucoin_futures').id: KucoinFutures,
     }[exchange_id]
-    credentials = Bot.get(bot_token).account.credentials
+    credentials = Bot.get(bot_token).account(exchange_id).credentials
     return client_class(credentials, bot_token)
 
 def get_client(exchange_id, bot_token):

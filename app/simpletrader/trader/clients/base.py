@@ -75,14 +75,9 @@ def handle_exception(func):
             try:
                 response = func(*args, **kwargs)
             except requests.RequestException as e:
-                if e.response and e.response.status_code == 403:
-                    self.initialize()
-                    continue
-                elif e.response and e.response.status_code == 400:
-                    logger.info(e)
-                    raise ExchangeClientError(e)
-            except Exception as e:
                 logger.error(e)
-                time.sleep(10)
+                if e.response:
+                    logger.error(vars(e.json()))
+                raise ExchangeClientError(e)
             return response
     return wrapper

@@ -1,6 +1,7 @@
 from typing import TypedDict, Dict, List, Optional, NamedTuple
 from decimal import Decimal
 from datetime import datetime
+import json
 import uuid
 import base64
 import hmac
@@ -13,7 +14,7 @@ import time
 from simpletrader.base.utils import LimitGuard
 from simpletrader.trader.sharedconfigs import Asset, Market
 from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception, FillParams
-from .helpers.kucoin_futures import get_symbol
+from .helpers.kucoin_futures import get_symbol, translate_symbol
 
 
 logger = logging.getLogger('django')
@@ -51,11 +52,11 @@ class Serializer:
     contract_info_map: Dict[Symbol, ContractInfo] = {}
 
     @classmethod
-    def serialize_fill(self, fill: dict) -> FillParams:
+    def serialize_fill(cls, fill: dict) -> FillParams:
         pass
 
     @classmethod
-    def serialize_contract_info(self, contract_info) -> ContractInfo:
+    def serialize_contract_info(cls, contract_info) -> ContractInfo:
         decimal_keys = [
             'maxPrice',
             'tickSize',
@@ -77,15 +78,15 @@ class Serializer:
         }
 
     @classmethod
-    def serialize_order(self, order: dict) -> OrderParams:
+    def serialize_order(cls, order: dict) -> OrderParams:
         return {
             'exchange_id': order['orderId']
         }
 
     @classmethod
-    def deserialize_order(self, order: OrderParams) -> dict:
+    def deserialize_order(cls, order: OrderParams) -> dict:
         symbol = get_symbol(order['market_id'])
-        contract_info: ContractInfo = contract_info[symbol]
+        contract_info: ContractInfo = cls.contract_info_map[symbol]
         contract_info['multiplier']
         if not order['leverage']:
             order['leverage'] = 10
@@ -97,16 +98,16 @@ class Serializer:
             order['price'] = price
 
         #fix amount
-        amount= order['amount']
+        amount = order['volume']
         size = round(amount / contract_info['multiplier'], 0)
-        order['amount'] = size * contract_info['multiplier']
+        order['volume'] = size * contract_info['multiplier']
 
         # MARKET ORDER PARAMETERS
         return {
             # Integer	[optional] amount of contract to buy or sell
-            'size': size,
+            'size': int(size),
             # String	Limit price
-            **({'price': price} if price else {}),
+            **({'price': float(price)} if price else {}),
             #String	Unique order id created by users to identify their orders, e.g. UUID, Only allows numbers, characters, underline(_), and separator(-)
             'clientOid': order['client_order_id'],
             #String	buy or sell
@@ -146,7 +147,7 @@ class KucoinFutures(BaseClient):
             self.TYPE.public: {},
             self.TYPE.private: {},
         }
-        self.self[self.TYPE.public] = {
+        self.headers[self.TYPE.public] = {
             'content-type': 'application/json',
         }
         passphrase = base64.b64encode(
@@ -164,22 +165,30 @@ class KucoinFutures(BaseClient):
         }
         if not Serializer.contract_info_map:
             Serializer.contract_info_map = {
-                contract_info['symbol']: Serializer.serialize_contract_info(contract_info)
+                translate_symbol(contract_info['symbol']): Serializer.serialize_contract_info(contract_info)
                 for contract_info in self._request(
                     self.TYPE.public,
                     self.METHOD.get,
                     '/api/v1/contracts/active',
                 )
+                if translate_symbol(contract_info['symbol']) is not None
             }
+
 
     def _set_sand_box(self):
         pass
 
-    def _signed_headers(self, path: str, method: str) -> Dict:
+    def _signed_headers(self, path: str, method: str, data: Optional[str] = None) -> dict:
         now = int(time.time() * 1000)
-        str_to_sign = str(now) + method.upper() + path
+        str_to_sign = str(now) + method.upper() + path + data
+        print(str_to_sign)
         signature = base64.b64encode(
-            hmac.new(self.api_secret.encode('utf-8'), str_to_sign.encode('utf-8'), hashlib.sha256).digest())
+            hmac.new(
+                self.api_secret.encode('utf-8'),
+                str_to_sign.encode('utf-8'),
+                hashlib.sha256,
+            ).digest()
+        )
         return {
             **self.headers[self.TYPE.private],
             'KC-API-SIGN': signature,
@@ -187,11 +196,12 @@ class KucoinFutures(BaseClient):
         }
 
     @handle_exception
-    def _request(self, type, method, path, data=None) -> Dict:
+    def _request(self, type, method, path, data:Optional[str] = None) -> Dict:
+        data = data or ''
         if type == self.TYPE.public:
             headers = self.headers[self.TYPE.public]
         else:
-            headers = self._signed_headers(path, method)
+            headers = self._signed_headers(path, method, data)
         response = requests.request(
             method=method,
             url=self.base_url + path,
@@ -213,7 +223,7 @@ class KucoinFutures(BaseClient):
                     type=KucoinFutures.TYPE.private,
                     method=KucoinFutures.METHOD.post,
                     path='/api/v1/orders',
-                    data=Serializer.deserialize_order(order),
+                    data=json.dumps(Serializer.deserialize_order(order)).strip(),
                 )
             ),
             **order,

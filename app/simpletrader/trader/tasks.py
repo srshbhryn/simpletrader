@@ -1,4 +1,5 @@
 import json
+import decimal
 
 from django.db import models
 from celery import shared_task
@@ -23,12 +24,15 @@ def place_order_task(args):
     del order['bot_token']
     del order['exchange_id']
     bot: Bot  = Bot.get(bot_token)
+    if order['price']:
+        order['price'] = decimal.Decimal(order['price'])
+    order['volume'] = decimal.Decimal(order['volume'])
     client = bot.get_client(exchange_id)
     order = client.place_order(order)
     Order.objects.create({
         **order,
         'placed_by': bot,
-        'account': bot.account,
+        'account': bot.account(exchange_id),
     })
     return json.dumps({'code': 0})
 
