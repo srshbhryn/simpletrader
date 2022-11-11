@@ -28,6 +28,10 @@ type Market struct {
 var instanceById map[int]*Market
 var instanceBySymbol map[string]*Market
 
+func GetBySymbol(symbol string) (*Market, error) {
+	return instanceBySymbol[symbol], nil
+}
+
 func init() {
 	configDir := os.Getenv("CONFIG_DIR")
 	configFile := configDir + "markets.json"

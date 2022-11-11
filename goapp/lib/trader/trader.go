@@ -1,12 +1,13 @@
 package trader
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"time"
 
-	"github.com/gocelery/gocelery"
 	"github.com/gomodule/redigo/redis"
+	"github.com/srshbhryn/gocelery"
 )
 
 func Load() {}
@@ -55,7 +56,9 @@ func GetResult(ar *gocelery.AsyncResult, timeout time.Duration) (interface{}, er
 			return nil, err
 		case <-ticker.C:
 			val, err := ar.AsyncGet()
-			// TODO: should return if task failed.
+			if errors.Is(err, gocelery.TaskFailedError) {
+				return nil, err
+			}
 			if err != nil {
 				continue
 			}
