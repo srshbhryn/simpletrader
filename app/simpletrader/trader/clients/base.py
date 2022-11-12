@@ -76,8 +76,8 @@ def handle_exception(func):
                 response = func(*args, **kwargs)
             except requests.RequestException as e:
                 logger.error(e)
-                if e.response:
-                    print(e.response.text)
+                if e.response is not None:
+                    logger.error(e.response.text)
                 raise ExchangeClientError(e)
             return response
     return wrapper

@@ -101,7 +101,8 @@ class Serializers:
         if price is None:
             _order['execution'] = 'market'
         else:
-            _order['price'] = price
+            _order['execution'] = 'limit'
+            _order['price'] = str(price)
         return _order
 
 
@@ -162,7 +163,7 @@ class Nobitex(BaseClient):
         response = self.sessions[type].request(
             method=method,
             url=url,
-            data=data,
+            json=data,
         )
         response.raise_for_status()
         response = response.json()

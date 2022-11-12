@@ -41,12 +41,12 @@ func main() {
 	args, err := json.Marshal(
 		OrderParams{
 			BotToken:   "test",
-			ExchangeId: 3,
+			ExchangeId: 1,
 			// MarketId:   market.Id,
 			MarketId: 2,
 			Volume:   0.01,
 			Leverage: &a,
-			IsSell:   false,
+			IsSell:   true,
 		})
 	if err != nil {
 		panic(err)
