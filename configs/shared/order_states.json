@@ -3,17 +3,20 @@
     "name": "queued"
 }, {
     "id": 2,
-    "name": "cancelled"
+    "name": "open_no_fill"
 }, {
     "id": 3,
-    "name": "filled"
+    "name": "failed_no_fill"
 }, {
     "id": 4,
-    "name": "failed"
+    "name": "canceled_no_fill"
 }, {
     "id": 5,
-    "name": "partially_filled"
+    "name": "open_partially_filled"
 }, {
     "id": 6,
-    "name": "placed"
+    "name": "canceled_partially_filled"
+}, {
+    "id": 7,
+    "name": "failed_partially_filled"
 }]
