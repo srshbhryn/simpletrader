@@ -1,18 +1,12 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
 
 	// "goapp/lib/config/markets"
 
+	"fmt"
 	"goapp/lib/config"
-	"goapp/lib/config/markets"
 	"goapp/lib/trader"
-	"time"
-
-	"github.com/srshbhryn/gocelery"
 )
 
 func init() {
@@ -30,37 +24,23 @@ type OrderParams struct {
 	Volume     float64  `json:"volume"`
 	IsSell     bool     `json:"is_sell"`
 }
+type OrderResponse struct {
+	Code int `json:"code"`
+	Id   int `json:"id"`
+}
 
 func main() {
-	market, err := markets.GetByAssetsAndExchange(2, 0, 1)
-	if err != nil {
-		panic(err)
-	}
-	args, err := json.Marshal(
-		OrderParams{
-			BotToken:   "test",
-			ExchangeId: 1,
-			MarketId:   market.Id,
-			// MarketId:   2,
-			Volume: 0.01,
-			// Leverage: &a,
-			IsSell: true,
-		})
-	if err != nil {
-		panic(err)
-	}
-	// for {
-	response, err := trader.Call("trader.place_order", string(args))
+	// id, err := trader.PlaceLimitOrder(0, -1, 1, 100, 4000000, true)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	fmt.Println("Success placed", id)
+	// }
+	// time.Sleep(5 * time.Second)
+	err := trader.CancelOrder(11)
 	if err != nil {
 		fmt.Println(err)
-		if errors.Is(err, gocelery.TaskFailedError) {
-			fmt.Println("AAAAAAAAAAAA")
-			panic(":(")
-		}
-		// fmt.Println("error")
+	} else {
+		fmt.Println("Successfully canceled")
 	}
-	fmt.Println("--------")
-	fmt.Println(response)
-	time.Sleep(10 * time.Second)
-	// }/
 }
