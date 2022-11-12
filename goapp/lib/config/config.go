@@ -1,7 +1,7 @@
 package config
 
 import (
-	"goapp/config/assets"
+	"goapp/lib/config/assets"
 )
 
 func Load() {}

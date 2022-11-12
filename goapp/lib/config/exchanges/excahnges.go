@@ -40,8 +40,8 @@ func load(filePath string) {
 	}
 	instanceById = make(map[int]*Exchange)
 	instanceByName = make(map[string]*Exchange)
-	for _, instance := range instances {
-		instanceById[instance.Id] = &instance
-		instanceByName[instance.Name] = &instance
+	for i, instance := range instances {
+		instanceById[instance.Id] = &instances[i]
+		instanceByName[instance.Name] = &instances[i]
 	}
 }

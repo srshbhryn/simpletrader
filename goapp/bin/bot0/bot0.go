@@ -7,6 +7,8 @@ import (
 
 	// "goapp/lib/config/markets"
 
+	"goapp/lib/config"
+	"goapp/lib/config/markets"
 	"goapp/lib/trader"
 	"time"
 
@@ -15,6 +17,7 @@ import (
 
 func init() {
 	trader.Load()
+	config.Load()
 }
 
 type OrderParams struct {
@@ -28,25 +31,20 @@ type OrderParams struct {
 	IsSell     bool     `json:"is_sell"`
 }
 
-// order: OrderParams = json.loads(args)
-// bot_token = order['']
-// exchange_id = order['exchange_id']
-// del order['bot_token']
-// del order['exchange_id']
 func main() {
-	// args := "{\"x\":3,\"y\":5}"
-	// args := "{\"x\":3,\"y\":5}"
-	// market, _ := markets.GetBySymbol("ETHUSDT")
-	a := 75
+	market, err := markets.GetByAssetsAndExchange(2, 0, 1)
+	if err != nil {
+		panic(err)
+	}
 	args, err := json.Marshal(
 		OrderParams{
 			BotToken:   "test",
 			ExchangeId: 1,
-			// MarketId:   market.Id,
-			MarketId: 2,
-			Volume:   0.01,
-			Leverage: &a,
-			IsSell:   true,
+			MarketId:   market.Id,
+			// MarketId:   2,
+			Volume: 0.01,
+			// Leverage: &a,
+			IsSell: true,
 		})
 	if err != nil {
 		panic(err)
