@@ -40,8 +40,8 @@ func loadAssets(filePath string) {
 	}
 	assetsById = make(map[int]*Asset)
 	assetsByName = make(map[string]*Asset)
-	for _, asset := range instances {
-		assetsById[asset.Id] = &asset
-		assetsByName[asset.Name] = &asset
+	for i, asset := range instances {
+		assetsById[asset.Id] = &instances[i]
+		assetsByName[asset.Name] = &instances[i]
 	}
 }

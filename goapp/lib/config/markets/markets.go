@@ -2,8 +2,9 @@ package markets
 
 import (
 	"encoding/json"
-	"goapp/config/assets"
-	"goapp/config/exchanges"
+	"errors"
+	"goapp/lib/config/assets"
+	"goapp/lib/config/exchanges"
 	"os"
 )
 
@@ -36,6 +37,15 @@ func init() {
 	configDir := os.Getenv("CONFIG_DIR")
 	configFile := configDir + "markets.json"
 	load(configFile)
+}
+
+func GetByAssetsAndExchange(baseAssetId int, quoteAssetId int, exchangeId int) (*Market, error) {
+	for _, m := range instanceBySymbol {
+		if m.BaseAsset.Id == baseAssetId && m.QuoteAsset.Id == quoteAssetId && m.Exchange.Id == exchangeId {
+			return m, nil
+		}
+	}
+	return nil, errors.New("market does not exists")
 }
 
 func load(filePath string) {
