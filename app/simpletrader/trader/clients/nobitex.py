@@ -32,35 +32,24 @@ class Serializers:
         is_sell = fill['type'] == 'sell'
         fee_asset_id = market.quote_asset.id if is_sell else market.base_asset.id
         return {
-            'exchange_id': fill['id'],
-            'exchange_order_id': fill['orderId'],
+            'external_id': fill['id'],
+            'external_order_id': fill['orderId'],
             'market_id': market.id,
             'timestamp': datetime.fromisoformat(fill['timestamp']),
             'is_sell': is_sell,
             'price': Decimal(fill['price']),
             'volume': Decimal(fill['price']),
             'fee': Decimal(fill['fee']),
-            'fee_asset_id': fee_asset_id
+            'fee_asset_id': fee_asset_id,
+            'exchange_id': 1,
         }
 
     @classmethod
     def serialize_order(self, order: dict) -> OrderParams:
-        base_asset = Asset.get_by('name',
-            translate_currency(order['srcCurrency']),
-        )
-        quote_asset = Asset.get_by('name',
-            translate_currency(order['dstCurrency']),
-        )
-        markets = Market.get_by('base_asset', base_asset)
-        if isinstance(markets, list):
-            market = [
-                m for m in markets
-                if m.quote_asset == quote_asset
-            ][0]
-        else:
-            market = markets
+        symbol = order['market'].replace('-', '').replace('RLS', 'IRT')
+        market = Market.get_by('symbol', symbol)
         _order = {
-            'exchange_id': order['id'],
+            'external_id': order['id'],
             'market_id': market.id,
             'is_sell': order['type'] == 'sell',
             'volume': Decimal(order['amount']),
@@ -68,6 +57,7 @@ class Serializers:
             'status_id': OrderState.get_by('name',
                 translate_order_status(order['status'])
             ).id,
+            'exchange_id': 1,
         }
         if 'price' in order:
             _order['price'] = Decimal(order['price'])
@@ -168,7 +158,7 @@ class Nobitex(BaseClient):
         response.raise_for_status()
         response = response.json()
         if not response['status'] == 'ok':
-            raise NobitexClientError(response['message'])
+            raise NobitexClientError(response)
         return response
 
     @LimitGuard('20/m')
@@ -209,7 +199,7 @@ class Nobitex(BaseClient):
                 self.METHOD.post,
                 self.base_url + '/market/orders/add',
                 Serializers.deserialize_order(order)
-            )
+            )['order']
         )
 
     @LimitGuard('60/m')
@@ -224,12 +214,12 @@ class Nobitex(BaseClient):
         )
 
     @LimitGuard('30/m')
-    def cancel_order(self, exchange_id: int) -> None:
+    def cancel_order(self, external_id: int) -> None:
         self._request(
             self.TYPE.private,
             self.METHOD.post,
             self.base_url + '/market/orders/update-status',
-            {'id': exchange_id, 'status': 'canceled'},
+            {'order': external_id, 'status': 'canceled'},
         )
 
     @functools.cached_property

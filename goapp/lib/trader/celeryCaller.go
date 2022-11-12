@@ -34,19 +34,19 @@ func init() {
 
 }
 
-func Call(taskName string, args string) (interface{}, error) {
+func call(taskName string, args string) (interface{}, error) {
 	asyncResult, err := client.Delay(taskName, args)
 	if err != nil {
 		return nil, err
 	}
-	res, err := GetResult(asyncResult, 10*time.Second)
+	res, err := getResult(asyncResult, 5*time.Second)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func GetResult(ar *gocelery.AsyncResult, timeout time.Duration) (interface{}, error) {
+func getResult(ar *gocelery.AsyncResult, timeout time.Duration) (interface{}, error) {
 	ticker := time.NewTicker(100 * time.Microsecond)
 	timeoutChan := time.After(timeout)
 	for {

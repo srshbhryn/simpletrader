@@ -29,26 +29,25 @@ def place_order_task(args):
     order['volume'] = decimal.Decimal(order['volume'])
     client = bot.get_client(exchange_id)
     order = client.place_order(order)
-    Order.objects.create(**{
+    order_object = Order.objects.create(**{
         **order,
         'placed_by': bot,
         'account': bot.account(exchange_id),
     })
-    return json.dumps({'code': 0})
+    return json.dumps({'code': 0, 'id': order_object.id})
 
 
 @shared_task(name='trader.cancel_order',)
 def cancel_order_task(args):
     args = json.loads(args)
     bot_token = args['bot_token']
-    exchange_id = args['exchange_id']
-    order_id = args['exchange_id']
-    bot: Bot  = Bot.get(bot_token)
-    client = bot.get_client(exchange_id)
-    client.cancel_order(order_id)
-    Order.objects.filter(exchange_id=order_id).update(
-        status_id=OrderState.get_by('name', 'cancelled').id
-    )
+    order_id = args['order_id']
+    order: Order = Order.objects.get(pk=order_id)
+    bot: Bot = Bot.get(bot_token)
+    client = bot.get_client(order.exchange_id)
+    client.cancel_order(int(order.external_id))
+    order.status_id = OrderState.get_by('name', 'cancelled').id
+    order.save(update_fields=['status_id',])
     return json.dumps({'code': 0})
 
 
@@ -57,17 +56,12 @@ def get_order_status_task(args):
     args = json.loads(args)
     bot_token = args['bot_token']
     exchange_id = args['exchange_id']
-    order_id = args['exchange_id']
+    order_id = args['order_id']
     order: Order = Order.objects.get(exchange_id=order_id)
     if order.status_id in Order.FINAL_STATE_IDS:
         return json.dumps({'code': 0, 'status_id': order.status_id})
 
     # FINAL_STATE_IDS
-
-# @shared_task(name='trader.cancel_order',)
-# def cancel_order_task(*args):
-#     a, b = args[0]
-#     return async_to_sync(main)(a, b)
 
 
 @shared_task(name='trader.get_balance',)
@@ -88,17 +82,4 @@ def get_balance(args):
         'timestamp': last_record.timestamp.isoformat(),
         'free_balance': last_record.free_balance,
         'blocked_balance': last_record.blocked_balance,
-    })
-
-
-@shared_task(name='trader.cancel_order',)
-def get_fills(args):
-    args = json.loads(args)
-    order_id = args['order_id']
-    fills = Fill.objects.filter(
-        external_order_id=Order.get(id=order_id).external_id
-    ).aggregate(fills=models.Sum('amount')).get('fills') or 0
-    return json.dumps({
-        'code': 0,
-        'fills': fills,
     })
