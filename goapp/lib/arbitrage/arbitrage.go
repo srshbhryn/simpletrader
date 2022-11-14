@@ -61,6 +61,7 @@ func (pair *MarketPair) getMaxBuyPrice() (float64, error) {
 	return (book.BestBidPrice * feeFactor) / safetyFactor, nil
 }
 
+// TODO: NOT TOO MUCH DATA
 func (pair *MarketPair) getSellAmount() (float64, error) {
 	var gotError sync.Mutex
 	var returningError error
