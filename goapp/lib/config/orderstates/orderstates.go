@@ -9,7 +9,7 @@ func Load() {}
 
 func init() {
 	configDir := os.Getenv("CONFIG_DIR")
-	configFile := configDir + "orderstates.json"
+	configFile := configDir + "order_states.json"
 	load(configFile)
 }
 
@@ -40,8 +40,8 @@ func load(filePath string) {
 	}
 	instanceById = make(map[int]*OrderState)
 	instanceByName = make(map[string]*OrderState)
-	for _, instance := range instances {
-		instanceById[instance.Id] = &instance
-		instanceByName[instance.Name] = &instance
+	for i, instance := range instances {
+		instanceById[instance.Id] = &instances[i]
+		instanceByName[instance.Name] = &instances[i]
 	}
 }

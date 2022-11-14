@@ -30,6 +30,19 @@ type OrderResponse struct {
 }
 
 func main() {
+	status, _ := trader.GetOrderStatus(5)
+	fmt.Println(status)
+	status, _ = trader.GetOrderStatus(11)
+	fmt.Println(status)
+
+	// m := make(map[int]string)
+	// m[12] = "Salam"
+	// x, y := m[12]
+	// fmt.Println(x)
+	// fmt.Printf("%T\n", x)
+	// fmt.Println(y)
+	// fmt.Printf("%T\n", y)
+
 	// id, err := trader.PlaceLimitOrder(0, -1, 1, 100, 4000000, true)
 	// if err != nil {
 	// 	fmt.Println(err)
@@ -37,10 +50,11 @@ func main() {
 	// 	fmt.Println("Success placed", id)
 	// }
 	// time.Sleep(5 * time.Second)
-	err := trader.CancelOrder(11)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("Successfully canceled")
-	}
+	// err = trader.CancelOrder(id)
+	// // err := trader.CancelOrder(14)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	fmt.Println("Successfully canceled")
+	// }
 }

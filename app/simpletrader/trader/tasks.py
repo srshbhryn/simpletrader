@@ -45,8 +45,11 @@ def cancel_order_task(args):
     order: Order = Order.objects.get(pk=order_id)
     bot: Bot = Bot.get(bot_token)
     client = bot.get_client(order.exchange_id)
-    client.cancel_order(int(order.external_id))
-    order.status_id = OrderState.get_by('name', 'cancelled').id
+    client.cancel_order(order.external_id)
+    status_name = 'canceled_partially_filled' if Fill.objects.filter(
+        external_order_id=order_id,
+    ).exists() else 'canceled_no_fill'
+    order.status_id = OrderState.get_by('name', status_name).id
     order.save(update_fields=['status_id',])
     return json.dumps({'code': 0})
 
@@ -54,14 +57,9 @@ def cancel_order_task(args):
 @shared_task(name='trader.get_order_status',)
 def get_order_status_task(args):
     args = json.loads(args)
-    bot_token = args['bot_token']
-    exchange_id = args['exchange_id']
     order_id = args['order_id']
-    order: Order = Order.objects.get(exchange_id=order_id)
-    if order.status_id in Order.FINAL_STATE_IDS:
-        return json.dumps({'code': 0, 'status_id': order.status_id})
-
-    # FINAL_STATE_IDS
+    order: Order = Order.objects.filter(id=order_id).only('status_id').first()
+    return json.dumps({'code': 0, 'status_id': order.status_id})
 
 
 @shared_task(name='trader.get_balance',)

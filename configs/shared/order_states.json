@@ -19,4 +19,7 @@
 }, {
     "id": 7,
     "name": "failed_partially_filled"
+}, {
+    "id": 8,
+    "name": "filled"
 }]
