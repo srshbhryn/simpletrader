@@ -21,6 +21,10 @@ type Asset struct {
 var assetsById map[int]*Asset
 var assetsByName map[string]*Asset
 
+func All() *map[int]*Asset {
+	return &assetsById
+}
+
 func ById(id int) *Asset {
 	return assetsById[id]
 }
