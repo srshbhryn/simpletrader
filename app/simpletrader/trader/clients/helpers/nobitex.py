@@ -120,10 +120,10 @@ class OrderStates(TypedDict):
 _order_states: OrderStates = {}
 
 for name, nbx_name in [
-    ('placed', 'New'),
-    ('placed', 'Active'),
+    ('open_no_fill', 'New'),
+    ('open_no_fill', 'Active'),
     ('filled', 'Done'),
-    ('cancelled', 'Canceled'),
+    # ('cancelled', 'Canceled'), # wont happen as initial state
 ]:
     _order_states[nbx_name] = name
 

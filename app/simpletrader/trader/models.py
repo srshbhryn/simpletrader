@@ -94,16 +94,6 @@ class Order(models.Model):
 
     objects = TimescaleManager()
 
-    FINAL_STATE_IDS = [
-        OrderState.get_by('name', state).id
-        for state in [
-            'cancelled',
-            'filled',
-            'failed',
-        ]
-    ]
-
-
 class Fill(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     #

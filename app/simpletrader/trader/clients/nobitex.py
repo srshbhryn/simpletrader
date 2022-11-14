@@ -219,7 +219,7 @@ class Nobitex(BaseClient):
             self.TYPE.private,
             self.METHOD.post,
             self.base_url + '/market/orders/update-status',
-            {'order': external_id, 'status': 'canceled'},
+            {'order': int(external_id), 'status': 'canceled'},
         )
 
     @functools.cached_property
