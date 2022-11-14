@@ -37,7 +37,7 @@ class BaseKucoin:
         await self.connect_to_socket()
         await self.subscribe()
         self.loop.add_callback(self.ws_msg_callback)
-        self.loop.add_callback(self.run_health_check)
+        # self.loop.add_callback(self.run_health_check)
 
     async def _get_socket_url(self):
         response: HTTPResponse  = await self.http_client.fetch(HTTPRequest(
