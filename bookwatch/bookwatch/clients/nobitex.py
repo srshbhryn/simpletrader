@@ -31,12 +31,12 @@ class Nobitex:
                     data += body[symbol]['asks'][0]
                     data = ','.join(data)
                     self.loop.add_callback(redis.set, name=market.id, value=data)
+                sleep_time = 1.05 - (
+                    self.loop.time() - start_time
+                )
+                if sleep_time <= 0:
+                    continue
+                await sleep(sleep_time)
             except Exception as e:
                 print(e)
-            sleep_time = 1.05 - (
-                self.loop.time() - start_time
-            )
-            if sleep_time <= 0:
-                continue
-            await sleep(sleep_time)
 
