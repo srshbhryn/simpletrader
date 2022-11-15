@@ -17,7 +17,7 @@ var client *gocelery.CeleryClient
 func init() {
 	redisPool := &redis.Pool{
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.DialURL(os.Getenv("REDIS"))
+			c, err := redis.DialURL(os.Getenv("TRADER_REDIS"))
 			if err != nil {
 				return nil, err
 			}
