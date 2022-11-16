@@ -47,7 +47,8 @@ def cancel_order_task(args):
     client = bot.get_client(order.exchange_id)
     client.cancel_order(order.external_id)
     status_name = 'canceled_partially_filled' if Fill.objects.filter(
-        external_order_id=order_id,
+        external_order_id=order.external_id,
+        external_id=order.external_id
     ).exists() else 'canceled_no_fill'
     order.status_id = OrderState.get_by('name', status_name).id
     order.save(update_fields=['status_id',])
@@ -63,7 +64,7 @@ def get_order_status_task(args):
 
 
 @shared_task(name='trader.get_balance',)
-def get_balance(args):
+def get_balance_task(args):
     args = json.loads(args)
     bot_token = args['bot_token']
     exchange_id = args['exchange_id']
@@ -81,3 +82,22 @@ def get_balance(args):
         'free_balance': last_record.free_balance,
         'blocked_balance': last_record.blocked_balance,
     })
+
+
+@shared_task(name='trader._update_order_status',)
+def update_order_status_task(exchange_id, external_order_id):
+    order = Order.objects.get(external_id=external_order_id, exchange_id=exchange_id)
+    filled_volume = Fill.objects.filter(
+        external_order_id=external_order_id,
+        exchange_id=exchange_id
+    ).aggregate(fv=models.Sum('volume')).get('fv') or decimal.Decimal('0')
+    if abs(order.volume - filled_volume) < decimal.Decimal('0.005'):
+        status_name = 'filled'
+    else:
+        status_name = 'open_partially_filled'
+    print(f'order.volume:\t{order.volume}')
+    print(f'filled_volume:\t{filled_volume}')
+    print(f'status_name:\t{status_name}')
+    order.status_id = OrderState.get_by('name', status_name).id
+    order.save(update_fields=['status_id',])
+    return None

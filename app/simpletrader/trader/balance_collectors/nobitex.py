@@ -1,3 +1,8 @@
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'simpletrader.settings')
+django.setup()
+
 import time
 import logging
 
@@ -14,6 +19,7 @@ class NobitexBalanceCollector(GracefulKiller):
     @classmethod
     def create_and_run(cls, account_id):
         i = cls(account_id)
+        i._init()
         i.run()
 
     def __init__(self, account_id) -> None:
@@ -24,7 +30,7 @@ class NobitexBalanceCollector(GracefulKiller):
 
     def _init(self):
         self.account: Account = Account.objects.get(pk=self.account_id)
-        self.client: Nobitex = Nobitex(credentials=self.account.credentials)
+        self.client: Nobitex = Nobitex(credentials=self.account.credentials, token='blnc')
 
     def run(self):
         while self.is_alive:
@@ -38,4 +44,4 @@ class NobitexBalanceCollector(GracefulKiller):
                 ],)
             except Exception as e:
                 log.error(e)
-            time.sleep(2)
+            time.sleep(60/12)

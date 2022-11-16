@@ -11,7 +11,7 @@ from decimal import Decimal
 from django.utils.timezone import now
 
 from simpletrader.base.utils import LimitGuard
-from simpletrader.trader.sharedconfigs import Market, Asset, OrderState
+from simpletrader.trader.sharedconfigs import Market, Asset, OrderState, ASSETS
 
 from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception, FillParams, \
     WalletSnapShotParams
@@ -28,7 +28,8 @@ class NobitexClientError(ExchangeClientError):
 class Serializers:
     @classmethod
     def serialize_fill(self, fill: dict) -> FillParams:
-        market: Market = Market.get_by('symbol', fill['market'])
+        symbol = fill['market'].replace('-', '').replace('RLS', 'IRT')
+        market = Market.get_by('symbol', symbol)
         is_sell = fill['type'] == 'sell'
         fee_asset_id = market.quote_asset.id if is_sell else market.base_asset.id
         return {
@@ -38,7 +39,7 @@ class Serializers:
             'timestamp': datetime.fromisoformat(fill['timestamp']),
             'is_sell': is_sell,
             'price': Decimal(fill['price']),
-            'volume': Decimal(fill['price']),
+            'volume': Decimal(fill['amount']),
             'fee': Decimal(fill['fee']),
             'fee_asset_id': fee_asset_id,
             'exchange_id': 1,
@@ -69,11 +70,14 @@ class Serializers:
         balances: dict,
         timestamp: datetime,
     ) -> WalletSnapShotParams:
+        balance=Decimal(balances['balance'])
+        blocked_balance=Decimal(balances['blocked'])
+        free_balance = balance - blocked_balance
         return WalletSnapShotParams(
             asset_id=Asset.get_by('name', currency_codename.lower()).id,
             timestamp=timestamp,
-            blocked_balance=Decimal(balances['blocked_balance']),
-            free_balance=Decimal(balances['free_balance']),
+            blocked_balance=blocked_balance,
+            free_balance=free_balance,
         )
 
     @classmethod
@@ -161,20 +165,33 @@ class Nobitex(BaseClient):
             raise NobitexClientError(response)
         return response
 
-    @LimitGuard('20/m')
     def get_fills(self, from_id: int = None) -> List[FillParams]:
-        params = ''
+        has_next = True
+        trades = []
+        page = 1
+        while has_next:
+            fetched_trades, has_next = self._get_fills(from_id, page)
+            trades += fetched_trades
+            page += 1
+        return trades
+
+    @LimitGuard('20/m')
+    def _get_fills(self, from_id: int = None, page: int = None):
+        params = '?pageSize=100'
         if from_id:
-            params = f'?from_id={from_id}'
-        return [
-            Serializers.serialize_fill(f)
-            for f in self._request(
+            params += f'&fromId={from_id}'
+        if page:
+            params += f'&page={page}'
+        response = self._request(
                 self.TYPE.private,
                 self.METHOD.get,
                 self.base_url + '/market/trades/list' + params,
                 None
-            )['trades']
-        ]
+            )
+        return [
+            Serializers.serialize_fill(f)
+            for f in response['trades']
+        ], response['hasNext']
 
     # @LimitGuard('30/m')
     # def get_orders(self, from_id: int = None) -> dict:
@@ -226,7 +243,7 @@ class Nobitex(BaseClient):
     def _wallet_currencies(self):
         return ','.join([
             a.name
-            for a in Asset.instances
+            for a in ASSETS
         ])
 
     @LimitGuard('12/m')
@@ -241,6 +258,6 @@ class Nobitex(BaseClient):
             for currency_codename, balances in self._request(
                 self.TYPE.private,
                 self.METHOD.get,
-                self.base_url + f'/path?currencies={self._wallet_currencies}' #TODO: URL
-            )['balances'].items() # TODO check 'balances' key
+                self.base_url + f'/v2/wallets?currencies={self._wallet_currencies}'
+            )['wallets'].items()
         ]

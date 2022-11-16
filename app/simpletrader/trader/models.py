@@ -94,6 +94,7 @@ class Order(models.Model):
 
     objects = TimescaleManager()
 
+
 class Fill(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     #

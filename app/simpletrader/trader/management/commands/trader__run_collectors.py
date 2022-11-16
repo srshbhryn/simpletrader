@@ -13,6 +13,9 @@ from simpletrader.trader.fill_collectors.nobitex import NobitexFillCollector
 from simpletrader.trader.balance_collectors.nobitex import NobitexBalanceCollector
 
 
+multiprocessing.set_start_method('spawn')
+
+
 class Command(BaseCommand, GracefulKiller):
     def __init__(self, *args, **kwargs) -> None:
 
@@ -28,7 +31,6 @@ class Command(BaseCommand, GracefulKiller):
         return super().exit_gracefully(*args, **kwargs)
 
     def handle(self, *args, **options):
-        connections.close_all()
         self.collect_nobitex_fills()
         self.collect_nobitex_balances()
         while self.is_alive:
@@ -42,7 +44,7 @@ class Command(BaseCommand, GracefulKiller):
         for account_id in account_ids:
             p = multiprocessing.Process(
                 target=NobitexFillCollector.create_and_run,
-                args=(account_id,)
+                args=(account_id,),
             )
             self.processes.append(p)
             p.start()
@@ -54,7 +56,7 @@ class Command(BaseCommand, GracefulKiller):
         for account_id in account_ids:
             p = multiprocessing.Process(
                 target=NobitexBalanceCollector.create_and_run,
-                args=(account_id,)
+                args=(account_id,),
             )
             self.processes.append(p)
             p.start()
