@@ -20,8 +20,8 @@ class WalletSnapShotParams(TypedDict):
 
 
 class FillParams(TypedDict):
-    exchange_id: str
-    exchange_order_id: str
+    external_id: str
+    external_order_id: str
     market_id: int
     timestamp: datetime
     price: Decimal
