@@ -84,8 +84,8 @@ def get_balance_task(args):
     return json.dumps({
         'code': 0,
         'timestamp': last_record.timestamp.isoformat(),
-        'free_balance': last_record.free_balance,
-        'blocked_balance': last_record.blocked_balance,
+        'free_balance': float(last_record.free_balance),
+        'blocked_balance': float(last_record.blocked_balance),
     })
 
 

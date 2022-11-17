@@ -47,7 +47,7 @@ func checkBookDelay() {
 	}
 }
 
-func main() {
+func placeOrder() {
 	// checkBookDelay()
 	baseAssetId := assets.ByName("usdt").Id
 	quoteAssetId := assets.ByName("rls").Id
@@ -77,4 +77,11 @@ func main() {
 	// time.Sleep(100 * time.Millisecond)
 	// }
 
+}
+func main() {
+	baseAssetId := assets.ByName("usdt").Id
+	quoteAssetId := assets.ByName("rls").Id
+	exchangeId := exchanges.ByName("nobitex").Id
+	fmt.Println(trader.GetWalletsStats(baseAssetId, exchangeId))
+	fmt.Println(trader.GetWalletsStats(quoteAssetId, exchangeId))
 }
