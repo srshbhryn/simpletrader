@@ -60,7 +60,12 @@ def get_order_status_task(args):
     args = json.loads(args)
     order_id = args['order_id']
     order: Order = Order.objects.filter(id=order_id).only('status_id').first()
-    return json.dumps({'code': 0, 'status_id': order.status_id})
+    filled_volume = Fill.objects.filter(
+        external_order_id=order.external_id,
+        exchange_id=order.exchange_id
+    ).aggregate(fv=models.Sum('volume')).get('fv') or decimal.Decimal('0')
+    filled_volume = float(filled_volume)
+    return json.dumps({'code': 0, 'status_id': order.status_id, 'filled_volume': filled_volume})
 
 
 @shared_task(name='trader.get_balance',)
