@@ -75,7 +75,7 @@ class Serializer:
                 if k not in decimal_keys
             },
             **{
-                k: Decimal(contract_info[k])
+                k: Decimal(str(contract_info[k]))
                 for k in decimal_keys
             }
         }
@@ -105,7 +105,7 @@ class Serializer:
         price = order['price']
         if price is not None:
             tick_size = contract_info['tickSize']
-            price = round(amount / tick_size, 0) * tick_size
+            price = round(price / tick_size, 0) * tick_size
             order['price'] = price
 
         # MARKET ORDER PARAMETERS
@@ -242,6 +242,8 @@ class KucoinFutures(BaseClient):
             path=f'/api/v1/orders/{external_id}'
         )
 
+
+    @LimitGuard('9/3s')
     def get_fills(self, from_timestamp: Optional[datetime] = None) -> List[FillParams]:
         raise NotImplementedError()
 

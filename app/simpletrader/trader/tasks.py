@@ -25,8 +25,8 @@ def place_order_task(args):
     del order['exchange_id']
     bot: Bot  = Bot.get(bot_token)
     if order['price']:
-        order['price'] = decimal.Decimal(order['price'])
-    order['volume'] = decimal.Decimal(order['volume'])
+        order['price'] = decimal.Decimal(str(order['price']))
+    order['volume'] = decimal.Decimal(str(order['volume']))
     client = bot.get_client(exchange_id)
     order = client.place_order(order)
     order_object = Order.objects.create(**{
