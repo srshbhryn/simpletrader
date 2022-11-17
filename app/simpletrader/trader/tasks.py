@@ -100,9 +100,6 @@ def update_order_status_task(exchange_id, external_order_id):
         status_name = 'filled'
     else:
         status_name = 'open_partially_filled'
-    print(f'order.volume:\t{order.volume}')
-    print(f'filled_volume:\t{filled_volume}')
-    print(f'status_name:\t{status_name}')
     order.status_id = OrderState.get_by('name', status_name).id
     order.save(update_fields=['status_id',])
     return None
