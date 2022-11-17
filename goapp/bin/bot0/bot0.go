@@ -100,7 +100,7 @@ func placeKucoinOrder() {
 		panic(err)
 	}
 	fmt.Println(book.BestAskPrice, book.BestBidPrice)
-	orderId, err := trader.PlaceLimitOrder(baseAssetId, quoteAssetId, exchangeId, .01, (book.BestAskPrice)*0.9, false)
+	orderId, err := trader.PlaceLimitOrder(baseAssetId, quoteAssetId, exchangeId, .01, (book.BestAskPrice), false)
 	if err != nil {
 		panic(err)
 	}

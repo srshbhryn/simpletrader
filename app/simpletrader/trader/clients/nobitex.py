@@ -8,7 +8,7 @@ import requests
 import pyotp
 from decimal import Decimal
 
-from django.utils.timezone import now
+from django.utils.timezone import now, make_aware
 
 from simpletrader.base.utils import LimitGuard
 from simpletrader.trader.sharedconfigs import Market, Asset, OrderState, ASSETS, Exchange
@@ -36,7 +36,7 @@ class Serializers:
             'external_id': fill['id'],
             'external_order_id': fill['orderId'],
             'market_id': market.id,
-            'timestamp': datetime.fromisoformat(fill['timestamp']),
+            'timestamp': make_aware(datetime.fromisoformat(fill['timestamp'])),
             'is_sell': is_sell,
             'price': Decimal(str(fill['price'])),
             'volume': Decimal(str(fill['amount'])),

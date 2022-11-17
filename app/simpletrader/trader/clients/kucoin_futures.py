@@ -10,10 +10,10 @@ import requests
 import logging
 import time
 
-from django.utils.timezone import now
+from django.utils.timezone import now, make_aware
 
 from simpletrader.base.utils import LimitGuard
-from simpletrader.trader.sharedconfigs import Market, Exchange
+from simpletrader.trader.sharedconfigs import Market, Exchange, OrderState
 from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception, FillParams
 from .helpers.kucoin_futures import get_symbol, translate_symbol, get_fee_asset_id
 
@@ -64,7 +64,7 @@ class Serializer:
             'external_id': fill['tradeId'],
             'external_order_id': fill['orderId'],
             'market_id': market.id,
-            'timestamp': datetime.fromtimestamp(fill['tradeTime'] / 10**9),
+            'timestamp': make_aware(datetime.fromtimestamp(fill['tradeTime'] / 10**9)),
             'is_sell': is_sell,
             'price': Decimal(str(fill['price'])),
             'volume': volume,
@@ -100,6 +100,7 @@ class Serializer:
         return {
             'external_id': order['orderId'],
             'timestamp': now(),
+            'status_id': OrderState.get_by('name','open_no_fill').id,
             'exchange_id': exchange_id,
         }
 
@@ -238,6 +239,7 @@ class KucoinFutures(BaseClient):
     def place_order(self, order: OrderParams) -> str:
         order['client_order_id'] = f'{self.bot_token}_{uuid.uuid4().hex}'
         return {
+            **order,
             **Serializer.serialize_order(
                 self._request(
                     type=KucoinFutures.TYPE.private,
@@ -246,7 +248,6 @@ class KucoinFutures(BaseClient):
                     data=json.dumps(Serializer.deserialize_order(order)).strip(),
                 )
             ),
-            **order,
         }
 
     @LimitGuard('40/3s')
