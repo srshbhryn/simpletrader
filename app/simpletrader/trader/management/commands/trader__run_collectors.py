@@ -9,7 +9,7 @@ from simpletrader.base.utils import GracefulKiller
 from simpletrader.trader.sharedconfigs import Exchange
 from simpletrader.trader.models import Account
 from simpletrader.trader.fill_collectors import NobitexFillCollector, KucoinFuturesFillCollector
-from simpletrader.trader.balance_collectors.nobitex import NobitexBalanceCollector
+from simpletrader.trader.balance_collectors import NobitexBalanceCollector, KucoinFuturesBalanceCollector
 
 
 multiprocessing.set_start_method('spawn')
@@ -33,6 +33,7 @@ class Command(BaseCommand, GracefulKiller):
         self.collect_nobitex_fills()
         self.collect_kucoin_futures_fills()
         self.collect_nobitex_balances()
+        self.collect_kucoin_futures_balances()
         while self.is_alive:
             time.sleep(1)
         sys.exit(0)
@@ -68,6 +69,19 @@ class Command(BaseCommand, GracefulKiller):
         for account_id in account_ids:
             p = multiprocessing.Process(
                 target=KucoinFuturesFillCollector.create_and_run,
+                args=(account_id,),
+            )
+            self.processes.append(p)
+            p.start()
+
+
+    def collect_kucoin_futures_balances(self):
+        account_ids = Account.objects.filter(
+            exchange_id=Exchange.get_by('name', 'kucoin_futures').id
+        ).values_list('id', flat=True)
+        for account_id in account_ids:
+            p = multiprocessing.Process(
+                target=KucoinFuturesBalanceCollector.create_and_run,
                 args=(account_id,),
             )
             self.processes.append(p)

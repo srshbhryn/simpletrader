@@ -1,6 +1,7 @@
 from typing import TypedDict, Dict, List, Optional
 from decimal import Decimal
 from datetime import datetime
+import functools
 import json
 import uuid
 import base64
@@ -13,8 +14,8 @@ import time
 from django.utils.timezone import now, make_aware
 
 from simpletrader.base.utils import LimitGuard
-from simpletrader.trader.sharedconfigs import Market, Exchange, OrderState
-from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception, FillParams
+from simpletrader.trader.sharedconfigs import Market, Exchange, OrderState, Asset, ASSETS
+from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception, FillParams, WalletSnapShotParams
 from .helpers.kucoin_futures import get_symbol, translate_symbol, get_fee_asset_id
 
 
@@ -290,6 +291,64 @@ class KucoinFutures(BaseClient):
     def get_order_detail(self, exchange_id: int) -> OrderParams:
         raise NotImplementedError()
 
+    @LimitGuard('30/3s')
+    def get_usdt_balances(self):
+        response = self._request(
+            type=KucoinFutures.TYPE.private,
+            method=KucoinFutures.METHOD.get,
+            path='/api/v1/account-overview?currency=USDT',
+        )
+        free_balance = Decimal(str(response['positionMargin'])) + Decimal(str(response['orderMargin']))
+        blocked_balance = Decimal(str(response['availableBalance']))
+        return WalletSnapShotParams(
+            asset_id=Asset.get_by('name', 'usdt').id,
+            timestamp=now(),
+            free_balance=free_balance,
+            blocked_balance=blocked_balance,
+        )
 
-# class StreamClient:
-#     pass
+    @functools.cached_property
+    def _base_asset_ids(self):
+        asset_ids = []
+        for asset in ASSETS:
+            if asset.name in [
+                'rls',
+                'usdt',
+            ]:
+                continue
+            asset_ids.append(asset.id)
+        return asset_ids
+
+    @LimitGuard('9/3s')
+    def get_positions(self):
+        nw = now()
+        response = self._request(
+            type=KucoinFutures.TYPE.private,
+            method=KucoinFutures.METHOD.get,
+            path='/api/v1/positions',
+        )
+        snapshots = []
+        asset_ids = []
+        for position in response:
+
+            if not position['isOpen']:
+                continue
+            asset_id = Market.get_by('symbol', position['symbol']).base_asset.id
+            free_balance = position['currentQty'] * Serializer.contract_info_map[position['symbol']]['multiplier']
+            asset_ids.append(asset_id)
+            snapshots.append(WalletSnapShotParams(
+                asset_id=asset_id,
+                timestamp=nw,
+                free_balance=free_balance,
+                blocked_balance=Decimal('0'),
+            ))
+        for asset_id in self._base_asset_ids:
+            if asset_id in asset_ids:
+                continue
+            snapshots.append(WalletSnapShotParams(
+                asset_id=asset_id,
+                timestamp=nw,
+                free_balance=Decimal('0'),
+                blocked_balance=Decimal('0'),
+            ))
+        return snapshots

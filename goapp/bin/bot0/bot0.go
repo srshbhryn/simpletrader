@@ -100,7 +100,7 @@ func placeKucoinOrder() {
 		panic(err)
 	}
 	fmt.Println(book.BestAskPrice, book.BestBidPrice)
-	orderId, err := trader.PlaceLimitOrder(baseAssetId, quoteAssetId, exchangeId, .01, (book.BestAskPrice), false)
+	orderId, err := trader.PlaceLimitOrder(baseAssetId, quoteAssetId, exchangeId, .03, (book.BestAskPrice)*.9, false)
 	if err != nil {
 		panic(err)
 	}
@@ -121,7 +121,24 @@ func placeKucoinOrder() {
 	}
 }
 
+func getKucoinBalance() {
+	quoteAssetId := assets.ByName("usdt").Id
+	exchangeId := exchanges.ByName("kucoin_futures").Id
+	stats, err := trader.GetWalletsStats(quoteAssetId, exchangeId)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(stats)
+	baseAssetId := assets.ByName("eth").Id
+	stats, err = trader.GetWalletsStats(baseAssetId, exchangeId)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(stats)
+
+}
 func main() {
+	getKucoinBalance()
 	// checkBookDelay()
-	placeKucoinOrder()
+	// placeKucoinOrder()
 }

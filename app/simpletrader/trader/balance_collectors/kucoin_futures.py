@@ -1,15 +1,50 @@
-aklsdnalksdn
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'simpletrader.settings')
+django.setup()
 
-key
-636e5c561b544f00012f2193
+import time
+import logging
 
+from django.db import models as m
 
+from simpletrader.base.utils import GracefulKiller
+from simpletrader.trader.models import Account, WalletSnapShot
+from simpletrader.trader.clients import KucoinFutures
 
-secret 
-e1e11725-5d0a-42ad-aba9-02bec5b7806a
+log = logging.getLogger('django')
 
+class KucoinFuturesBalanceCollector(GracefulKiller):
 
-credentials = {}
-credentials['api_key']= '636e5c561b544f00012f2193'
-credentials['api_secret'] = 'e1e11725-5d0a-42ad-aba9-02bec5b7806a'
-credentials['api_passphrase'] = 'aklsdnalksdn'
+    @classmethod
+    def create_and_run(cls, account_id):
+        i = cls(account_id)
+        i._init()
+        i.run()
+
+    def __init__(self, account_id) -> None:
+        self.account_id = account_id
+        self.account: Account = None
+        super().__init__()
+
+    def _init(self):
+        self.account: Account = Account.objects.get(pk=self.account_id)
+        self.client: KucoinFutures = KucoinFutures(credentials=self.account.credentials, token='blnc')
+
+    def run(self):
+        while self.is_alive:
+            try:
+                WalletSnapShot.objects.create(**{
+                    'account_id': self.account_id,
+                    **self.client.get_usdt_balances()
+                })
+                WalletSnapShot.objects.bulk_create([
+                    WalletSnapShot(**{
+                        'account_id': self.account_id,
+                        **wallet_balance
+                    })
+                    for wallet_balance in self.client.get_positions()
+                ],batch_size=100)
+            except Exception as e:
+                log.error(e)
+            time.sleep(1)
