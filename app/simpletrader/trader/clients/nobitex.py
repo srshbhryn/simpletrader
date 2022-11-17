@@ -11,7 +11,7 @@ from decimal import Decimal
 from django.utils.timezone import now
 
 from simpletrader.base.utils import LimitGuard
-from simpletrader.trader.sharedconfigs import Market, Asset, OrderState, ASSETS
+from simpletrader.trader.sharedconfigs import Market, Asset, OrderState, ASSETS, Exchange
 
 from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception, FillParams, \
     WalletSnapShotParams
@@ -38,11 +38,11 @@ class Serializers:
             'market_id': market.id,
             'timestamp': datetime.fromisoformat(fill['timestamp']),
             'is_sell': is_sell,
-            'price': Decimal(fill['price']),
-            'volume': Decimal(fill['amount']),
-            'fee': Decimal(fill['fee']),
+            'price': Decimal(str(fill['price'])),
+            'volume': Decimal(str(fill['amount'])),
+            'fee': Decimal(str(fill['fee'])),
             'fee_asset_id': fee_asset_id,
-            'exchange_id': 1,
+            'exchange_id': Exchange.get_by('name', 'nobitex').id,
         }
 
     @classmethod

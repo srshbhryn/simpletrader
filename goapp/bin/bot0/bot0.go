@@ -78,10 +78,50 @@ func placeOrder() {
 	// }
 
 }
-func main() {
+
+func getWalletsStats() {
 	baseAssetId := assets.ByName("usdt").Id
 	quoteAssetId := assets.ByName("rls").Id
 	exchangeId := exchanges.ByName("nobitex").Id
 	fmt.Println(trader.GetWalletsStats(baseAssetId, exchangeId))
 	fmt.Println(trader.GetWalletsStats(quoteAssetId, exchangeId))
+}
+
+func placeKucoinOrder() {
+	baseAssetId := assets.ByName("eth").Id
+	quoteAssetId := assets.ByName("usdt").Id
+	exchangeId := exchanges.ByName("kucoin_futures").Id
+	market, err := markets.GetByAssetsAndExchange(baseAssetId, quoteAssetId, exchangeId)
+	if err != nil {
+		panic(err)
+	}
+	book, err := bookwatch.ReadBook(market.Id)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(book.BestAskPrice, book.BestBidPrice)
+	orderId, err := trader.PlaceLimitOrder(baseAssetId, quoteAssetId, exchangeId, .01, (book.BestAskPrice)*0.9, false)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("SUCCESS", orderId)
+	// time.Sleep(time.Second)
+	// err = trader.CancelOrder(orderId)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println("CANCELED")
+	for {
+		stat, filledAmount, err := trader.GetOrderStatusAndFills(orderId)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(stat)
+		fmt.Println(filledAmount)
+	}
+}
+
+func main() {
+	// checkBookDelay()
+	placeKucoinOrder()
 }

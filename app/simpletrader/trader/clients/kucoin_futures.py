@@ -1,4 +1,4 @@
-from typing import TypedDict, Dict, List, Optional, NamedTuple
+from typing import TypedDict, Dict, List, Optional
 from decimal import Decimal
 from datetime import datetime
 import json
@@ -13,9 +13,9 @@ import time
 from django.utils.timezone import now
 
 from simpletrader.base.utils import LimitGuard
-from simpletrader.trader.sharedconfigs import Asset, Market, Exchange
+from simpletrader.trader.sharedconfigs import Market, Exchange
 from .base import OrderParams, ExchangeClientError, BaseClient, handle_exception, FillParams
-from .helpers.kucoin_futures import get_symbol, translate_symbol
+from .helpers.kucoin_futures import get_symbol, translate_symbol, get_fee_asset_id
 
 
 exchange_id = Exchange.get_by('name', 'kucoin_futures').id
@@ -56,7 +56,22 @@ class Serializer:
 
     @classmethod
     def serialize_fill(cls, fill: dict) -> FillParams:
-        pass
+        symbol = fill['symbol']
+        market = Market.get_by('symbol', symbol)
+        volume = fill['size'] * cls.contract_info_map[symbol]['multiplier']
+        is_sell = fill['side'] == 'sell'
+        return {
+            'external_id': fill['tradeId'],
+            'external_order_id': fill['orderId'],
+            'market_id': market.id,
+            'timestamp': datetime.fromtimestamp(fill['tradeTime'] / 10**9),
+            'is_sell': is_sell,
+            'price': Decimal(str(fill['price'])),
+            'volume': volume,
+            'fee': Decimal(str(fill['fee'])),
+            'fee_asset_id': get_fee_asset_id(fill['feeCurrency']),
+            'exchange_id': exchange_id,
+        }
 
     @classmethod
     def serialize_contract_info(cls, contract_info) -> ContractInfo:
@@ -242,10 +257,34 @@ class KucoinFutures(BaseClient):
             path=f'/api/v1/orders/{external_id}'
         )
 
+    def get_fills(self, from_timestamp: Optional[datetime] = None) -> List[FillParams]:
+        from_timestamp = int(from_timestamp.timestamp() * 1000)
+        has_next = True
+        trades = []
+        page = 1
+        while has_next:
+            fetched_trades, has_next = self._get_fills(from_timestamp, page)
+            trades += fetched_trades
+            page += 1
+        return trades
 
     @LimitGuard('9/3s')
-    def get_fills(self, from_timestamp: Optional[datetime] = None) -> List[FillParams]:
-        raise NotImplementedError()
+    def _get_fills(self, from_timestamp: Optional[datetime] = None, page: int = None):
+        params = '?pageSize=100'
+        if from_timestamp:
+            params += f'&startAt={from_timestamp}'
+        if page:
+            params += f'&currentPage={page}'
+        response = self._request(
+            type=KucoinFutures.TYPE.private,
+            method=KucoinFutures.METHOD.get,
+            path='/api/v1/fills' + params,
+        )
+        has_next = response['totalPage'] > response['currentPage']
+        return [
+            Serializer.serialize_fill(f)
+            for f in response['items']
+        ], has_next
 
     def get_order_detail(self, exchange_id: int) -> OrderParams:
         raise NotImplementedError()
