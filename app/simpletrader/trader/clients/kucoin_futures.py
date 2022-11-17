@@ -95,17 +95,18 @@ class Serializer:
         contract_info['multiplier']
         if not order['leverage']:
             order['leverage'] = 10
+
+        #fix amount
+        amount = order['volume']
+        size = round(amount / contract_info['multiplier'], 0)
+        order['volume'] = size * contract_info['multiplier']
+
         #fix price
         price = order['price']
         if price is not None:
             tick_size = contract_info['tickSize']
             price = round(amount / tick_size, 0) * tick_size
             order['price'] = price
-
-        #fix amount
-        amount = order['volume']
-        size = round(amount / contract_info['multiplier'], 0)
-        order['volume'] = size * contract_info['multiplier']
 
         # MARKET ORDER PARAMETERS
         return {
@@ -144,8 +145,6 @@ class KucoinFutures(BaseClient):
     base_url = 'https://api-futures.kucoin.com'
 
     def __init__(self, credentials: dict, token: str):
-        print(credentials)
-        print(type(credentials))
         self.bot_token  = token
         self.api_key = credentials['api_key']
         self.api_secret = credentials['api_secret']

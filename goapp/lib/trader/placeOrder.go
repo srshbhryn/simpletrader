@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"goapp/lib/config"
+	"goapp/lib/config/exchanges"
 	"goapp/lib/config/markets"
 )
 
@@ -75,7 +76,7 @@ func PlaceLimitOrder(
 	if err != nil {
 		return 0, err
 	}
-	args, err := json.Marshal(OrderParams{
+	orderParams := OrderParams{
 		BotToken:   config.BotToken,
 		Leverage:   config.DefaultLeverage,
 		ExchangeId: exchangeId,
@@ -83,7 +84,11 @@ func PlaceLimitOrder(
 		Volume:     amount,
 		Price:      &price,
 		IsSell:     isSell,
-	})
+	}
+	if exchangeId != exchanges.ByName("nobitex").Id {
+		orderParams.Leverage = config.DefaultLeverage
+	}
+	args, err := json.Marshal(orderParams)
 	if err != nil {
 		return 0, err
 	}
