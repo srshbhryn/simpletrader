@@ -52,6 +52,9 @@ class KucoinFuturesFillCollector(GracefulKiller):
                 if not fills:
                     first_ts += time_step
                     continue
+                fills = [f for f in fills if f['external_id'] not in list(self._fills.filter(
+                    timestamp=last_fetched_trade_timestamp
+                ).values_list('external_id', flat=True))]
                 Fill.objects.bulk_create([
                     Fill(**{
                         'account_id': self.account_id,
