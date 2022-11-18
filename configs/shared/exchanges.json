@@ -1,13 +1,19 @@
 [{
         "id": 1,
-        "name": "nobitex"
+        "name": "nobitex",
+        "taker_fee": 0.001,
+        "marker_fee": 0.001
     },
     {
         "id": 2,
-        "name": "kucoin_spot"
+        "name": "kucoin_spot",
+        "taker_fee": 0.001,
+        "marker_fee": 0.001
     },
     {
         "id": 3,
-        "name": "kucoin_futures"
+        "name": "kucoin_futures",
+        "taker_fee": 0.0006,
+        "marker_fee": 0.0002
     }
 ]

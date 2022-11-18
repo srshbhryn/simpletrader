@@ -14,8 +14,10 @@ func init() {
 }
 
 type Exchange struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+	Id       int     `json:"id"`
+	Name     string  `json:"name"`
+	TakerFee float64 `json:"taker_fee"`
+	MakerFee float64 `json:"maker_fee"`
 }
 
 var instanceById map[int]*Exchange

@@ -37,9 +37,11 @@ class Asset(Base):
 class Exchange(Base):
     instances = {}
 
-    def __init__(self, id: int, name: str) -> None:
+    def __init__(self, id: int, name: str, taker_fee: float, maker_fee: float) -> None:
         self.id = id
         self.name = name
+        self.taker_fee = taker_fee
+        self.maker_fee = maker_fee
         super().__init__(id=id, name=name)
 
 class Market(Base):
