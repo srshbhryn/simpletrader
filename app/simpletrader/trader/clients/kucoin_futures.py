@@ -238,7 +238,7 @@ class KucoinFutures(BaseClient):
 
     @LimitGuard('30/3s')
     def place_order(self, order: OrderParams) -> str:
-        order['client_order_id'] = f'{self.bot_token}_{uuid.uuid4().hex}'
+        order['client_order_id'] = f'{self.bot_token}_{uuid.uuid4().hex}'[:40]
         return {
             **order,
             **Serializer.serialize_order(
