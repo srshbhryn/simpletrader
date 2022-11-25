@@ -47,6 +47,7 @@ class AccountManager(models.Manager):
     def create(self, exchange_id, _credentials):
         return super().create(exchange_id, json.dumps(_credentials))
 
+
 class Account(models.Model):
     def __init__(self, id=None, exchange_id=None, _credentials=None) -> None:
         super().__init__(id=id, exchange_id=exchange_id, _credentials=json.dumps(_credentials))
@@ -67,15 +68,10 @@ class Account(models.Model):
 
     objects = AccountManager()
 
+
 class BotAccount(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = [
-            ['bot', 'account',],
-        ]
-
 
 class Order(models.Model):
     placed_by = models.ForeignKey(Bot, on_delete=models.CASCADE)

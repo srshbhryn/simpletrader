@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     # 'simpletrader.indices',
     'simpletrader.trader',
     'simpletrader.trader_god',
+    'simpletrader.bot_wallets',
 ]
 
 MIDDLEWARE = [
@@ -114,6 +115,7 @@ DB_ROUTING = {
     'traderdb': [
         'trader',
         'trader_god',
+        'bot_wallets',
     ]
 }
 DEFAULT_DB = 'default'
@@ -272,7 +274,9 @@ CELERY_TASK_ROUTES = {
     'kucoin_index.hp_compute.*': {'queue': 'idx_hp'},
     'kucoin_index.lp_compute.*': {'queue': 'idx_lp'},
     'trader.*': {'queue': 'trader'},
-    'trader_god.*': {'queue': 'trader_god'},
+    'trader_god.virtual_balance.*': {'queue': 'trader'},
+    'trader_god.*': {'queue': 'trader'},
+    'bot_wallets.*': {'queue': 'trader'},
 }
 
 
