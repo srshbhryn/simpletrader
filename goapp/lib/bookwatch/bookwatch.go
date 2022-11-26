@@ -24,12 +24,15 @@ var ctx = context.Background()
 
 func Load() {}
 func init() {
+	db, err := strconv.Atoi(os.Getenv("BOOKWATCH_REDIS_DB"))
+	if err != nil {
+		panic(err)
+	}
 	rdb = redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("BOOKWATCH_REDIS"),
+		Addr:     os.Getenv("BOOKWATCH_REDIS_HOST"),
 		Password: "",
-		DB:       0,
+		DB:       db,
 	})
-
 }
 
 // func ExampleClient() {
