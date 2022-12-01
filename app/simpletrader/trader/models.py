@@ -1,10 +1,14 @@
 from typing import Dict
 from functools import cache
 import json
+import string
 
 from django.db import models
 import uuid
 from django.utils.functional import cached_property
+from django.contrib.postgres import constraints
+from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
+
 
 from timescale.db.models.fields import TimescaleDateTimeField
 from timescale.db.models.managers import TimescaleManager
@@ -15,14 +19,33 @@ from simpletrader.trader.sharedconfigs import Exchange
 from .clients.base import BaseClient
 
 
+def number_to_base(n, b):
+    if n == 0:
+        return [0]
+    digits = []
+    while n:
+        digits.append(int(n % b))
+        n //= b
+    return digits[::-1]
+
+
 def create_bot_token():
     return uuid.uuid4().hex[:16]
 
 
 class Bot(models.Model):
-    token = models.CharField(max_length=16, primary_key=True, default=create_bot_token)
     name = models.CharField(max_length=128)
     managed = models.BooleanField(default=False)
+
+    @property
+    def token(self):
+        digits = string.digits + string.ascii_letters
+        indices = number_to_base(self.id, len(digits))
+        return ''.join([
+            digits[i]
+            for i in indices
+        ])
+
 
     def get_client(self, exchange_id: int) -> BaseClient:
         return get_client(exchange_id, self.token)
@@ -51,7 +74,7 @@ class AccountManager(models.Manager):
 class Account(models.Model):
     def __init__(self, id=None, exchange_id=None, _credentials=None) -> None:
         super().__init__(id=id, exchange_id=exchange_id, _credentials=json.dumps(_credentials))
-    exchange_id = models.IntegerField()
+    exchange_id = models.SmallIntegerField(db_index=True)
     _credentials = models.TextField(default='{}')
 
     @property
@@ -72,6 +95,7 @@ class Account(models.Model):
 class BotAccount(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
+
 
 class Order(models.Model):
     placed_by = models.ForeignKey(Bot, on_delete=models.CASCADE)
