@@ -2,6 +2,7 @@ import json
 import decimal
 
 from django.db import models
+from django.db.transaction import atomic
 from celery import shared_task
 
 
@@ -17,6 +18,7 @@ from .clients.base import OrderParams
 
 
 @shared_task(name='trader.place_order',)
+@atomic
 def place_order_task(args):
     order: OrderParams = json.loads(args)
     bot_token = order['bot_token']
@@ -32,12 +34,13 @@ def place_order_task(args):
     order_object = Order.objects.create(**{
         **order,
         'placed_by': bot,
-        'account': bot.account(exchange_id),
+        'account_id': client.account_id,
     })
     return json.dumps({'code': 0, 'id': order_object.id})
 
 
 @shared_task(name='trader.cancel_order',)
+@atomic
 def cancel_order_task(args):
     args = json.loads(args)
     bot_token = args['bot_token']
@@ -68,7 +71,26 @@ def get_order_status_task(args):
     return json.dumps({'code': 0, 'status_id': order.status_id, 'filled_volume': filled_volume})
 
 
-@shared_task(name='trader.get_balance',)
+@shared_task(name='trader.get_bot_balance',)
+def get_bot_balances_task(args):
+    from simpletrader.bot_wallets.models import Wallet
+    bot_token = args['bot_token']
+    exchange_id = args['exchange_id']
+    asset_id = args['asset_id']
+    bot = Bot.get(bot_token)
+    w, _ = Wallet.objects.get_or_create(
+        bot_id=bot.id,
+        exchange_id=exchange_id,
+        asset_id=asset_id,
+    )
+    return json.dumps({
+        'code': 0,
+        'free_balance': float(w.free_balance),
+        'blocked_balance': float(w.blocked_balance),
+    })
+
+
+@shared_task(name='trader.get_exchange_balance',)
 def get_balance_task(args):
     args = json.loads(args)
     bot_token = args['bot_token']
@@ -90,8 +112,9 @@ def get_balance_task(args):
 
 
 @shared_task(name='trader._update_order_status',)
+@atomic
 def update_order_status_task(exchange_id, external_order_id):
-    order = Order.objects.get(external_id=external_order_id, exchange_id=exchange_id)
+    order = Order.objects.select_for_update().get(external_id=external_order_id, exchange_id=exchange_id)
     filled_volume = Fill.objects.filter(
         external_order_id=external_order_id,
         exchange_id=exchange_id

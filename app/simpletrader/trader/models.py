@@ -35,7 +35,7 @@ def create_bot_token():
 
 class Bot(models.Model):
     name = models.CharField(max_length=128)
-    managed = models.BooleanField(default=False)
+    is_managed = models.BooleanField(default=False)
 
     @property
     def token(self):
@@ -59,10 +59,11 @@ class Bot(models.Model):
         return cls._bots[token]
 
     @cache
-    def account(self, exchange_id: int) -> 'Account':
+    def account(self, exchange_id: int, is_fake: bool) -> 'Account':
         return BotAccount.objects.get(
             bot__token=self.token,
             account__exchange_id=exchange_id,
+            account__is_fake=is_fake,
         ).account
 
 
@@ -76,6 +77,7 @@ class Account(models.Model):
         super().__init__(id=id, exchange_id=exchange_id, _credentials=json.dumps(_credentials))
     exchange_id = models.SmallIntegerField(db_index=True)
     _credentials = models.TextField(default='{}')
+    is_fake = models.BooleanField(default=False)
 
     @property
     def credentials(self):

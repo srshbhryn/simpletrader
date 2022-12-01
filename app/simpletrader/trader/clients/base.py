@@ -44,6 +44,10 @@ class OrderParams(TypedDict):
 
 
 class BaseClient:
+
+    is_fake = False
+    account_id = None
+
     class TYPE:
         public = 0
         private = 1

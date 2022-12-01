@@ -1,10 +1,11 @@
+import uuid
+
 from django.db import models
-from django.db.models import Q
+from django.utils import timezone
 
 from timescale.db.models.fields import TimescaleDateTimeField
 from timescale.db.models.managers import TimescaleManager
 
-from simpletrader.base.models import assuming
 from simpletrader.trader.models import Bot
 
 
@@ -42,7 +43,7 @@ class BotStateChange(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
     parent = models.OneToOneField('self', null=True, blank=True, on_delete=models.PROTECT)
     state = models.SmallIntegerField()
-    created_at = TimescaleDateTimeField(interval='24 hour')
+    created_at = models.DateTimeField(default=timezone.now)
 
     @classmethod
     def get_bot_state(cls, bot_id):
@@ -60,41 +61,15 @@ class BotStateChange(models.Model):
                 include=('state',),
             ),
         ]
-        constraints = [
-            models.constraints.CheckConstraint(
-                name='a6cb673588bb5404b9f1ce9db',
-                check=assuming(
-                    Q(parent__isnull=True),
-                    then=Q(state=_BotStateChangeStates.created),
-                ),
-            ),
-            models.constraints.CheckConstraint(
-                name='f81ab85918df49239d31c9fe',
-                check=assuming(
-                    Q(parent__state=_BotStateChangeStates.created),
-                    then=Q(state=_BotStateChangeStates.demo_running)
-                ),
-            ),
-            models.constraints.CheckConstraint(
-                name='',
-                check=assuming(
-                    Q(parent__state=_BotStateChangeStates.pre_stop),
-                    then=Q(state=_BotStateChangeStates.stopped)
-                ),
-            ),
-            models.constraints.CheckConstraint(
-                name='a824b3342dcd0481c8e1d4c78',
-                check=assuming(
-                    Q(parent__state=_BotStateChangeStates.demo_running),
-                    then=Q(state=_BotStateChangeStates.real_running)
-                    | Q(state=_BotStateChangeStates.pre_stop),
-                ),
-            ),
-            models.constraints.CheckConstraint(
-                name='a306c64a823db4c6e81460490',
-                check=assuming(
-                    Q(parent__state=_BotStateChangeStates.real_running),
-                    then=Q(state=_BotStateChangeStates.demo_running)
-                ),
-            ),
-        ]
+
+class DummyOrder(models.Model):
+    exchange_id = models.SmallIntegerField(db_index=True)
+    external_id = models.CharField(max_length=32, db_index=True)
+
+    @classmethod
+    def create(cls, exchange_id):
+        external_id = uuid.uuid4().hex
+        cls.objects.create(
+            exchange_id=exchange_id,
+            external_id=external_id,
+        )
