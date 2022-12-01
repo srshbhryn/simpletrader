@@ -1,3 +1,4 @@
+import functools
 import decimal
 
 from simpletrader.trader.models import Bot
@@ -32,3 +33,8 @@ class BotWalletManager:
             amount=amount,
             type=type,
         )
+
+
+@functools.cache
+def get_wallet_manager(bot_id) -> BotWalletManager:
+    return BotWalletManager(Bot.objects.get(pk=bot_id))
