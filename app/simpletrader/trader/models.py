@@ -6,8 +6,6 @@ import string
 from django.db import models
 import uuid
 from django.utils.functional import cached_property
-from django.contrib.postgres import constraints
-from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
 
 
 from timescale.db.models.fields import TimescaleDateTimeField
@@ -58,13 +56,25 @@ class Bot(models.Model):
             cls._bots[token] = Bot.objects.get(token=token)
         return cls._bots[token]
 
-    @cache
-    def account(self, exchange_id: int, is_fake: bool) -> 'Account':
-        return BotAccount.objects.get(
-            bot__token=self.token,
-            account__exchange_id=exchange_id,
-            account__is_fake=is_fake,
-        ).account
+    @property
+    def does_paper_trading(self):
+        from simpletrader.trader_god.models import BotStateChange
+        return not (
+            BotStateChange.get_bot_state(
+                self.id,
+            ) == BotStateChange.States.real_running
+        )
+
+    def account(self, exchange_id: int) -> 'Account':
+        bot_accounts = Account.objects.filter(
+            bot=self,
+            exchange_id=exchange_id,
+        )
+        if not self.is_managed:
+            return bot_accounts.first()
+        return bot_accounts.filter(
+            is_fake=self.does_paper_trading,
+        ).first()
 
 
 class AccountManager(models.Manager):
@@ -75,9 +85,16 @@ class AccountManager(models.Manager):
 class Account(models.Model):
     def __init__(self, id=None, exchange_id=None, _credentials=None) -> None:
         super().__init__(id=id, exchange_id=exchange_id, _credentials=json.dumps(_credentials))
+
+    bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
     exchange_id = models.SmallIntegerField(db_index=True)
     _credentials = models.TextField(default='{}')
     is_fake = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = [
+            ('bot', 'exchange_id', 'is_fake',),
+        ]
 
     @property
     def credentials(self):
@@ -92,11 +109,6 @@ class Account(models.Model):
         return Exchange.get_by('id', self.exchange_id).name
 
     objects = AccountManager()
-
-
-class BotAccount(models.Model):
-    bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
 
 
 class Order(models.Model):

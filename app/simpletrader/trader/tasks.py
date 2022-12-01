@@ -75,12 +75,10 @@ def get_order_status_task(args):
 def get_bot_balances_task(args):
     from simpletrader.bot_wallets.models import Wallet
     bot_token = args['bot_token']
-    exchange_id = args['exchange_id']
     asset_id = args['asset_id']
     bot = Bot.get(bot_token)
     w, _ = Wallet.objects.get_or_create(
         bot_id=bot.id,
-        exchange_id=exchange_id,
         asset_id=asset_id,
     )
     return json.dumps({

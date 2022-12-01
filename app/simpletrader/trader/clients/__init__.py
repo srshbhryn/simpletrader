@@ -11,13 +11,8 @@ def get_client(exchange_id, bot):
     from simpletrader.trader.models import Bot
     from simpletrader.trader_god.models import BotStateChange
     bot_token = bot.token
-    is_fake = lambda: not (
-        BotStateChange.get_bot_state(
-            bot,
-        ) == BotStateChange.States.real_running
-    )
-    account = Bot.get(bot_token).account(exchange_id, is_fake)
-    client = Dummy if bot.is_managed and is_fake() else (
+    account = Bot.get(bot_token).account(exchange_id)
+    client = Dummy if account.is_fake else (
         {
             Exchange.get_by('name', 'nobitex').id: Nobitex,
             Exchange.get_by('name', 'kucoin_spot').id: KucoinSpot,

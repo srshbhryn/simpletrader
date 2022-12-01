@@ -1,6 +1,6 @@
 from typing import Dict, Tuple
 
-from .models import Bot, Account, BotAccount
+from .models import Bot
 
 
 class BotCache:
