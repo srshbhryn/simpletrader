@@ -77,15 +77,7 @@ class Bot(models.Model):
         ).first()
 
 
-class AccountManager(models.Manager):
-    def create(self, exchange_id, _credentials):
-        return super().create(exchange_id, json.dumps(_credentials))
-
-
 class Account(models.Model):
-    def __init__(self, id=None, exchange_id=None, _credentials=None) -> None:
-        super().__init__(id=id, exchange_id=exchange_id, _credentials=json.dumps(_credentials))
-
     bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
     exchange_id = models.SmallIntegerField(db_index=True)
     _credentials = models.TextField(default='{}')
@@ -107,8 +99,6 @@ class Account(models.Model):
     @cached_property
     def exchange_name(self):
         return Exchange.get_by('id', self.exchange_id).name
-
-    objects = AccountManager()
 
 
 class Order(models.Model):

@@ -9,7 +9,6 @@ from .dummy import Dummy
 
 def get_client(exchange_id, bot):
     from simpletrader.trader.models import Bot
-    from simpletrader.trader_god.models import BotStateChange
     bot_token = bot.token
     account = Bot.get(bot_token).account(exchange_id)
     client = Dummy if account.is_fake else (
