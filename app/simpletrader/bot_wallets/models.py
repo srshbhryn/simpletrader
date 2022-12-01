@@ -4,11 +4,12 @@ from django.db import models
 from django.db import transaction
 from django.utils import timezone
 
-from simpletrader.trader.models import Account
+from simpletrader.trader.models import Bot
 
 
 class Wallet(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    bot = models.ForeignKey(Bot, on_delete=models.CASCADE)
+    exchange_id = models.SmallIntegerField()
     asset_id = models.SmallIntegerField()
     free_balance = models.DecimalField(max_digits=32, decimal_places=16, default=decimal.Decimal(0))
     blocked_balance = models.DecimalField(max_digits=32, decimal_places=16, default=decimal.Decimal(0))
@@ -17,7 +18,7 @@ class Wallet(models.Model):
         constraints = [
             models.UniqueConstraint(
                 name='unqibotassetexchange',
-                fields=('account_id', 'asset_id',),
+                fields=('bot_id', 'exchange_id', 'asset_id',),
             ),
             models.CheckConstraint(
                 name='walletnonnefreebalance',

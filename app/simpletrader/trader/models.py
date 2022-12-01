@@ -118,6 +118,10 @@ class Order(models.Model):
 
     objects = TimescaleManager()
 
+    def __init__(self, *args, **kwargs) -> None:
+        self.org_status_id = self.status_id
+        super().__init__(*args, **kwargs)
+
 
 class Fill(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
