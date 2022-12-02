@@ -26,3 +26,4 @@ def open_order_state_ids():
             'open_no_fill',
             'open_partially_filled',
         ]
+    ]
