@@ -15,6 +15,11 @@ type MarketPair struct {
 	KucoinMarket  *markets.Market
 }
 
+type Opportunity struct {
+	Amount    float64
+	GainRatio float64
+}
+
 func GetKucoinArbitrageMarkets() []*MarketPair {
 	usdtId := assets.ByName("usdt").Id
 	kucoinId := exchanges.ByName("kucoin_futures").Id
@@ -37,6 +42,21 @@ func GetKucoinArbitrageMarkets() []*MarketPair {
 	return marketPairs
 }
 
+func (pair *MarketPair) GetAmount(isSell bool) (*Opportunity, error) {
+	if isSell {
+		op, err := pair.getSellAmount()
+		if err != nil {
+			return nil, err
+		}
+		return op, nil
+	}
+	op, err := pair.getBuyAmount()
+	if err != nil {
+		return nil, err
+	}
+	return op, nil
+}
+
 func getFeeFactor() float64 {
 	return (1 - config.NobitexFee) * (1 - config.KucoinFuturesFee)
 }
@@ -54,15 +74,10 @@ func (pair *MarketPair) getMinSellPrice() (float64, error) {
 }
 
 func (pair *MarketPair) getMaxBuyPrice() (float64, error) {
-	book, err := bookwatch.ReadBook(pair.KucoinMarket.Id)
-	if err != nil {
-		return 0, err
-	}
-	return (book.BestBidPrice * feeFactor) / safetyFactor, nil
 }
 
-// TODO: NOT TOO MUCH DATA
-func (pair *MarketPair) getSellAmount() (float64, error) {
+// TODO: NOT TOO MUCH DATA ?????
+func (pair *MarketPair) getSellAmount() (*Opportunity, error) {
 	var gotError sync.Mutex
 	var returningError error
 	var wg sync.WaitGroup
@@ -103,7 +118,7 @@ func (pair *MarketPair) getSellAmount() (float64, error) {
 	return nobitexSellVolume, nil
 }
 
-func (pair *MarketPair) getBuyAmount() (float64, error) {
+func (pair *MarketPair) getBuyAmount() (*Opportunity, error) {
 	var gotError sync.Mutex
 	var returningError error
 	var wg sync.WaitGroup
@@ -112,23 +127,28 @@ func (pair *MarketPair) getBuyAmount() (float64, error) {
 	var maxBuyPrice float64
 	var nobitexBuyPrice float64
 	var nobitexBuyVolume float64
+	setError := func (err error){
+		if gotError.TryLock() {
+			returningError = err
+		}
+	}
 	go func() {
 		defer wg.Done()
-		var err error
+		book, err := bookwatch.ReadBook(pair.KucoinMarket.Id)
+		if err != nil {
+			return 0, err
+		}
+		return (book.Bes * feeFactor) / safetyFactor, nil
 		maxBuyPrice, err = pair.getMaxBuyPrice()
 		if err != nil {
-			if gotError.TryLock() {
-				returningError = err
-			}
+			setError(err)
 		}
 	}()
 	go func() {
 		defer wg.Done()
 		book, err := bookwatch.ReadBook(pair.NobitexMarket.Id)
 		if err != nil {
-			if gotError.TryLock() {
-				returningError = err
-			}
+			setError(err)
 			return
 		}
 		nobitexBuyPrice = book.BestAskPrice
@@ -141,5 +161,5 @@ func (pair *MarketPair) getBuyAmount() (float64, error) {
 	if nobitexBuyPrice > maxBuyPrice {
 		return 0, fmt.Errorf("BadPrice")
 	}
-	return nobitexBuyVolume, nil
+	return &Opportunity{Amount: nobitexBuyVolume, GainRatio: }, nil
 }

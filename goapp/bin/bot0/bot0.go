@@ -138,7 +138,7 @@ func getKucoinBalance() {
 
 }
 func main() {
-	getKucoinBalance()
-	// checkBookDelay()
+	// getKucoinBalance()
+	checkBookDelay()
 	// placeKucoinOrder()
 }
