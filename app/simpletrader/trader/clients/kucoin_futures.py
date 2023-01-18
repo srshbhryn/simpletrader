@@ -161,11 +161,12 @@ class Serializer:
 class KucoinFutures(BaseClient):
     base_url = 'https://api-futures.kucoin.com'
 
-    def __init__(self, credentials: dict, token: str):
+    def __init__(self, credentials: dict, token: str, proxies: Optional[dict] = {}):
         self.bot_token  = token
         self.api_key = credentials['api_key']
         self.api_secret = credentials['api_secret']
         self.api_passphrase = credentials['api_passphrase']
+        self.proxies = proxies
         self.headers: Dict[int, Dict] = {
             self.TYPE.public: {},
             self.TYPE.private: {},
@@ -229,6 +230,7 @@ class KucoinFutures(BaseClient):
             url=self.base_url + path,
             data=data,
             headers=headers,
+            proxies=self.proxies,
         )
         response.raise_for_status()
         response = response.json()
