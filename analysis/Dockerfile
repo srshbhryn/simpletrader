@@ -11,6 +11,7 @@ RUN apt -y install netcat
 RUN mkdir -p /var/log/simpletrader/
 
 RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
 COPY . .
 
