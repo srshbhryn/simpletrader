@@ -100,7 +100,7 @@ services:
     restart: always
 
   default_db:
-    image: postgres:13.0-alpine
+    image: postgres:14.0-alpine
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -110,7 +110,7 @@ services:
       - POSTGRES_DB=simpletrader_default
 
   timescale_db:
-    image: timescale/timescaledb:latest-pg14
+    image: timescale/timescaledb:2.9.2-pg14
     restart: always
     volumes:
       - timescale_data:/var/lib/postgresql/data/
@@ -120,7 +120,7 @@ services:
       - POSTGRES_DB=simpletrader_ts
 
   traderdb:
-    image: timescale/timescaledb:latest-pg14
+    image: timescale/timescaledb:2.9.2-pg14
     restart: always
     volumes:
       - traderdb_data:/var/lib/postgresql/data/
@@ -175,7 +175,7 @@ services:
     #   - bookwatch_redis
 
   analysisdb:
-    image: timescale/timescaledb:latest-pg14
+    image: timescale/timescaledb:2.9.2-pg14
     restart: always
     ports:
       - 5436:5432
