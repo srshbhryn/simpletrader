@@ -194,7 +194,7 @@ services:
     build:
       context: ./analysis
       dockerfile: Dockerfile
-    image: analysis
+    image: analysis__image
 
   analysis__run_collector:
     image: analysis__image
