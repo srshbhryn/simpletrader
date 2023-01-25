@@ -184,12 +184,6 @@ services:
       - POSTGRES_PASSWORD=analysisdb
       - POSTGRES_DB=analysisdb
 
-  analysis__base_image:
-    build:
-      context: ./analysis
-      dockerfile: baseDockerfile
-    image: analysis_base_image
-
   analysis__image:
     build:
       context: ./analysis

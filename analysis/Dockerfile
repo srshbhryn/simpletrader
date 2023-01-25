@@ -1,8 +1,18 @@
-FROM analysis_base_image
-
+FROM python:3.10-slim 
 
 WORKDIR /app
 
+RUN apt-get update \
+    && apt-get -y install libpq-dev gcc \
+    && pip install psycopg2
+
+RUN apt -y install netcat
+
+RUN mkdir -p /var/log/simpletrader/
+
+RUN pip install --upgrade pip
+
 COPY . .
+
 RUN pip install -r requirements.txt
 RUN chmod +x ./entrypoint.*.sh
