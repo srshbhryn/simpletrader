@@ -1,0 +1,7 @@
+[{
+    "model": "analysis.exchange",
+    "pk": 1,
+    "fields": {
+        "name": "nobitex"
+    }
+}]

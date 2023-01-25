@@ -1,0 +1,904 @@
+[{
+        "model": "analysis.asset",
+        "pk": 1,
+        "fields": {
+            "name": "usd"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 2,
+        "fields": {
+            "name": "rls"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 10,
+        "fields": {
+            "name": "btc"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 11,
+        "fields": {
+            "name": "eth"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 12,
+        "fields": {
+            "name": "ltc"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 13,
+        "fields": {
+            "name": "usdt"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 14,
+        "fields": {
+            "name": "xrp"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 15,
+        "fields": {
+            "name": "bch"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 16,
+        "fields": {
+            "name": "bnb"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 17,
+        "fields": {
+            "name": "eos"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 18,
+        "fields": {
+            "name": "doge"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 19,
+        "fields": {
+            "name": "xlm"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 20,
+        "fields": {
+            "name": "trx"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 21,
+        "fields": {
+            "name": "ada"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 22,
+        "fields": {
+            "name": "xmr"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 23,
+        "fields": {
+            "name": "xem"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 24,
+        "fields": {
+            "name": "iota"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 25,
+        "fields": {
+            "name": "etc"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 26,
+        "fields": {
+            "name": "dash"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 27,
+        "fields": {
+            "name": "zec"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 28,
+        "fields": {
+            "name": "neo"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 29,
+        "fields": {
+            "name": "qtum"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 30,
+        "fields": {
+            "name": "xtz"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 31,
+        "fields": {
+            "name": "pmn"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 32,
+        "fields": {
+            "name": "link"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 33,
+        "fields": {
+            "name": "dai"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 34,
+        "fields": {
+            "name": "dot"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 35,
+        "fields": {
+            "name": "uni"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 36,
+        "fields": {
+            "name": "aave"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 37,
+        "fields": {
+            "name": "sol"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 38,
+        "fields": {
+            "name": "matic"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 39,
+        "fields": {
+            "name": "fil"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 40,
+        "fields": {
+            "name": "grt"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 41,
+        "fields": {
+            "name": "theta"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 42,
+        "fields": {
+            "name": "shib"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 50,
+        "fields": {
+            "name": "1inch"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 51,
+        "fields": {
+            "name": "alice"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 52,
+        "fields": {
+            "name": "alpha"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 53,
+        "fields": {
+            "name": "ankr"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 54,
+        "fields": {
+            "name": "arpa"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 55,
+        "fields": {
+            "name": "ata"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 56,
+        "fields": {
+            "name": "atom"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 57,
+        "fields": {
+            "name": "avax"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 58,
+        "fields": {
+            "name": "axs"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 59,
+        "fields": {
+            "name": "bake"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 60,
+        "fields": {
+            "name": "bal"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 61,
+        "fields": {
+            "name": "band"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 62,
+        "fields": {
+            "name": "bat"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 63,
+        "fields": {
+            "name": "bel"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 64,
+        "fields": {
+            "name": "blz"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 65,
+        "fields": {
+            "name": "btt"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 66,
+        "fields": {
+            "name": "c98"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 67,
+        "fields": {
+            "name": "celr"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 68,
+        "fields": {
+            "name": "chr"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 69,
+        "fields": {
+            "name": "comp"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 70,
+        "fields": {
+            "name": "coti"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 71,
+        "fields": {
+            "name": "ctk"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 72,
+        "fields": {
+            "name": "ctsi"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 73,
+        "fields": {
+            "name": "dodo"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 74,
+        "fields": {
+            "name": "egld"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 75,
+        "fields": {
+            "name": "ftm"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 76,
+        "fields": {
+            "name": "gala"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 77,
+        "fields": {
+            "name": "iotx"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 78,
+        "fields": {
+            "name": "knc"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 79,
+        "fields": {
+            "name": "ksm"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 80,
+        "fields": {
+            "name": "lina"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 81,
+        "fields": {
+            "name": "lit"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 82,
+        "fields": {
+            "name": "mask"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 83,
+        "fields": {
+            "name": "mkr"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 84,
+        "fields": {
+            "name": "near"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 85,
+        "fields": {
+            "name": "ocean"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 86,
+        "fields": {
+            "name": "ont"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 87,
+        "fields": {
+            "name": "reef"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 88,
+        "fields": {
+            "name": "sfp"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 89,
+        "fields": {
+            "name": "snx"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 90,
+        "fields": {
+            "name": "sushi"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 91,
+        "fields": {
+            "name": "sxp"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 92,
+        "fields": {
+            "name": "tlm"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 93,
+        "fields": {
+            "name": "unfi"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 94,
+        "fields": {
+            "name": "yfi"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 95,
+        "fields": {
+            "name": "yfii"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 96,
+        "fields": {
+            "name": "zil"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 97,
+        "fields": {
+            "name": "mana"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 98,
+        "fields": {
+            "name": "sand"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 99,
+        "fields": {
+            "name": "ape"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 100,
+        "fields": {
+            "name": "one"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 101,
+        "fields": {
+            "name": "wbtc"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 102,
+        "fields": {
+            "name": "usdc"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 103,
+        "fields": {
+            "name": "algo"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 104,
+        "fields": {
+            "name": "luna"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 105,
+        "fields": {
+            "name": "klay"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 106,
+        "fields": {
+            "name": "gmt"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 107,
+        "fields": {
+            "name": "chz"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 108,
+        "fields": {
+            "name": "vet"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 109,
+        "fields": {
+            "name": "qnt"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 110,
+        "fields": {
+            "name": "busd"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 111,
+        "fields": {
+            "name": "flow"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 112,
+        "fields": {
+            "name": "hbar"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 113,
+        "fields": {
+            "name": "pgala"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 114,
+        "fields": {
+            "name": "egala"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 115,
+        "fields": {
+            "name": "enj"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 116,
+        "fields": {
+            "name": "op"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 117,
+        "fields": {
+            "name": "crv"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 118,
+        "fields": {
+            "name": "cake"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 119,
+        "fields": {
+            "name": "ldo"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 120,
+        "fields": {
+            "name": "dydx"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 121,
+        "fields": {
+            "name": "gno"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 122,
+        "fields": {
+            "name": "apt"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 123,
+        "fields": {
+            "name": "flr"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 124,
+        "fields": {
+            "name": "lrc"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 125,
+        "fields": {
+            "name": "ens"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 126,
+        "fields": {
+            "name": "lpt"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 127,
+        "fields": {
+            "name": "glm"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 128,
+        "fields": {
+            "name": "api3"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 129,
+        "fields": {
+            "name": "elf"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 130,
+        "fields": {
+            "name": "dao"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 131,
+        "fields": {
+            "name": "cvc"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 132,
+        "fields": {
+            "name": "nmr"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 133,
+        "fields": {
+            "name": "storj"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 134,
+        "fields": {
+            "name": "cvx"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 135,
+        "fields": {
+            "name": "snt"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 136,
+        "fields": {
+            "name": "slp"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 137,
+        "fields": {
+            "name": "nft"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 138,
+        "fields": {
+            "name": "srm"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 139,
+        "fields": {
+            "name": "ant"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 140,
+        "fields": {
+            "name": "ilv"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 142,
+        "fields": {
+            "name": "icp"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 143,
+        "fields": {
+            "name": "hnt"
+        }
+    },
+    {
+        "model": "analysis.asset",
+        "pk": 144,
+        "fields": {
+            "name": "babydoge"
+        }
+    }
+]

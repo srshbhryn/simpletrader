@@ -1,0 +1,9 @@
+[{
+    "model": "analysis.market",
+    "pk": 1,
+    "fields": {
+        "base_asset": 13,
+        "quote_asset": 2,
+        "exchange": 1
+    }
+}]
