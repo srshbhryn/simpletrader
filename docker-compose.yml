@@ -92,8 +92,6 @@ services:
   celery_redis:
     image: redis:7.0.4-alpine
     restart: always
-    ports:
-      - "16379:6379"
 
   bookwatch_redis:
     image: redis:7.0.4-alpine
@@ -177,8 +175,6 @@ services:
   analysisdb:
     image: timescale/timescaledb:latest-pg14
     restart: always
-    ports:
-      - 5436:5432
     environment:
       - POSTGRES_USER=analysisdb
       - POSTGRES_PASSWORD=analysisdb
