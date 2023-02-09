@@ -1,13 +1,13 @@
 package main
 
 import (
+	"bots/lib/bookwatch"
+	"bots/lib/config"
+	"bots/lib/config/assets"
+	"bots/lib/config/exchanges"
+	"bots/lib/config/markets"
+	"bots/lib/trader"
 	"fmt"
-	"goapp/lib/bookwatch"
-	"goapp/lib/config"
-	"goapp/lib/config/assets"
-	"goapp/lib/config/exchanges"
-	"goapp/lib/config/markets"
-	"goapp/lib/trader"
 	"time"
 )
 

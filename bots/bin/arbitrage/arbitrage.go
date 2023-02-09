@@ -1,11 +1,11 @@
 package main
 
 import (
+	"bots/lib/arbitrage"
+	"bots/lib/bookwatch"
+	"bots/lib/config"
+	"bots/lib/trader"
 	"fmt"
-	"goapp/lib/arbitrage"
-	"goapp/lib/bookwatch"
-	"goapp/lib/config"
-	"goapp/lib/trader"
 )
 
 func init() {

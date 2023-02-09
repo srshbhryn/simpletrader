@@ -1,10 +1,10 @@
 package config
 
 import (
-	"goapp/lib/config/assets"
-	"goapp/lib/config/exchanges"
-	"goapp/lib/config/markets"
-	"goapp/lib/config/orderstates"
+	"bots/lib/config/assets"
+	"bots/lib/config/exchanges"
+	"bots/lib/config/markets"
+	"bots/lib/config/orderstates"
 	"os"
 	"strconv"
 )

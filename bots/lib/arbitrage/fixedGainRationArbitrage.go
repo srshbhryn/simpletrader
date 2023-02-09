@@ -1,9 +1,9 @@
 package arbitrage
 
 import (
-	"goapp/lib/config/assets"
-	"goapp/lib/config/exchanges"
-	"goapp/lib/config/markets"
+	"bots/lib/config/assets"
+	"bots/lib/config/exchanges"
+	"bots/lib/config/markets"
 )
 
 type order struct {

@@ -1,4 +1,4 @@
-FROM goapp_base_image
+FROM bots_base_image
 
 
 COPY . .

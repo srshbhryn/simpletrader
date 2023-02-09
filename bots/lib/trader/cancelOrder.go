@@ -1,9 +1,9 @@
 package trader
 
 import (
+	"bots/lib/config"
 	"encoding/json"
 	"fmt"
-	"goapp/lib/config"
 )
 
 type CancelOrderParams struct {

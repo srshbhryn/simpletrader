@@ -1,11 +1,11 @@
-module goapp
+module bots
 
 go 1.18
 
 require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gomodule/redigo v2.0.0+incompatible
-	github.com/srshbhryn/gocelery v0.0.0-20221111194629-7968b84daf11
+	github.com/srshbhryn/gocelery v0.0.0-20230203155254-192665e8c276
 
 )
 

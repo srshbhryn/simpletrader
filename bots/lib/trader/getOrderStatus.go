@@ -1,10 +1,10 @@
 package trader
 
 import (
+	"bots/lib/config"
+	"bots/lib/config/orderstates"
 	"encoding/json"
 	"fmt"
-	"goapp/lib/config"
-	"goapp/lib/config/orderstates"
 )
 
 type OrderStatusRequest struct {

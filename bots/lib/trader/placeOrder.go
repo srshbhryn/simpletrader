@@ -1,11 +1,11 @@
 package trader
 
 import (
+	"bots/lib/config"
+	"bots/lib/config/exchanges"
+	"bots/lib/config/markets"
 	"encoding/json"
 	"fmt"
-	"goapp/lib/config"
-	"goapp/lib/config/exchanges"
-	"goapp/lib/config/markets"
 )
 
 type OrderId int

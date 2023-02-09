@@ -1,10 +1,10 @@
 package markets
 
 import (
+	"bots/lib/config/assets"
+	"bots/lib/config/exchanges"
 	"encoding/json"
 	"errors"
-	"goapp/lib/config/assets"
-	"goapp/lib/config/exchanges"
 	"os"
 )
 
