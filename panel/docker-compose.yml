@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  paneldb:
+    image: postgres:14.6
+    restart: always
+    ports:
+      - 5465:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=paneldb
+      - POSTGRES_PASSWORD=paneldb
+      - POSTGRES_DB=paneldb
+
+volumes:
+  postgres_data:

@@ -82,10 +82,22 @@ WSGI_APPLICATION = 'panel.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'paneldb',
+        'USER': 'paneldb',
+        'PASSWORD': 'paneldb',
+        'HOST': 'paneldb',
+        'PORT': '5432',
+        'CONN_MAX_AGE': 3600,
+        'DISABLE_SERVER_SIDE_CURSORS': True,
     }
 }
+
+if DEBUG:
+    DATABASES['default'].update({
+        'HOST': '127.0.0.1',
+        'PORT': '5465',
+    })
 
 
 # Password validation
