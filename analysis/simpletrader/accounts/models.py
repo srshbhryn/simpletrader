@@ -1,3 +1,4 @@
+from uuid import uuid4
 from decimal import Decimal
 
 from django.db import models
@@ -8,7 +9,7 @@ from simpletrader.analysis.models import Asset, Exchange
 
 
 class Account(models.Model):
-    uid = models.UUIDField()
+    uid = models.UUIDField(primary_key=True, default=uuid4)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
     description = models.TextField(default='')
 

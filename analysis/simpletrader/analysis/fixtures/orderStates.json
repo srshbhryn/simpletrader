@@ -8,29 +8,17 @@
     "model": "analysis.orderstatus",
     "pk": 2,
     "fields": {
-        "name": "failed_no_fill"
+        "name": "failed"
     }
 }, {
     "model": "analysis.orderstatus",
     "pk": 3,
     "fields": {
-        "name": "canceled_no_fill"
+        "name": "canceled"
     }
 }, {
     "model": "analysis.orderstatus",
     "pk": 4,
-    "fields": {
-        "name": "canceled_partially_filled"
-    }
-}, {
-    "model": "analysis.orderstatus",
-    "pk": 5,
-    "fields": {
-        "name": "failed_partially_filled"
-    }
-}, {
-    "model": "analysis.orderstatus",
-    "pk": 6,
     "fields": {
         "name": "filled"
     }

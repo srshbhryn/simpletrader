@@ -1,4 +1,7 @@
+from uuid import uuid4
+
 from django.db import models
+from django.utils.timezone import now
 
 from timescale.db.models.fields import TimescaleDateTimeField
 from timescale.db.models.managers import TimescaleManager
@@ -8,6 +11,7 @@ from simpletrader.accounts.models import Account
 
 
 class Order(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid4)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
 
     external_id = models.CharField(max_length=32, db_index=True)
@@ -16,7 +20,7 @@ class Order(models.Model):
     pair = models.ForeignKey(Pair, on_delete=models.CASCADE)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
     status = models.ForeignKey(OrderStatus, on_delete=models.CASCADE)
-    timestamp = TimescaleDateTimeField(interval='24 hour')
+    timestamp = TimescaleDateTimeField(interval='24 hour', default=now)
     price = models.DecimalField(max_digits=32, decimal_places=16, default=None, null=True)
     volume = models.DecimalField(max_digits=32, decimal_places=16)
     is_sell = models.BooleanField()
@@ -25,13 +29,15 @@ class Order(models.Model):
 
 
 class Fill(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid4)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
 
+    order_uid = models.UUIDField(db_index=True, null=True, default=None,)
     external_id = models.CharField(max_length=32, db_index=True)
     external_order_id = models.CharField(max_length=32, db_index=True)
     pair = models.ForeignKey(Pair, on_delete=models.CASCADE)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
-    timestamp = TimescaleDateTimeField(interval='24 hour')
+    timestamp = TimescaleDateTimeField(interval='24 hour', default=now)
     price = models.DecimalField(max_digits=32, decimal_places=16, default=None, null=True)
     volume = models.DecimalField(max_digits=32, decimal_places=16)
     is_sell = models.BooleanField()
