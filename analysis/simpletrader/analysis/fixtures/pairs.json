@@ -1,0 +1,8 @@
+[{
+    "model": "analysis.pair",
+    "pk": 1,
+    "fields": {
+        "base_asset": 13,
+        "quote_asset": 2
+    }
+}]

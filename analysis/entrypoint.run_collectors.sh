@@ -8,5 +8,5 @@ done
 echo "PostgreSQL started"
 
 python manage.py migrate
-python manage.py loaddata assets exchanges markets
+python manage.py loaddata assets exchanges pairs markets orderStates
 python manage.py run_collectors

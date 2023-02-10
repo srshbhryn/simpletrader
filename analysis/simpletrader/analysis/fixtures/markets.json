@@ -2,8 +2,7 @@
     "model": "analysis.market",
     "pk": 1,
     "fields": {
-        "base_asset": 13,
-        "quote_asset": 2,
+        "pair": 1,
         "exchange": 1
     }
 }]
