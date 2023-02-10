@@ -8,7 +8,7 @@ from simpletrader.analysis.models import Asset, Exchange
 
 
 class Account(models.Model):
-    uid = models.URLField()
+    uid = models.UUIDField()
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
     description = models.TextField(default='')
 
