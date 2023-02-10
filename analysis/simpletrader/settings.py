@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     'timescale',
     'simpletrader.base',
     'simpletrader.analysis',
+    'simpletrader.accounts',
 ]
 
 
