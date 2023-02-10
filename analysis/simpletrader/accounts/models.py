@@ -4,11 +4,12 @@ from django.db import models
 from django.utils.timezone import now
 
 from timescale.db.models.fields import TimescaleDateTimeField
-from simpletrader.analysis.models import Asset
+from simpletrader.analysis.models import Asset, Exchange
 
 
 class Account(models.Model):
     uid = models.URLField()
+    exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
     description = models.TextField(default='')
 
 
