@@ -10,6 +10,7 @@ from bookwatch.markets import kucoin_spot_markets, kucoin_futures_markets
 from bookwatch.clients.redis import redis
 from bookwatch.clients.utils import restart_on_exception
 
+
 class BaseKucoin:
     base_url = None
     topic_template = None
@@ -116,6 +117,7 @@ class KucoinSpot(BaseKucoin):
             data['bestBid'],
             data['bestBidSize'],
         ])
+
 
 class KucoinFutures(BaseKucoin):
     base_url = 'https://api-futures.kucoin.com'

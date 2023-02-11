@@ -1,7 +1,7 @@
 from redis.asyncio import Redis
-from bookwatch import config
+from bookwatch import settings
 
 redis = Redis(
-    host=config.REDIS_HOST,
-    db=config.REDIS_DB,
+    host=settings.REDIS_HOST,
+    db=settings.REDIS_DB,
 )
