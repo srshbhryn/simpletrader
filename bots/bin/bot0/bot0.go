@@ -1,144 +1,61 @@
 package main
 
 import (
-	"bots/lib/bookwatch"
 	"bots/lib/config"
-	"bots/lib/config/assets"
-	"bots/lib/config/exchanges"
-	"bots/lib/config/markets"
-	"bots/lib/trader"
+	"bots/lib/rpc"
 	"fmt"
 	"time"
+
+	"github.com/gomodule/redigo/redis"
+	"github.com/srshbhryn/gocelery"
 )
 
-func init() {
-	trader.Load()
-	config.Load()
-	bookwatch.Load()
-}
-
-func checkBookDelay() {
-	nobitexMarket, err := markets.GetByAssetsAndExchange(
-		assets.ByName("usdt").Id,
-		assets.ByName("rls").Id,
-		exchanges.ByName("nobitex").Id,
-	)
-	kucoinMarket, err := markets.GetByAssetsAndExchange(
-		assets.ByName("btc").Id,
-		assets.ByName("usdt").Id,
-		exchanges.ByName("kucoin_futures").Id,
-	)
-
-	if err != nil {
-		panic(err)
-	}
-	for {
-		nobitexBook, err := bookwatch.ReadBook(nobitexMarket.Id)
-		if err != nil {
-			panic(err)
-		}
-		kucoinBook, err := bookwatch.ReadBook(kucoinMarket.Id)
-		if err != nil {
-			panic(err)
-		}
-		now := time.Now()
-		fmt.Println(now.Sub(nobitexBook.Timestamp), "\t", now.Sub(kucoinBook.Timestamp))
-		time.Sleep(100 * time.Microsecond)
-	}
-}
-
-func placeOrder() {
-	// checkBookDelay()
-	baseAssetId := assets.ByName("usdt").Id
-	quoteAssetId := assets.ByName("rls").Id
-	exchangeId := exchanges.ByName("nobitex").Id
-	market, err := markets.GetByAssetsAndExchange(baseAssetId, quoteAssetId, exchangeId)
-	if err != nil {
-		panic(err)
-	}
-	book, err := bookwatch.ReadBook(market.Id)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(book.BestAskPrice, book.BestBidPrice)
-	orderId, err := trader.PlaceLimitOrder(baseAssetId, quoteAssetId, exchangeId, 10, (book.BestBidPrice), true)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("SUCCESS", orderId)
-	for {
-		stat, filledAmount, err := trader.GetOrderStatusAndFills(orderId)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(stat)
-		fmt.Println(filledAmount)
-	}
-	// time.Sleep(100 * time.Millisecond)
-	// }
-
-}
-
-func getWalletsStats() {
-	baseAssetId := assets.ByName("usdt").Id
-	quoteAssetId := assets.ByName("rls").Id
-	exchangeId := exchanges.ByName("nobitex").Id
-	fmt.Println(trader.GetWalletsStats(baseAssetId, exchangeId))
-	fmt.Println(trader.GetWalletsStats(quoteAssetId, exchangeId))
-}
-
-func placeKucoinOrder() {
-	baseAssetId := assets.ByName("eth").Id
-	quoteAssetId := assets.ByName("usdt").Id
-	exchangeId := exchanges.ByName("kucoin_futures").Id
-	market, err := markets.GetByAssetsAndExchange(baseAssetId, quoteAssetId, exchangeId)
-	if err != nil {
-		panic(err)
-	}
-	book, err := bookwatch.ReadBook(market.Id)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(book.BestAskPrice, book.BestBidPrice)
-	orderId, err := trader.PlaceLimitOrder(baseAssetId, quoteAssetId, exchangeId, .03, (book.BestAskPrice)*.9, false)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("SUCCESS", orderId)
-	// time.Sleep(time.Second)
-	// err = trader.CancelOrder(orderId)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// fmt.Println("CANCELED")
-	for {
-		stat, filledAmount, err := trader.GetOrderStatusAndFills(orderId)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(stat)
-		fmt.Println(filledAmount)
-	}
-}
-
-func getKucoinBalance() {
-	quoteAssetId := assets.ByName("usdt").Id
-	exchangeId := exchanges.ByName("kucoin_futures").Id
-	stats, err := trader.GetWalletsStats(quoteAssetId, exchangeId)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(stats)
-	baseAssetId := assets.ByName("eth").Id
-	stats, err = trader.GetWalletsStats(baseAssetId, exchangeId)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(stats)
-
-}
 func main() {
-	// getKucoinBalance()
-	checkBookDelay()
-	// placeKucoinOrder()
+	rpc.Load()
+	config.Load()
+	redisPool := &redis.Pool{
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.DialURL("redis://127.0.0.1:6379/3")
+			if err != nil {
+				return nil, err
+			}
+			return c, err
+		},
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			_, err := c.Do("PING")
+			return err
+		},
+		MaxIdle:         32,
+		MaxActive:       32,
+		Wait:            false,
+		MaxConnLifetime: time.Duration(10 * time.Hour),
+	}
+	backend := gocelery.NewRedisRPCcBackend(redisPool)
+	broker := gocelery.NewRedisBroker(redisPool)
+	broker.QueueName = "trade_rpc"
+
+	// initialize celery client
+	cli, _ := gocelery.NewCeleryClient(
+		broker,
+		backend,
+		16,
+	)
+	// prepare arguments
+	taskName := "trade.get_balance"
+	argA := "99994715bc10442f85a1de3a8bad9896"
+	argB := "13"
+	// run task
+	for i := 0; i < 10; i++ {
+		time.Sleep(time.Second)
+		// go func() {
+		ar, err := cli.Delay(taskName, argA, argB)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("X")
+		r, err := backend.GetResult(ar.TaskID)
+		fmt.Println("Y")
+		fmt.Println(r)
+	}
+	time.Sleep(30 * time.Second)
 }

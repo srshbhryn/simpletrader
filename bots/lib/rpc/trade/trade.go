@@ -1,4 +1,4 @@
-package analysis
+package trade
 
 import (
 	"github.com/gomodule/redigo/redis"
@@ -9,7 +9,7 @@ func Load(redisPool *redis.Pool, celeryBackend gocelery.CeleryBackend) {
 	backend = celeryBackend
 	var err error
 	broker := gocelery.NewRedisBroker(redisPool)
-	broker.QueueName = "analysis_query"
+	broker.QueueName = "trade_rpc"
 	client, err = gocelery.NewCeleryClient(
 		broker,
 		backend,
@@ -18,7 +18,6 @@ func Load(redisPool *redis.Pool, celeryBackend gocelery.CeleryBackend) {
 	if err != nil {
 		panic(err)
 	}
-
 }
 
 var client *gocelery.CeleryClient
