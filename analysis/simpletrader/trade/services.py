@@ -61,11 +61,10 @@ def get_order_status(order_uid):
     ).get('fv') or Decimal('0')
     return serialize({'status_id': order.status_id, 'filled_volume': filled_volume})
 
+
 def get_balance(account_uid, asset_id):
-    account = Account.objects.select_related('exchange').get(uid=account_uid)
-    asset = Asset.objects.get(pk=asset_id)
-    wallet = Wallet.objects.get_or_create(
-        account=account,
-        asset=asset,
+    wallet, _ = Wallet.objects.get_or_create(
+        account_uid=account_uid,
+        asset_id=asset_id,
     )
-    return {'blocked': wallet.blocked_balance, 'free':wallet.free_balance}
+    return serialize({'blocked': wallet.blocked_balance, 'free':wallet.free_balance})

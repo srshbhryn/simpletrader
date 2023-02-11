@@ -15,7 +15,7 @@ class Account(models.Model):
 
 
 class Wallet(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    account_uid = models.UUIDField()
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     free_balance = models.DecimalField(max_digits=32, decimal_places=16, default=0)
     blocked_balance = models.DecimalField(max_digits=32, decimal_places=16, default=0)
@@ -24,7 +24,7 @@ class Wallet(models.Model):
         constraints = (
             models.UniqueConstraint(
                 name='unique_bot_asset_pair',
-                fields=('account', 'asset'),
+                fields=('account_uid', 'asset'),
             ),
             models.CheckConstraint(
                 name='non_negative_free_balance',

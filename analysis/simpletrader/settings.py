@@ -196,6 +196,6 @@ CELERY_BROKER = f'redis://{CELERY_REDIS_HOST}:{CELERY_REDIS_PORT}/{CELERY_REDIS_
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_TASK_ROUTES = {
     'analysis.q.*': {'queue': 'analysis_query'},
-    'trade.*': {'queue': 'trade'},
+    'trade.*': {'queue': 'trade_rpc'},
 }
 CELERY_TIMEZONE = TIME_ZONE

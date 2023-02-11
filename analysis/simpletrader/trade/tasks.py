@@ -5,7 +5,8 @@ from simpletrader.trade.services import place_order, cancel_order, get_order_sta
 
 
 @shared_task(name='trade.place_order')
-def place_order_task(account_uuid, pair_id, leverage, volume, is_sell, price = None, client_order_id = None):
+def place_order_task(account_uuid, pair_id, leverage, volume, is_sell, price, client_order_id,):
+    client_order_id = client_order_id or None
     if price is None:
         pass
     leverage = leverage
