@@ -9,13 +9,20 @@ from simpletrader.analysis.models import Asset, Exchange
 
 
 class Account(models.Model):
+    class Types(models.IntegerChoices):
+        demo = 10
+        regular = 20
+        internal = 30
+        external = 40
+
     uid = models.UUIDField(primary_key=True, default=uuid4)
+    type = models.IntegerField(choices=Types.choices)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
     description = models.TextField(default='')
 
 
 class Wallet(models.Model):
-    account_uid = models.UUIDField()
+    account_uid = models.UUIDField(db_index=True)
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     free_balance = models.DecimalField(max_digits=32, decimal_places=16, default=0)
     blocked_balance = models.DecimalField(max_digits=32, decimal_places=16, default=0)
