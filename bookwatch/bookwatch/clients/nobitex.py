@@ -45,6 +45,8 @@ class Nobitex:
             for market in self.nobitex_markets:
                 symbol = self.get_symbol(market)
                 data = [str(body[symbol]['lastUpdate'])]
+                l = len(data[0])
+                data[0] += (13 - l) * '0'
                 data += body[symbol]['bids'][0]
                 data += body[symbol]['asks'][0]
                 data = ','.join(data)
