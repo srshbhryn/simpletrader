@@ -1,6 +1,7 @@
 package bookwatch
 
 import (
+	"bots/lib/config/markets"
 	"context"
 	"encoding/csv"
 	"os"
@@ -35,50 +36,8 @@ func init() {
 	})
 }
 
-// func ExampleClient() {
-// 	rdb := Client()
-// 	err := rdb.Set(ctx, "key", "value", 0).Err()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	val, err := rdb.Get(ctx, "key").Result()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	fmt.Println("key", val)
-
-// 	val2, err := rdb.Get(ctx, "key2").Result()
-// 	if err == redis.Nil {
-// 		fmt.Println("key2 does not exist")
-// 	} else if err != nil {
-// 		panic(err)
-// 	} else {
-// 		fmt.Println("key2", val2)
-// 	}
-// 	// Output: key value
-// 	// key2 does not exist
-// 	fmt.Println("=============================")
-// 	val, err = rdb.Get(ctx, "97").Result()
-// 	if err == redis.Nil {
-// 		fmt.Println("!!!!!!!!!!!")
-// 		fmt.Println("key does not exist")
-// 	} else if err != nil {
-// 		fmt.Println("!!!!!!!!!!!")
-// 		panic(err)
-// 	} else {
-// 		fmt.Println("val:")
-// 		fmt.Println(val)
-// 	}
-// 	// records, err := csvReader.ReadAll()
-// 	// if err != nil {
-// 	// 	log.Fatal("Unable to parse file as CSV for "+filePath, err)
-// 	// }
-
-// }
-
-func ReadBook(marketId int) (*Book, error) {
-	msg, err := rdb.Get(ctx, strconv.Itoa(marketId)).Result()
+func ReadBook(market markets.Market) (*Book, error) {
+	msg, err := rdb.Get(ctx, strconv.Itoa(int(market.Id))).Result()
 	if err != nil {
 		return nil, err
 	}
