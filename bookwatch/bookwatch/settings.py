@@ -8,4 +8,4 @@ if IS_PROD:
     REDIS_HOST = 'bookwatch_redis'
 if IS_DEV:
     REDIS_HOST = '127.0.0.1'
-    REDIS_DB = 3
+    REDIS_DB = 4
