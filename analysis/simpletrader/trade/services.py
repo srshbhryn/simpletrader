@@ -5,7 +5,8 @@ from django.db import models
 from django.db.transaction import atomic
 
 from simpletrader.base.serializers import serialize
-from simpletrader.analysis.models import Asset, Pair, OrderStatus
+from simpletrader.base.rpc.bookwatch import get_book
+from simpletrader.analysis.models import Asset, Pair, OrderStatus, Market
 from simpletrader.accounts.models import Wallet, Account, Transaction
 from simpletrader.trade.models import Order, Fill
 
@@ -26,6 +27,14 @@ def place_order(
     account = Account.objects.select_related('exchange').get(uid=account_uuid)
     exchange = account.exchange
     pair = Pair.objects.select_related('base_asset', 'quote_asset').get(pk=pair_id)
+    if price is None:
+        market = Market.objects.get(exchange=exchange,pair=pair,)
+        book = get_book(market.id)
+        if is_sell:
+            price = book.best_bid_price * .99
+        else:
+            price = book.best_ask_price * .99
+
     blocking_asset = pair.base_asset if is_sell else pair.quote_asset
     blocking_amount = volume if is_sell else volume * price
     Wallet.objects.get(account=account, asset=blocking_asset).create_transaction(
