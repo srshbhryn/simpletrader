@@ -20,6 +20,15 @@ class Account(models.Model):
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
     description = models.TextField(default='')
 
+    def get_wallet(self, asset_id: int):
+        return Wallet.objects.filter(
+            account_uid=self.uid,
+            asset=asset_id,
+        ).first() or Wallet.objects.create(
+            account_uid=self.uid,
+            asset=asset_id,
+        )
+
 
 class Wallet(models.Model):
     account_uid = models.UUIDField(db_index=True)

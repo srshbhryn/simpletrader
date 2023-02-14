@@ -3,6 +3,8 @@ import signal
 import logging
 import time
 import json
+import math
+import decimal
 
 from django.core.cache import cache
 from django.utils.timezone import make_aware
@@ -123,3 +125,9 @@ class GracefulKiller:
 
     def exit_gracefully(self, *args, **kwargs):
         self._kill_now = True
+
+
+def float_to_decimal(value):
+    if value >= 0:
+        return decimal.Decimal(str(math.floor(value * 10 ** 12) / 10 ** 12))
+    return -decimal.Decimal(str(math.floor(-value * 10 ** 12) / 10 ** 12))

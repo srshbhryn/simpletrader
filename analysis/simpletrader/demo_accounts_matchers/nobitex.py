@@ -1,6 +1,6 @@
 
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 import multiprocessing
 
 from typing import List
@@ -9,9 +9,9 @@ from django.core.cache import cache
 from django.db import transaction, models
 from django.utils.timezone import now
 
-from simpletrader.base.rpc.bookwatch import get_book
-from simpletrader.analysis.models import Asset, OrderStatus, Exchange, Pair, Market, Trade
-from simpletrader.accounts.models import Account
+from simpletrader.base.utils import float_to_decimal
+from simpletrader.analysis.models import OrderStatus, Exchange, Pair, Market, Trade
+from simpletrader.accounts.models import Account, Transaction
 from simpletrader.trade.models import Order, Fill
 
 
@@ -57,7 +57,6 @@ class NobitexDemoMatcher:
             account__exchange=self.nobitex,
             pair=pair,
             exchange=self.nobitex,
-        ).filter(
         ))
 
     def get_price_minmax(self, pair: Pair) -> tuple[float, float]:
@@ -100,30 +99,60 @@ class NobitexDemoMatcher:
         elif not order.is_sell and order.price > max_price:
             execution_price = max_price
 
-
-
         blocked_asset = order.pair.base_asset if order.is_sell else order.pair.quote_asset
-        blocked_amount = 
-        amount_to_get = 
-        amount_to_give = 
-
-        order.status = 
-        Fill.objects.create()
+        blocked_amount = order.volume * (1 if order.is_sell else order.price)
 
 
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    order_uid = models.UUIDField(db_index=True, null=True, default=None,)
-    external_id = models.CharField(max_length=32, db_index=True)
-    external_order_id = models.CharField(max_length=32, db_index=True)
-    pair = models.ForeignKey(Pair, on_delete=models.CASCADE)
-    exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=32, decimal_places=16, default=None, null=True)
-    volume = models.DecimalField(max_digits=32, decimal_places=16)
-    is_sell = models.BooleanField()
-    fee = models.DecimalField(max_digits=32, decimal_places=16)
-    fee_asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+        asset_to_get = order.pair.quote_asset if order.is_sell else order.pair.base_asset
+        amount_to_get = (execution_price * order.volume if order.is_sell else order.volume) * self.fee_factor
 
+        asset_to_give = blocked_asset
+        amount_to_give = order.volume if order.is_sell else execution_price * order.volume
 
+        fee_asset = asset_to_get
+        fee_amount = (execution_price * order.volume if order.is_sell else order.volume) * (1 - self.fee_factor)
+
+        execution_price = float_to_decimal(execution_price)
+
+        asset_to_get_wallet = order.account.get_wallet(asset_to_get.id)
+        asset_to_give_wallet = order.account.get_wallet(asset_to_give.id)
+
+        try:
+            with transaction.atomic():
+                asset_to_give_wallet.create_transaction(
+                    type=Transaction.Type.add_to_blocked_balance,
+                    amount=-float_to_decimal(amount_to_give),
+                )
+                asset_to_give_wallet.create_transaction(
+                    type=Transaction.Type.block,
+                    amount=-float_to_decimal(blocked_amount - amount_to_give),
+                )
+                asset_to_get_wallet.create_transaction(
+                    type=Transaction.Type.subtract_from_free_balance,
+                    amount=-float_to_decimal(amount_to_get),
+                )
+        except Exception as e:
+            print(f'ORDER FAILED: {e}')
+            Order.objects.filter(id=order.id).update(status_id=self.filled_order_status_id)
+            asset_to_give_wallet.create_transaction(
+                type=Transaction.Type.block,
+                amount=-float_to_decimal(blocked_amount),
+            )
+
+        Order.objects.filter(id=order.id).update(status_id=self.filled_order_status_id)
+        Fill.objects.create(
+            account=order.account,
+            order_uid=order.uid,
+            external_id=order.uid.hex,
+            external_order_id=order.uid.hex,
+            pair=order.pair,
+            exchange=self.nobitex,
+            price=float_to_decimal(execution_price),
+            volume=order.amount,
+            is_sell=order.is_sell,
+            fee=float_to_decimal(fee_amount),
+            fee_asset=fee_asset,
+        )
 
     @transaction.atomic
     def do_all_orders(self, pair: Pair, min_price: float, max_price: float,) -> None:
