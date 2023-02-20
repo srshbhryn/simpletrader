@@ -4,7 +4,6 @@ from typing import Optional
 from django.db import models
 from django.db.transaction import atomic
 
-from simpletrader.base.serializers import serialize
 from simpletrader.base.rpc.bookwatch import get_book
 from simpletrader.analysis.models import Asset, Pair, OrderStatus, Market
 from simpletrader.accounts.models import Wallet, Account, Transaction
@@ -33,12 +32,12 @@ def place_order(
         if is_sell:
             price = book.best_bid_price * .99
         else:
-            price = book.best_ask_price * .99
+            price = book.best_ask_price * 1.01
 
     blocking_asset = pair.base_asset if is_sell else pair.quote_asset
     blocking_amount = volume if is_sell else volume * price
-    Wallet.objects.get(account=account, asset=blocking_asset).create_transaction(
-        tp=Transaction.Type.block, amount=blocking_amount
+    Wallet.objects.get(account_uid=account.uid, asset=blocking_asset).create_transaction(
+        type=Transaction.Type.block, amount=blocking_amount
     )
     order = Order.objects.create(
         account=account,
@@ -68,10 +67,10 @@ def get_order_status(order_uid):
     filled_volume = Fill.objects.filter(order_uid=order_uid).aggregate(
         fv=models.Sum('volume')
     ).get('fv') or Decimal('0')
-    return serialize({'status_id': order.status_id, 'filled_volume': filled_volume})
+    return {'status_id': order.status_id, 'filled_volume': filled_volume}
 
 
 def get_balance(account_uid, asset_id):
     account = Account.objects.get(uid=account_uid)
     wallet = account.get_wallet(asset_id)
-    return serialize({'blocked': wallet.blocked_balance, 'free':wallet.free_balance})
+    return {'blocked': wallet.blocked_balance, 'free':wallet.free_balance}

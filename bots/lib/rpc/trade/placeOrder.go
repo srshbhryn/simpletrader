@@ -48,6 +48,9 @@ func PlaceOrder(
 	if response.Status != "SUCCESS" {
 		return nil, fmt.Errorf(response.Traceback.(string))
 	}
-	orderUUID := response.Result.(uuid.UUID)
-	return &orderUUID, nil
+	orderUUID, err := uuid.FromString(response.Result.(string))
+	if err != nil {
+		return nil, err
+	}
+	return &orderUUID, err
 }

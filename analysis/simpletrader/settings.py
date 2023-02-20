@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'simpletrader.analysis',
     'simpletrader.accounts',
     'simpletrader.trade',
+    'simpletrader.demo_accounts_matchers',
 ]
 
 

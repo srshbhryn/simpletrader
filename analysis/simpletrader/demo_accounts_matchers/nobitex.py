@@ -1,7 +1,7 @@
 
 import time
 from datetime import timedelta
-import multiprocessing
+import threading
 
 from typing import List
 
@@ -9,43 +9,62 @@ from django.core.cache import cache
 from django.db import transaction, models
 from django.utils.timezone import now
 
-from simpletrader.base.utils import float_to_decimal
+from simpletrader.base.utils import float_to_decimal, ReadWriteLock, GracefulKiller
 from simpletrader.analysis.models import OrderStatus, Exchange, Pair, Market, Trade
 from simpletrader.accounts.models import Account, Transaction
 from simpletrader.trade.models import Order, Fill
 
 
-multiprocessing.set_start_method('spawn')
+RELOAD_ACCOUNTS_CACHE_KEY = 'reload_nobitex_accounts'
 
 
-class NobitexDemoMatcher:
+class NobitexDemoMatcher(GracefulKiller):
     def __init__(self) -> None:
         self.sleep_time: timedelta = timedelta(seconds=2)
         self.account_ids: List[int] = []
         self.nobitex: Exchange = None
         self.pairs: List[Pair] = []
-        self.open_order_state = OrderStatus.objects.get(name='open').id
-        self.reload_accounts_cache_key = 'reload_nobitex_accounts'
-        self.fee_factor = 1 - 0.001
+        self.reload_accounts_cache_key = RELOAD_ACCOUNTS_CACHE_KEY
+        self.fee_factor = float_to_decimal(1 - 0.001)
         self.pair_id_to_market_id_map: dict = None
         self.failed_order_status_id: int = None
         self.filled_order_status_id: int = None
         self.open_order_status_id: int = None
         self.canceled_order_status_id: int = None
+        self.mutex: ReadWriteLock = None
+        GracefulKiller.__init__(self)
 
-    def _init(self) -> None:
+    def run(self) -> None:
         self.nobitex = Exchange.objects.get(name='nobitex')
         self.pair_id_to_market_id_map = dict(list(Market.objects.filter(
             exchange=self.nobitex
         ).values_list('pair_id', 'id',)))
-        self.pairs = list(self.pair_id_to_market_id_map.keys())
-        self.failed_order_status_id: int = OrderStatus.objects.get('failed').id
-        self.filled_order_status_id: int = OrderStatus.objects.get('filled').id
-        self.open_order_status_id: int = OrderStatus.objects.get('open').id
-        self.canceled_order_status_id: int = OrderStatus.objects.get('canceled').id
+        self.pairs = Pair.objects.filter(id__in=list(self.pair_id_to_market_id_map.keys()))
+        self.failed_order_status_id: int = OrderStatus.objects.get(name='failed').id
+        self.filled_order_status_id: int = OrderStatus.objects.get(name='filled').id
+        self.open_order_status_id: int = OrderStatus.objects.get(name='open').id
+        self.canceled_order_status_id: int = OrderStatus.objects.get(name='canceled').id
+        self.mutex = ReadWriteLock()
+        self.fetch_accounts()
+        for pair in self.pairs:
+            thread = threading.Thread(target=self.run_for_pair, args=(pair,))
+            thread.daemon = True
+            thread.start()
 
-    def reload_account(self):
-        pass
+        while self.is_alive:
+            time.sleep(self.sleep_time.total_seconds())
+            if cache.get(self.reload_accounts_cache_key):
+                self.mutex.acquire_write()
+                try:
+                    self.reload_accounts()
+                    cache.decr(self.reload_accounts_cache_key)
+                except Exception as e:
+                    print(f'reload_accounts\t{str(pair)}\t{e}')
+                finally:
+                    self.mutex.acquire_write()
+
+    def reload_accounts(self):
+        self.accounts = Account.objects.filter(type=Account.Types.demo, exchange=self.nobitex)
 
     def fetch_accounts(self):
         cache.set(self.reload_accounts_cache_key, 0)
@@ -63,7 +82,7 @@ class NobitexDemoMatcher:
         nw = now()
         min_max = Trade.objects.filter(
             market_id=self.pair_id_to_market_id_map[pair.id],
-            time__gt=nw - 2 * self.sleep_time,
+            time__gt=nw - timedelta(minutes=.3),
             time__lt=nw,
         ).aggregate(
             min_price=models.Min(models.F('quote_amount') / models.F('base_amount')),
@@ -73,17 +92,23 @@ class NobitexDemoMatcher:
 
     def run_for_pair(self, pair: Pair):
         while True:
+            self.mutex.acquire_read()
             try:
                 time.sleep(self.sleep_time.total_seconds())
                 min_price, max_price = self.get_price_minmax(pair,)
                 if min_price is None:
-                    continue
+                    raise ValueError("No price")
                 self.do_all_orders(pair, min_price, max_price,)
             except Exception as e:
-                print(f'ERROR{e}')
+                raise e
+                # print(f'ERROR\t{pair}\t{e}')
+            finally:
+                self.mutex.release_read()
 
     @transaction.atomic
     def do_order(self, order: Order, min_price: float, max_price: float,):
+        min_price = float_to_decimal(min_price)
+        max_price = float_to_decimal(max_price)
         if order.is_sell and order.price > max_price:
             return
 
@@ -100,7 +125,7 @@ class NobitexDemoMatcher:
             execution_price = max_price
 
         blocked_asset = order.pair.base_asset if order.is_sell else order.pair.quote_asset
-        blocked_amount = order.volume * (1 if order.is_sell else order.price)
+        blocked_amount = order.volume * (float_to_decimal(1) if order.is_sell else order.price)
 
 
         asset_to_get = order.pair.quote_asset if order.is_sell else order.pair.base_asset
@@ -139,7 +164,7 @@ class NobitexDemoMatcher:
                 amount=-float_to_decimal(blocked_amount),
             )
 
-        Order.objects.filter(id=order.id).update(status_id=self.filled_order_status_id)
+        Order.objects.filter(uid=order.uid).update(status_id=self.filled_order_status_id)
         Fill.objects.create(
             account=order.account,
             order_uid=order.uid,
@@ -148,7 +173,7 @@ class NobitexDemoMatcher:
             pair=order.pair,
             exchange=self.nobitex,
             price=float_to_decimal(execution_price),
-            volume=order.amount,
+            volume=order.volume,
             is_sell=order.is_sell,
             fee=float_to_decimal(fee_amount),
             fee_asset=fee_asset,
@@ -157,4 +182,4 @@ class NobitexDemoMatcher:
     @transaction.atomic
     def do_all_orders(self, pair: Pair, min_price: float, max_price: float,) -> None:
         for order in self.fetch_orders(pair, min_price, max_price,):
-            self.do_order(order)
+            self.do_order(order, min_price, max_price,)

@@ -9,6 +9,8 @@ from timescale.db.models.managers import TimescaleManager
 class Asset(models.Model):
     name = models.CharField(max_length=32)
 
+    def __str__(self) -> str:
+        return self.name
 
 class Exchange(models.Model):
     name = models.CharField(max_length=64)
@@ -22,6 +24,8 @@ class Pair(models.Model):
     base_asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='+')
     quote_asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='+')
 
+    def __str__(self) -> str:
+        return str(self.base_asset) + str(self.quote_asset)
 
 class Market(models.Model):
     pair = models.ForeignKey(Pair, on_delete=models.CASCADE)

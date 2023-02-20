@@ -1,4 +1,5 @@
 import datetime
+import uuid
 import re
 from decimal import Decimal, ROUND_HALF_UP, ROUND_UP
 
@@ -43,6 +44,8 @@ def serialize(obj, opts=None, ignore_keys=None, convert_to_camelcase=False):
     level = opts.get('level', 1)
     if obj is None:
         return None
+    if isinstance(obj, (uuid.UUID)):
+        return obj.hex
     if isinstance(obj, (int, float, str, bool)):
         return obj
     if isinstance(obj, (datetime.datetime, datetime.date)):

@@ -42,7 +42,7 @@ def get_book(market_id):
         best_ask_volume,
         best_bid_price,
         best_bid_volume,
-    ) = book.split(',')
+    ) = book.decode(encoding='utf8') .split(',')
     timestamp = make_aware(datetime.fromtimestamp(int(timestamp) / 1000))
     best_ask_price = float(best_ask_price)
     best_ask_volume = float(best_ask_volume)

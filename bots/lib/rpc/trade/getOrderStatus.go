@@ -3,6 +3,7 @@ package trade
 import (
 	"bots/lib/config/orderstates"
 	"fmt"
+	"strconv"
 
 	uuid "github.com/satori/go.uuid"
 )
@@ -25,8 +26,10 @@ func GetOrderStatus(OrderUUID uuid.UUID) (*OrderState, error) {
 		return nil, fmt.Errorf(response.Traceback.(string))
 	}
 	result := response.Result
+	filledAmount, err := strconv.ParseFloat(result.(map[string]interface{})["filled_volume"].(string), 64)
+	state := orderstates.OrderState(result.(map[string]interface{})["status_id"].(float64))
 	return &OrderState{
-		result.(map[string]orderstates.OrderState)["status_id"],
-		result.(map[string]float64)["filled_amount"],
+		state,
+		filledAmount,
 	}, nil
 }
