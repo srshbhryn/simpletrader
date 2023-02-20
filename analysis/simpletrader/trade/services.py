@@ -72,8 +72,6 @@ def get_order_status(order_uid):
 
 
 def get_balance(account_uid, asset_id):
-    wallet, _ = Wallet.objects.get_or_create(
-        account_uid=account_uid,
-        asset_id=asset_id,
-    )
+    account = Account.objects.get(uid=account_uid)
+    wallet = account.get_wallet(asset_id)
     return serialize({'blocked': wallet.blocked_balance, 'free':wallet.free_balance})
