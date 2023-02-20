@@ -59,14 +59,6 @@ class Wallet(models.Model):
                 name='unique_bot_asset_pair',
                 fields=('account_uid', 'asset'),
             ),
-            models.CheckConstraint(
-                name='non_negative_free_balance',
-                check=models.Q(free_balance__gte=0),
-            ),
-            models.CheckConstraint(
-                name='non_negative_block_balance',
-                check=models.Q(blocked_balance__gte=0),
-            ),
         )
 
     def create_transaction(self, type: int, amount: Decimal) -> 'Transaction':

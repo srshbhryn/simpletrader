@@ -100,8 +100,7 @@ class NobitexDemoMatcher(GracefulKiller):
                     raise ValueError("No price")
                 self.do_all_orders(pair, min_price, max_price,)
             except Exception as e:
-                raise e
-                # print(f'ERROR\t{pair}\t{e}')
+                print(f'ERROR\t{pair}\t{e}')
             finally:
                 self.mutex.release_read()
 
