@@ -74,6 +74,7 @@ class NobitexDemoMatcher(GracefulKiller):
         return list(Order.objects.select_for_update().filter(
             account__type=Account.Types.demo,
             account__exchange=self.nobitex,
+            status_id=self.open_order_status_id,
             pair=pair,
             exchange=self.nobitex,
         ))
@@ -141,27 +142,18 @@ class NobitexDemoMatcher(GracefulKiller):
         asset_to_get_wallet = order.account.get_wallet(asset_to_get.id)
         asset_to_give_wallet = order.account.get_wallet(asset_to_give.id)
 
-        try:
-            with transaction.atomic():
-                asset_to_give_wallet.create_transaction(
-                    type=Transaction.Type.add_to_blocked_balance,
-                    amount=-float_to_decimal(amount_to_give),
-                )
-                asset_to_give_wallet.create_transaction(
-                    type=Transaction.Type.block,
-                    amount=-float_to_decimal(blocked_amount - amount_to_give),
-                )
-                asset_to_get_wallet.create_transaction(
-                    type=Transaction.Type.subtract_from_free_balance,
-                    amount=-float_to_decimal(amount_to_get),
-                )
-        except Exception as e:
-            print(f'ORDER FAILED: {e}')
-            Order.objects.filter(id=order.id).update(status_id=self.filled_order_status_id)
-            asset_to_give_wallet.create_transaction(
-                type=Transaction.Type.block,
-                amount=-float_to_decimal(blocked_amount),
-            )
+        asset_to_give_wallet.create_transaction(
+            type=Transaction.Type.add_to_blocked_balance,
+            amount=-float_to_decimal(amount_to_give),
+        )
+        asset_to_give_wallet.create_transaction(
+            type=Transaction.Type.block,
+            amount=-float_to_decimal(blocked_amount - amount_to_give),
+        )
+        asset_to_get_wallet.create_transaction(
+            type=Transaction.Type.subtract_from_free_balance,
+            amount=-float_to_decimal(amount_to_get),
+        )
 
         Order.objects.filter(uid=order.uid).update(status_id=self.filled_order_status_id)
         Fill.objects.create(
