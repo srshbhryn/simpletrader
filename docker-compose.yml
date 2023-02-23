@@ -12,7 +12,6 @@ services:
   bookwatch_image:
     build:
       context: ./bookwatch
-      dockerfile: Dockerfile.bookwatch_image
     image: bookwatch_image
 
   bookwatch:
@@ -20,10 +19,7 @@ services:
     command: "python main.py"
     environment:
       - ENV=PROD
-      - CONFIG_DIR=/sharedconfs/
     restart: always
-    volumes:
-      - ./configs/shared/:/sharedconfs/
     depends_on:
       - bookwatch_redis
 
