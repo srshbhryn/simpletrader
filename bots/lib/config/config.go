@@ -6,7 +6,6 @@ import (
 	"bots/lib/config/markets"
 	"bots/lib/config/orderstates"
 	"bots/lib/config/pairs"
-	"os"
 )
 
 func Load() {}
@@ -17,11 +16,4 @@ func init() {
 	exchanges.Load()
 	orderstates.Load()
 	markets.Load()
-	loadAccountUUID()
-}
-
-var AccountUUID string
-
-func loadAccountUUID() {
-	AccountUUID = os.Getenv("ACCOUNT_UUID")
 }

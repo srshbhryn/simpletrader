@@ -1,7 +1,6 @@
 package trade
 
 import (
-	"bots/lib/config"
 	"bots/lib/config/pairs"
 	"fmt"
 
@@ -30,7 +29,7 @@ func PlaceOrder(
 	}
 	r, err := client.Delay(
 		"trade.place_order",
-		config.AccountUUID,
+		accountUUID,
 		Pair.Id,
 		Leverage,
 		Volume,

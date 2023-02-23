@@ -5,6 +5,12 @@ import (
 	"github.com/srshbhryn/gocelery"
 )
 
+var accountUUID string
+
+func SetAccountUUID(uuid string) {
+	accountUUID = uuid
+}
+
 func Load(redisPool *redis.Pool, celeryBackend gocelery.CeleryBackend) {
 	backend = celeryBackend
 	var err error

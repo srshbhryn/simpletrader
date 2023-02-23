@@ -28,7 +28,7 @@ class Account(models.Model):
         try:
             cache.incr(RELOAD_ACCOUNTS_CACHE_KEY)
         except ValueError as _:
-            cache.set(RELOAD_ACCOUNTS_CACHE_KEY, 0)
+            cache.set(RELOAD_ACCOUNTS_CACHE_KEY, 1)
         return super().save(*args, **kwargs)
 
     def get_wallet(self, asset_id: int):

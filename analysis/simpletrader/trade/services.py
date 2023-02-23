@@ -5,7 +5,7 @@ from django.db import models
 from django.db.transaction import atomic
 
 from simpletrader.base.rpc.bookwatch import get_book
-from simpletrader.analysis.models import Asset, Pair, OrderStatus, Market
+from simpletrader.analysis.models import Asset, Pair, OrderStatus, Market, Exchange
 from simpletrader.accounts.models import Wallet, Account, Transaction
 from simpletrader.trade.models import Order, Fill
 
@@ -74,3 +74,11 @@ def get_balance(account_uid, asset_id):
     account = Account.objects.get(uid=account_uid)
     wallet = account.get_wallet(asset_id)
     return {'blocked': wallet.blocked_balance, 'free':wallet.free_balance}
+
+
+def create_demo_account(exchange_id):
+    account = Account.objects.create(exchange_id=exchange_id)
+    wallet = account.get_wallet(Asset.objects.get(name='usdt').id)
+    wallet.free_balance = Decimal('1_000')
+    wallet.save()
+    return account.uid

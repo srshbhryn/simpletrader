@@ -2,7 +2,13 @@
 from celery import shared_task
 
 from simpletrader.base.serializers import serialize
-from simpletrader.trade.services import place_order, cancel_order, get_order_status, get_balance
+from simpletrader.trade.services import (
+    place_order,
+    cancel_order,
+    get_order_status,
+    get_balance,
+    create_demo_account,
+)
 
 
 @shared_task(name='trade.place_order')
@@ -35,3 +41,8 @@ def get_order_status_task(order_uid):
 @shared_task(name='trade.get_balance')
 def get_balance_task(account_uid, asset_id):
     return serialize(get_balance(account_uid, asset_id))
+
+
+@shared_task(name='trade.create_demo_account')
+def create_demo_account_task(exchange_id):
+    return create_demo_account(exchange_id)

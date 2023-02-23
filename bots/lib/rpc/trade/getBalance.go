@@ -1,7 +1,6 @@
 package trade
 
 import (
-	"bots/lib/config"
 	"bots/lib/config/assets"
 	"fmt"
 	"strconv"
@@ -13,7 +12,7 @@ type Balance struct {
 }
 
 func GetBalance(Asset assets.Asset) (*Balance, error) {
-	r, err := client.Delay("trade.get_balance", config.AccountUUID, fmt.Sprintf("%d", int64(Asset)))
+	r, err := client.Delay("trade.get_balance", accountUUID, fmt.Sprintf("%d", int64(Asset)))
 	if err != nil {
 		return nil, err
 	}

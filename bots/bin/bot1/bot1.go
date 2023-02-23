@@ -4,6 +4,7 @@ import (
 	"bots/lib/bookwatch"
 	"bots/lib/config"
 	"bots/lib/config/assets"
+	"bots/lib/config/exchanges"
 	"bots/lib/config/orderstates"
 	"bots/lib/config/pairs"
 	"bots/lib/rpc"
@@ -16,9 +17,21 @@ func main() {
 	rpc.Load()
 	config.Load()
 	bookwatch.Load()
-	// printBalances()
-	planeOrder()
+	createAccountAndCheckBalance()
+}
 
+func createAccountAndCheckBalance() {
+	uid, err := trade.GetDemoAccount(exchanges.Nobitex)
+	if err != nil {
+		panic(err)
+	}
+
+	trade.SetAccountUUID(uid)
+	balance, err := trade.GetBalance(assets.USDT)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(balance)
 }
 
 func planeOrder() {
