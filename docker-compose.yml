@@ -1,57 +1,19 @@
 version: '3.8'
 
 services:
-  autoheal:
-    restart: always
-    image: willfarrell/autoheal
-    environment:
-      - AUTOHEAL_CONTAINER_LABEL=all
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  simpletrader_base_image:
-    build:
-      context: ./app
-      dockerfile: Dockerfile.simpletrader_base_image
-    image: simpletrader_base_image
-
-  simpletrader_image:
-    build:
-      context: ./app
-      dockerfile: Dockerfile.simpletrader_image
-    image: simpletrader_image
-
-  bookwatch_base_image:
-    build:
-      context: ./bookwatch
-      dockerfile: Dockerfile.bookwatch_base_image
-    image: bookwatch_base_image
+  # autoheal:
+  #   restart: always
+  #   image: willfarrell/autoheal
+  #   environment:
+  #     - AUTOHEAL_CONTAINER_LABEL=all
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
 
   bookwatch_image:
     build:
       context: ./bookwatch
       dockerfile: Dockerfile.bookwatch_image
     image: bookwatch_image
-
-  kucoin__store_trades:
-    image: simpletrader_image
-    command: "./entrypoint.kucoin_store_trades.sh"
-    restart: always
-    environment:
-      - DEBUG=0
-    depends_on:
-      - journal_redis
-      - timescale_db
-
-  kucoin__collect_trades:
-    image: simpletrader_image
-    command: "./entrypoint.kucoin_collect_trades.sh"
-    restart: always
-    environment:
-      - DEBUG=0
-    depends_on:
-      - journal_redis
-      - timescale_db
 
   bookwatch:
     image: bookwatch_image
@@ -64,22 +26,6 @@ services:
       - ./configs/shared/:/sharedconfs/
     depends_on:
       - bookwatch_redis
-
-  nobitex__collect_trades:
-    image: simpletrader_image
-    command: "./entrypoint.nobitex_collect_trades.sh"
-    restart: always
-    environment:
-      - DEBUG=0
-    depends_on:
-      - journal_redis
-      - timescale_db
-    healthcheck:
-      test: ["CMD", "/app/manage.py", "nobitex__collect_trades_healthcheck"]
-      interval: 10s
-      timeout: 2s
-      retries: 1
-      start_period: 60s
 
   journal_redis:
     image: redis:7.0.4-alpine
@@ -96,56 +42,6 @@ services:
   bookwatch_redis:
     image: redis:7.0.4-alpine
     restart: always
-
-  default_db:
-    image: postgres:14.0-alpine
-    restart: always
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=simpletrader_default
-      - POSTGRES_PASSWORD=simpletrader_default
-      - POSTGRES_DB=simpletrader_default
-
-  timescale_db:
-    image: timescale/timescaledb:latest-pg14
-    restart: always
-    volumes:
-      - timescale_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=simpletrader_ts
-      - POSTGRES_PASSWORD=simpletrader_ts
-      - POSTGRES_DB=simpletrader_ts
-
-  traderdb:
-    image: timescale/timescaledb:latest-pg14
-    restart: always
-    volumes:
-      - traderdb_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=traderdb
-      - POSTGRES_PASSWORD=traderdb
-      - POSTGRES_DB=traderdb
-
-  trader__celery_worker:
-    image: simpletrader_image
-    command: "./entrypoint.trader_collectors.sh"
-    restart: always
-    environment:
-      - DEBUG=0
-    depends_on:
-      - celery_redis
-      - traderdb
-
-  trader__fill_collector:
-    image: simpletrader_image
-    command: "./entrypoint.trader_celery_worker.sh"
-    restart: always
-    environment:
-      - DEBUG=0
-    depends_on:
-      - celery_redis
-      - traderdb
 
   goapp_base_image:
     build:
@@ -179,6 +75,8 @@ services:
       - POSTGRES_USER=analysisdb
       - POSTGRES_PASSWORD=analysisdb
       - POSTGRES_DB=analysisdb
+    volumes:
+      - analysisdb_data:/var/lib/postgresql/data/
 
   analysis__image:
     build:
@@ -198,6 +96,4 @@ services:
 
 
 volumes:
-  postgres_data:
-  timescale_data:
-  traderdb_data:
+  analysisdb_data:
