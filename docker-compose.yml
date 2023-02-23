@@ -37,10 +37,14 @@ services:
 
   celery_redis:
     image: redis:7.0.4-alpine
+    ports:
+      - "6479:6379"
     restart: always
 
   bookwatch_redis:
     image: redis:7.0.4-alpine
+    ports:
+      - "6579:6379"
     restart: always
 
   goapp_base_image:
@@ -71,6 +75,8 @@ services:
   analysisdb:
     image: timescale/timescaledb:latest-pg14
     restart: always
+    ports:
+      - "5532:5432"
     environment:
       - POSTGRES_USER=analysisdb
       - POSTGRES_PASSWORD=analysisdb
@@ -94,6 +100,36 @@ services:
       - journal_redis
       - analysisdb
 
+  analysis__trade_rpc:
+    image: analysis__image
+    command: "./entrypoint.trade_rpc.sh"
+    restart: always
+    environment:
+      - DEBUG=0
+    depends_on:
+      - celery_redis
+      - cache_redis
+      - analysisdb
+
+  analysis__query_rpc:
+    image: analysis__image
+    command: "./entrypoint.query_rpc.sh"
+    restart: always
+    environment:
+      - DEBUG=0
+    depends_on:
+      - celery_redis
+      - analysisdb
+
+  analysis__demo_matcher:
+    image: analysis__image
+    command: "./entrypoint.demo_matcher.sh"
+    restart: always
+    environment:
+      - DEBUG=0
+    depends_on:
+      - cache_redis
+      - analysisdb
 
 volumes:
   analysisdb_data:
