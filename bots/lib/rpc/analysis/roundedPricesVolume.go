@@ -1,6 +1,7 @@
 package analysis
 
 import (
+	"bots/lib/config/markets"
 	"fmt"
 	"sort"
 	"time"
@@ -13,7 +14,7 @@ type RoundedPriceVolume struct {
 }
 
 func GetRoundedPriceVolume(
-	marketId int,
+	market markets.Market,
 	fromTimestamp time.Time,
 	toTimestamp time.Time,
 	bucketSize time.Duration,
@@ -21,7 +22,7 @@ func GetRoundedPriceVolume(
 ) (*RoundedPriceVolume, error) {
 	r, err := client.Delay(
 		"analysis.q.get_prices_volume",
-		fmt.Sprintf("%d", marketId),
+		fmt.Sprintf("%d", market.Id),
 		fmt.Sprintf("%f", float64(fromTimestamp.UnixMicro())/1e6),
 		fmt.Sprintf("%f", float64(toTimestamp.UnixMicro())/1e6),
 		fmt.Sprintf("%f", bucketSize.Seconds()),
