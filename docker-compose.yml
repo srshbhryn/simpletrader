@@ -71,14 +71,26 @@ services:
   analysisdb:
     image: timescale/timescaledb:latest-pg14
     restart: always
-    ports:
-      - "5532:5432"
     environment:
       - POSTGRES_USER=analysisdb
       - POSTGRES_PASSWORD=analysisdb
       - POSTGRES_DB=analysisdb
     volumes:
       - analysisdb_data:/var/lib/postgresql/data/
+
+  analysisdb_pgbouncer:
+    image: edoburu/pgbouncer
+    environment:
+       - DB_USER=analysisdb
+       - DB_PASSWORD=analysisdb
+       - DB_HOST=analysisdb
+       - DB_NAME=analysisdb
+       - POOL_MODE=transaction
+       - ADMIN_USERS=postgres,analysisdb
+    ports:
+      - "5532:5432"
+    depends_on:
+      - analysisdb
 
   analysis__image:
     build:

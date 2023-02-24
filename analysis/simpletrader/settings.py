@@ -50,7 +50,7 @@ DATABASES = {
         'NAME': 'analysisdb',
         'USER': 'analysisdb',
         'PASSWORD': 'analysisdb',
-        'HOST': 'analysisdb',
+        'HOST': 'analysisdb_pgbouncer',
         'PORT': '5432',
         'CONN_MAX_AGE': 3600,
         'DISABLE_SERVER_SIDE_CURSORS': True,
