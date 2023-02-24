@@ -84,9 +84,13 @@ services:
        - DB_USER=analysisdb
        - DB_PASSWORD=analysisdb
        - DB_HOST=analysisdb
+       - MAX_CLIENT_CONN=65535
        - DB_NAME=analysisdb
+       - AUTH_TYPE=plain
        - POOL_MODE=transaction
-       - ADMIN_USERS=postgres,analysisdb
+       - DEFAULT_POOL_SIZE=80
+       - MAX_DB_CONNECTIONS=80
+       - ADMIN_USERS=analysisdb
     ports:
       - "5532:5432"
     depends_on:

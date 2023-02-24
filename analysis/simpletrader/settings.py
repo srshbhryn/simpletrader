@@ -60,7 +60,7 @@ DATABASES = {
 if DEBUG:
     DATABASES['default'].update({
         'HOST': '127.0.0.1',
-        'PORT': '5436',
+        'PORT': '5536',
     })
 
 
