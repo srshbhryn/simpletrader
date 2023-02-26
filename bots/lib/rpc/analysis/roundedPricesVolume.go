@@ -59,9 +59,8 @@ func GetRoundedPriceVolume(
 				}
 			}
 			timeBuckets = append(timeBuckets, bucket)
-			rpv.Volumes[bucket] = make(map[float64]float64, 64)
+			rpv.Volumes[bucket] = make(map[float64]float64, 0)
 		}()
-
 		func() {
 			for _, listedPrice := range prices {
 				if price == listedPrice {
@@ -69,8 +68,9 @@ func GetRoundedPriceVolume(
 				}
 			}
 			prices = append(prices, price)
-			rpv.Volumes[bucket][price] = volume
+			rpv.Volumes[bucket][price] = 0
 		}()
+		rpv.Volumes[bucket][price] += volume
 	}
 	sort.Slice(prices, func(i, j int) bool {
 		return prices[i] < prices[j]
@@ -99,4 +99,12 @@ func appendIfMissingPrice(slice []interface{}, i interface{}) []interface{} {
 		}
 	}
 	return append(slice, i)
+}
+
+func (rpc *RoundedPriceVolume) TimeBucketTotalVolume(ts time.Time) float64 {
+	var totalVolume float64
+	for _, rp := range rpc.Prices {
+		totalVolume += rpc.Volumes[ts][rp]
+	}
+	return totalVolume
 }
