@@ -84,7 +84,7 @@ class NobitexDemoMatcher(GracefulKiller):
         nw = now()
         min_max = Trade.objects.filter(
             market_id=self.pair_id_to_market_id_map[pair.id],
-            time__gt=nw - timedelta(minutes=.3),
+            time__gt=nw - timedelta(minutes=1),
             time__lt=nw,
         ).aggregate(
             min_price=models.Min(models.F('quote_amount') / models.F('base_amount')),
