@@ -60,7 +60,7 @@ DATABASES = {
 if DEBUG:
     DATABASES['default'].update({
         'HOST': '127.0.0.1',
-        'PORT': '5536',
+        'PORT': '5436',
     })
 
 
@@ -119,6 +119,34 @@ LOGGING = {
         },
     },
 }
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+
+ENV = 'PRODUCTION' if not DEBUG else 'DEBUG'
+
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn="https://6b661aaec8a5478aac26bdbbb6e8460a@sentry.itshouldbe.fun/4",
+    integrations=[
+        DjangoIntegration(),
+    ],
+    environment=ENV,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
+
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -209,3 +237,4 @@ CELERY_TASK_ROUTES = {
     'trade.*': {'queue': 'trade_rpc'},
 }
 CELERY_TIMEZONE = TIME_ZONE
+

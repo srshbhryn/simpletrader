@@ -4,7 +4,7 @@ import asyncio
 import json
 
 import django
-
+import sentry_sdk
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'simpletrader.settings')
 django.setup()
@@ -47,8 +47,8 @@ class NobitexTradeCollector(GracefulKiller):
             try:
                 for market_id in self.market_id_to_symbol_map:
                     ioloop.IOLoop.current().add_callback(self.fetch_market, market_id=market_id)
-            except Exception as e:
-                log.error(e)
+            except:
+                sentry_sdk.capture_exception()
             await asyncio.sleep(3)
 
     async def fetch_market(self, market_id,):

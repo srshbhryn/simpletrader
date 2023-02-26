@@ -8,6 +8,7 @@ from typing import List
 from django.core.cache import cache
 from django.db import transaction, models
 from django.utils.timezone import now
+import sentry_sdk
 
 from simpletrader.base.utils import float_to_decimal, ReadWriteLock, GracefulKiller
 from simpletrader.analysis.models import OrderStatus, Exchange, Pair, Market, Trade
@@ -58,8 +59,8 @@ class NobitexDemoMatcher(GracefulKiller):
                 try:
                     self.reload_accounts()
                     cache.decr(self.reload_accounts_cache_key)
-                except Exception as e:
-                    print(f'reload_accounts\t{str(pair)}\t{e}')
+                except:
+                    sentry_sdk.capture_exception()
                 finally:
                     self.mutex.acquire_write()
 
@@ -100,8 +101,8 @@ class NobitexDemoMatcher(GracefulKiller):
                 if min_price is None:
                     raise ValueError("No price")
                 self.do_all_orders(pair, min_price, max_price,)
-            except Exception as e:
-                print(f'ERROR\t{pair}\t{e}')
+            except:
+                sentry_sdk.capture_exception()
             finally:
                 self.mutex.release_read()
 

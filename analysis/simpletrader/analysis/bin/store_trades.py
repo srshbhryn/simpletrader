@@ -2,7 +2,7 @@ import os
 import time
 import django
 import logging
-
+import sentry_sdk
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'simpletrader.settings')
 django.setup()
 
@@ -23,8 +23,8 @@ class StoreTrades(GracefulKiller):
         while self.is_alive:
             try:
                 self.jounral.insert_to_db()
-            except Exception as e:
-                log.error(e)
+            except:
+                sentry_sdk.capture_exception()
             time.sleep(.1)
 
 
