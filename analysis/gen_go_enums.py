@@ -92,9 +92,9 @@ def main():
     fid.write('package markets\n\n')
     fid.write('func Load() {}\n\n')
     fid.write('''type Market struct {
-            id int64
-            pair  pairs.Pair
-            exchange exchanges.Exchange
+            Id int64
+            Pair  pairs.Pair
+            Exchange exchanges.Exchange
         }
         ''')
 

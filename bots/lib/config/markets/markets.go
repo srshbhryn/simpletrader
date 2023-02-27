@@ -8,9 +8,9 @@ import (
 func Load() {}
 
 type Market struct {
-	id       int64
-	pair     pairs.Pair
-	exchange exchanges.Exchange
+	Id       int64
+	Pair     pairs.Pair
+	Exchange exchanges.Exchange
 }
 
 var (
