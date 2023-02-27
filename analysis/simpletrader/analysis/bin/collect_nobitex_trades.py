@@ -29,6 +29,7 @@ class NobitexTradeCollector(GracefulKiller):
         assets = dict(list(Asset.objects.values_list('id', 'name')))
         assets[2] = 'irt'
         markets = Market.objects.filter(exchange_id=nobitex_exchange_id)
+        self.shib_market_ids = list(markets.filter(pair__base_asset=Asset.objects.get(name='shib')).values_list('id', flat=True))
         self.market_id_to_symbol_map = {}
         self.symbol_to_market_id_map = {}
         for market in markets:
@@ -71,6 +72,8 @@ class NobitexTradeCollector(GracefulKiller):
         price = float(obj['price'])
         volume = float(obj['volume'])
         base_amount = volume
+        if market_id in self.shib_market_ids:
+            base_amount *= 1000
         quote_amount = volume * price
         return({
             'market_id': market_id,

@@ -5,4 +5,74 @@
         "base_asset": 13,
         "quote_asset": 2
     }
+}, {
+    "model": "analysis.pair",
+    "pk": 1000,
+    "fields": {
+        "base_asset": 10,
+        "quote_asset": 13
+    }
+}, {
+    "model": "analysis.pair",
+    "pk": 1001,
+    "fields": {
+        "base_asset": 10,
+        "quote_asset": 2
+    }
+}, {
+    "model": "analysis.pair",
+    "pk": 1010,
+    "fields": {
+        "base_asset": 101,
+        "quote_asset": 13
+    }
+}, {
+    "model": "analysis.pair",
+    "pk": 1011,
+    "fields": {
+        "base_asset": 101,
+        "quote_asset": 2
+    }
+}, {
+    "model": "analysis.pair",
+    "pk": 1020,
+    "fields": {
+        "base_asset": 11,
+        "quote_asset": 13
+    }
+}, {
+    "model": "analysis.pair",
+    "pk": 1021,
+    "fields": {
+        "base_asset": 11,
+        "quote_asset": 2
+    }
+}, {
+    "model": "analysis.pair",
+    "pk": 1030,
+    "fields": {
+        "base_asset": 18,
+        "quote_asset": 13
+    }
+}, {
+    "model": "analysis.pair",
+    "pk": 1031,
+    "fields": {
+        "base_asset": 18,
+        "quote_asset": 2
+    }
+}, {
+    "model": "analysis.pair",
+    "pk": 1040,
+    "fields": {
+        "base_asset": 42,
+        "quote_asset": 13
+    }
+}, {
+    "model": "analysis.pair",
+    "pk": 1041,
+    "fields": {
+        "base_asset": 42,
+        "quote_asset": 2
+    }
 }]

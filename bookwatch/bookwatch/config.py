@@ -146,6 +146,16 @@ class PairType:
 
 class Pair(Enum):
 	UsdtRls = PairType(1, Asset.USDT, Asset.RLS)
+	BtcUsdt = PairType(1000, Asset.BTC, Asset.USDT)
+	BtcRls = PairType(1001, Asset.BTC, Asset.RLS)
+	WbtcUsdt = PairType(1010, Asset.WBTC, Asset.USDT)
+	WbtcRls = PairType(1011, Asset.WBTC, Asset.RLS)
+	EthUsdt = PairType(1020, Asset.ETH, Asset.USDT)
+	EthRls = PairType(1021, Asset.ETH, Asset.RLS)
+	DogeUsdt = PairType(1030, Asset.DOGE, Asset.USDT)
+	DogeRls = PairType(1031, Asset.DOGE, Asset.RLS)
+	ShibUsdt = PairType(1040, Asset.SHIB, Asset.USDT)
+	ShibRls = PairType(1041, Asset.SHIB, Asset.RLS)
 
 
 class MarketType:
@@ -157,3 +167,13 @@ class MarketType:
 
 class Market(Enum):
 	NobitexUsdtRls = MarketType(1, Exchange.Nobitex, Pair.UsdtRls)
+	NobitexBtcUsdt = MarketType(2, Exchange.Nobitex, Pair.BtcUsdt)
+	NobitexBtcRls = MarketType(3, Exchange.Nobitex, Pair.BtcRls)
+	NobitexWbtcUsdt = MarketType(4, Exchange.Nobitex, Pair.WbtcUsdt)
+	NobitexWbtcRls = MarketType(5, Exchange.Nobitex, Pair.WbtcRls)
+	NobitexEthUsdt = MarketType(6, Exchange.Nobitex, Pair.EthUsdt)
+	NobitexEthRls = MarketType(7, Exchange.Nobitex, Pair.EthRls)
+	NobitexDogeUsdt = MarketType(8, Exchange.Nobitex, Pair.DogeUsdt)
+	NobitexDogeRls = MarketType(9, Exchange.Nobitex, Pair.DogeRls)
+	NobitexShibUsdt = MarketType(10, Exchange.Nobitex, Pair.ShibUsdt)
+	NobitexShibRls = MarketType(11, Exchange.Nobitex, Pair.ShibRls)

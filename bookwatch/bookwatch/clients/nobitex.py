@@ -47,8 +47,18 @@ class Nobitex:
                 data = [str(body[symbol]['lastUpdate'])]
                 l = len(data[0])
                 data[0] += (13 - l) * '0'
-                data += body[symbol]['bids'][0]
-                data += body[symbol]['asks'][0]
+
+                if market in [Market.NobitexShibRls, Market.NobitexShibUsdt]:
+                    price, vol = body[symbol]['bids'][0]
+                    price = str (float(price) / 1000)
+                    data += [price, vol]
+                    price, vol = body[symbol]['asks'][0]
+                    price = str (float(price) / 1000)
+                    data += [price, vol]
+
+                else:
+                    data += body[symbol]['bids'][0]
+                    data += body[symbol]['asks'][0]
                 data = ','.join(data)
                 await redis.set(name=market.value.id, value=data)
         except Exception as e:

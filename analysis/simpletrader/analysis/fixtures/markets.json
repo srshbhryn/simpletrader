@@ -5,4 +5,74 @@
         "pair": 1,
         "exchange": 1
     }
+}, {
+    "model": "analysis.market",
+    "pk": 2,
+    "fields": {
+        "pair": 1000,
+        "exchange": 1
+    }
+}, {
+    "model": "analysis.market",
+    "pk": 3,
+    "fields": {
+        "pair": 1001,
+        "exchange": 1
+    }
+}, {
+    "model": "analysis.market",
+    "pk": 4,
+    "fields": {
+        "pair": 1010,
+        "exchange": 1
+    }
+}, {
+    "model": "analysis.market",
+    "pk": 5,
+    "fields": {
+        "pair": 1011,
+        "exchange": 1
+    }
+}, {
+    "model": "analysis.market",
+    "pk": 6,
+    "fields": {
+        "pair": 1020,
+        "exchange": 1
+    }
+}, {
+    "model": "analysis.market",
+    "pk": 7,
+    "fields": {
+        "pair": 1021,
+        "exchange": 1
+    }
+}, {
+    "model": "analysis.market",
+    "pk": 8,
+    "fields": {
+        "pair": 1030,
+        "exchange": 1
+    }
+}, {
+    "model": "analysis.market",
+    "pk": 9,
+    "fields": {
+        "pair": 1031,
+        "exchange": 1
+    }
+}, {
+    "model": "analysis.market",
+    "pk": 10,
+    "fields": {
+        "pair": 1040,
+        "exchange": 1
+    }
+}, {
+    "model": "analysis.market",
+    "pk": 11,
+    "fields": {
+        "pair": 1041,
+        "exchange": 1
+    }
 }]
