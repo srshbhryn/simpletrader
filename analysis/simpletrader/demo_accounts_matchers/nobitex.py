@@ -94,17 +94,18 @@ class NobitexDemoMatcher(GracefulKiller):
 
     def run_for_pair(self, pair: Pair):
         while True:
-            self.mutex.acquire_read()
             try:
                 time.sleep(self.sleep_time.total_seconds())
+                self.mutex.acquire_read()
                 min_price, max_price = self.get_price_minmax(pair,)
                 if min_price is None:
-                    raise ValueError("No price")
+                    self.mutex.release_read()
+                    time.sleep(1)
+                    continue
                 self.do_all_orders(pair, min_price, max_price,)
             except:
                 sentry_sdk.capture_exception()
-            finally:
-                self.mutex.release_read()
+            self.mutex.release_read()
 
     @transaction.atomic
     def do_order(self, order: Order, min_price: float, max_price: float,):
