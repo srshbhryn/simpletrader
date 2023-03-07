@@ -52,6 +52,10 @@ class BaseJournal:
             field.name + '_id'
             for field in self.Meta.model._meta.fields
             if type(field) == fields.related.ForeignKey
+        ] + [
+            field.name
+            for field in self.Meta.model._meta.fields
+            if field.name[-3:] == '_id'
         ]
         self.template = self._DELIMITER.join(['{'+key+'}' for key in self.FIELDS])
         self._last_sequence_cache_key = 'journal:' + self.FILE_NAME + ':ltsq'
