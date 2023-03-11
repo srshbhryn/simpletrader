@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.db.models.functions.mixins import (
@@ -76,3 +78,17 @@ class TimeBucketGapFill(models.Func):
             interval = Interval(interval) / datapoints
         output_field = TimescaleDateTimeField(interval=interval)
         super().__init__(interval, expression, start, end, output_field=output_field)
+
+
+class TimeBucketWithOrigin(models.Func):
+
+    function = "time_bucket"
+    name = "time_bucket"
+
+    def __init__(self, expression, interval, origin, *args, **kwargs):
+        if not isinstance(interval, models.Value):
+            interval = models.Value(interval)
+        if not isinstance(origin, datetime.datetime):
+            raise ValueError('timescale time_bucket `origin` should be a datetime.')
+        output_field = TimescaleDateTimeField(interval=interval)
+        super().__init__(interval, expression, origin, output_field=output_field)

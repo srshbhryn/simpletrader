@@ -48,7 +48,7 @@ def get_prices_volume_task(market_id, from_datetime, to_datetime, bucket_size, p
         market_id=market_id,
         time__gt=from_datetime,
         time__lt=to_datetime,
-    ).time_bucket('time', bucket_size).annotate(rounded_price=models.ExpressionWrapper(expression=price_rounding_precision * Round(
+    ).time_bucket_with_origin('time', bucket_size, timezone.now()).annotate(rounded_price=models.ExpressionWrapper(expression=price_rounding_precision * Round(
         models.F('quote_amount') / (models.F('base_amount') * price_rounding_precision)
     ), output_field=models.FloatField(),)).values('bucket', 'rounded_price').annotate(
         total_volume=models.Sum('base_amount'),
