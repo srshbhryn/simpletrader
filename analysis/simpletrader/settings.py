@@ -129,11 +129,18 @@ ENV = 'PRODUCTION' if not DEBUG else 'DEBUG'
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.tornado import TornadoIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
 
 sentry_sdk.init(
     dsn="https://6b661aaec8a5478aac26bdbbb6e8460a@sentry.itshouldbe.fun/4",
     integrations=[
         DjangoIntegration(),
+        TornadoIntegration(),
+        RedisIntegration(),
+        CeleryIntegration(),
+
     ],
     environment=ENV,
     # Set traces_sample_rate to 1.0 to capture 100%
