@@ -114,7 +114,6 @@ services:
   bots_image:
     build:
       context: ./bots
-      dockerfile: Dockerfile
     image: bots_image
 
   bot0:
@@ -125,9 +124,6 @@ services:
       - BOOKWATCH_REDIS_HOST=analysis_ws:6579
       - BOOKWATCH_REDIS_DB=0
     restart: always
-    depends_on:
-      - bookwatch_redis
-      - celery_redis
 
 volumes:
   analysisdb_data:
