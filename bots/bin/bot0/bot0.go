@@ -7,10 +7,14 @@ import (
 	"bots/lib/config/markets"
 	"bots/lib/rpc"
 	"bots/lib/rpc/trade"
+	"bots/lib/utils"
 	"time"
+
+	"github.com/getsentry/sentry-go"
 )
 
 func main() {
+	utils.InitSentry()
 	rpc.Load()
 	bookwatch.Load()
 	accountUUID, err := trade.GetDemoAccount(exchanges.Nobitex)
@@ -19,16 +23,18 @@ func main() {
 	}
 	trade.SetAccountUUID(accountUUID)
 	conf := bot0.SimpleBotConfig{
-		Market:                       markets.NobitexUsdtRls,
-		TimeDelta:                    5 * time.Minute,
-		Len:                          3,
-		PriceRoundingPrecision:       100.0,
-		TradeSize:                    40,
-		StopLossRatio:                0,
-		GainRatio:                    1.0025,
-		MinBaseBalance:               700,
-		MinQuoteBalance:              0,
-		ErrorHandler:                 func(err error) { panic(err) },
+		Market:                 markets.NobitexUsdtRls,
+		TimeDelta:              5 * time.Minute,
+		Len:                    3,
+		PriceRoundingPrecision: 100.0,
+		TradeSize:              40,
+		StopLossRatio:          0,
+		GainRatio:              1.0025,
+		MinBaseBalance:         700,
+		MinQuoteBalance:        0,
+		ErrorHandler: func(err error) {
+			sentry.CaptureException(err)
+		},
 		CheckInterval:                time.Minute,
 		SideSleepAfterOrderPlacement: 10 * time.Minute,
 	}

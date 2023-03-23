@@ -123,6 +123,7 @@ services:
       - RPC_REDIS=redis://analysis_ws:6479/0
       - BOOKWATCH_REDIS_HOST=analysis_ws:6579
       - BOOKWATCH_REDIS_DB=0
+      - ENV=PROD
     restart: always
 
 volumes:
