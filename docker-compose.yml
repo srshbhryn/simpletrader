@@ -43,31 +43,6 @@ services:
       - "6579:6379"
     restart: always
 
-  goapp_base_image:
-    build:
-      context: ./goapp
-      dockerfile: Dockerfile.base_image
-    image: goapp_base_image
-
-  bot0_image:
-    build:
-      context: ./goapp
-      dockerfile: Dockerfile.bot0_image
-    image: bot0_image
-
-  bot0:
-    image: bot0_image
-    command: "./bot0"
-    # environment:
-    #   - BOOKWATCH_REDIS=
-    #   - CELERY_REDIS=
-    #   - CONFIG_DIR=/sharedconfs/
-    # restart: always
-    # volumes:
-    #   - ./configs/shared/:/sharedconfs/
-    # depends_on:
-    #   - bookwatch_redis
-
   analysisdb:
     image: timescale/timescaledb:latest-pg14
     restart: always
@@ -142,6 +117,24 @@ services:
     depends_on:
       - cache_redis
       - analysisdb
+
+  bots_image:
+    build:
+      context: ./bots
+      dockerfile: Dockerfile
+    image: bots_image
+
+  bot0:
+    image: bots_image
+    command: "/app/bot0"
+    environment:
+      - RPC_REDIS=redis://celery_redis:6379/0
+      - BOOKWATCH_REDIS_HOST=bookwatch_redis:6379
+      - BOOKWATCH_REDIS_DB=0
+    restart: always
+    depends_on:
+      - bookwatch_redis
+      - celery_redis
 
 volumes:
   analysisdb_data:

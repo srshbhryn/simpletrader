@@ -1,6 +1,0 @@
-FROM bots_base_image
-
-
-COPY . .
-RUN go mod download && go mod verify
-RUN go build bin/bot1/bot1.go
