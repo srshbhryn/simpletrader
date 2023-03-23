@@ -10,4 +10,4 @@ COPY go.sum ./
 RUN go mod download && go mod verify
 
 COPY *.go ./
-RUN go build ./bin/bot0/bot.go
+RUN go build ./bin/bot0/bot0.go
