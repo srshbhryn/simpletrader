@@ -35,10 +35,12 @@ func main() {
 		ErrorHandler: func(err error) {
 			sentry.CaptureException(err)
 		},
-		CheckInterval:                time.Minute,
-		SideSleepAfterOrderPlacement: 10 * time.Minute,
+		CheckInterval:                20 * time.Second,
+		SideSleepAfterOrderPlacement: time.Minute,
 	}
 	bot := bot0.New(&conf)
 	bot.Run()
-	time.Sleep(time.Hour)
+	for {
+		time.Sleep(time.Hour)
+	}
 }
