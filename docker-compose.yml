@@ -120,8 +120,8 @@ services:
     image: bots_image
     command: "/app/bot0"
     environment:
-      - RPC_REDIS=redis://analysis_ws:6479/0
-      - BOOKWATCH_REDIS_HOST=analysis_ws:6579
+      - RPC_REDIS=redis://185.208.175.141:6479/0
+      - BOOKWATCH_REDIS_HOST=185.208.175.141:6579
       - BOOKWATCH_REDIS_DB=0
       - ENV=PROD
     restart: always
