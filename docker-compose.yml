@@ -1,13 +1,6 @@
 version: '3.8'
 
 services:
-  # autoheal:
-  #   restart: always
-  #   image: willfarrell/autoheal
-  #   environment:
-  #     - AUTOHEAL_CONTAINER_LABEL=all
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
 
   bookwatch_image:
     build:
@@ -128,8 +121,8 @@ services:
     image: bots_image
     command: "/app/bot0"
     environment:
-      - RPC_REDIS=redis://celery_redis:6379/0
-      - BOOKWATCH_REDIS_HOST=bookwatch_redis:6379
+      - RPC_REDIS=redis://analysis_ws:6479/0
+      - BOOKWATCH_REDIS_HOST=analysis_ws:6579
       - BOOKWATCH_REDIS_DB=0
     restart: always
     depends_on:
