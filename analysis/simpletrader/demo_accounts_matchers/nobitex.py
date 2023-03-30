@@ -62,7 +62,7 @@ class NobitexDemoMatcher(GracefulKiller):
                 except:
                     sentry_sdk.capture_exception()
                 finally:
-                    self.mutex.acquire_write()
+                    self.mutex.release_write()
 
     def reload_accounts(self):
         self.accounts = Account.objects.filter(type=Account.Types.demo, exchange=self.nobitex)
