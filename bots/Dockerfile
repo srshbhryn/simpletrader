@@ -9,3 +9,4 @@ RUN go mod download && go mod verify
 
 COPY . .
 RUN go build bin/bot0/bot0.go
+RUN go build bin/bot1/bot1.go

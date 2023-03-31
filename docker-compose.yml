@@ -126,5 +126,15 @@ services:
       - ENV=PROD
     restart: always
 
+  bot1:
+    image: bots_image
+    command: "/app/bot1"
+    environment:
+      - RPC_REDIS=redis://185.208.175.141:6479/0
+      - BOOKWATCH_REDIS_HOST=185.208.175.141:6579
+      - BOOKWATCH_REDIS_DB=0
+      - ENV=PROD
+    restart: always
+
 volumes:
   analysisdb_data:
