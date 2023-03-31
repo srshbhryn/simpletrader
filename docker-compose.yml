@@ -43,6 +43,7 @@ services:
       - POSTGRES_USER=analysisdb
       - POSTGRES_PASSWORD=analysisdb
       - POSTGRES_DB=analysisdb
+      - POSTGRES_INITDB_ARGS="-c shared_buffers=1024MB -c max_connections=1024"
     volumes:
       - analysisdb_data:/var/lib/postgresql/data/
 
@@ -56,8 +57,8 @@ services:
        - DB_NAME=analysisdb
        - AUTH_TYPE=plain
        - POOL_MODE=transaction
-       - DEFAULT_POOL_SIZE=80
-       - MAX_DB_CONNECTIONS=80
+       - DEFAULT_POOL_SIZE=896
+       - MAX_DB_CONNECTIONS=896
        - ADMIN_USERS=analysisdb
     ports:
       - "5532:5432"
