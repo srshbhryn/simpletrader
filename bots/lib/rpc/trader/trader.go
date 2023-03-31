@@ -14,3 +14,7 @@ func New(exchange exchanges.Exchange) (*Trader, error) {
 	}
 	return &Trader{accountId, exchange}, nil
 }
+
+func Create(exchange exchanges.Exchange, accountUUID string) (*Trader, error) {
+	return &Trader{accountUUID, exchange}, nil
+}

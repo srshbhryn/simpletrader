@@ -4,8 +4,8 @@ import (
 	"bots/lib/config/exchanges"
 	"fmt"
 
-	"github.com/gocelery/gocelery"
 	"github.com/gomodule/redigo/redis"
+	"github.com/srshbhryn/gocelery"
 )
 
 func Load(redisPool *redis.Pool, celeryBackend gocelery.CeleryBackend) {
