@@ -39,13 +39,12 @@ services:
   analysisdb:
     image: timescale/timescaledb:latest-pg14
     restart: always
-    command: ["-c", "shared_buffers=1024MB", "-c", "max_connections=1024"]
     environment:
       - POSTGRES_USER=analysisdb
       - POSTGRES_PASSWORD=analysisdb
       - POSTGRES_DB=analysisdb
-      # - POSTGRES_INITDB_ARGS="-c shared_buffers=1024MB -c max_connections=1024"
     volumes:
+      - ./configs/analysisdb.conf:var/lib/postgresql/data/postgresql.conf
       - analysisdb_data:/var/lib/postgresql/data/
 
   analysisdb_pgbouncer:
