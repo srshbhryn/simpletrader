@@ -8,11 +8,8 @@ import (
 	"time"
 )
 
-func main() {
-	utils.InitSentry()
-	rpc.Load()
-	props := bot1.GenProps()
-	for _, p := range props {
+func genWorker(ch chan *bot1.Properties) {
+	for p := range ch {
 		b, err := bot1.New(p)
 		if err != nil {
 			fmt.Println(err)
@@ -20,7 +17,21 @@ func main() {
 			b.Run()
 		}
 	}
+}
+
+func main() {
+	utils.InitSentry()
+	rpc.Load()
+	props := bot1.GenProps()
+	ch := make(chan *bot1.Properties)
+	for i := 0; i < 64; i++ {
+		go genWorker(ch)
+	}
+	for _, p := range props {
+		ch <- p
+	}
 	for {
 		time.Sleep(time.Hour)
+		close(ch)
 	}
 }
