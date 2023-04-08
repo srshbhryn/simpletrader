@@ -10,12 +10,13 @@ import (
 
 func genWorker(ch chan *bot1.Properties) {
 	for p := range ch {
-		b, err := bot1.New(p)
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			b.Run()
-		}
+		fmt.Println(p)
+		// b, err := bot1.New(p)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// } else {
+		// 	b.Run()
+		// }
 	}
 }
 
@@ -31,7 +32,7 @@ func main() {
 		ch <- p
 	}
 	for {
-		time.Sleep(time.Hour)
+		time.Sleep(1 * time.Millisecond)
 		close(ch)
 	}
 }
