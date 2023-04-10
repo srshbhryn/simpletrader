@@ -7,4 +7,4 @@ done
 
 echo "PostgreSQL started"
 
-celery -A simpletrader worker --pool gevent --concurrency 128 --loglevel warning -Q trade_rpc
+celery -A simpletrader worker --concurrency 12 --loglevel warning -Q trade_rpc

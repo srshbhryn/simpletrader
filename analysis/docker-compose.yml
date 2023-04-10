@@ -26,6 +26,6 @@ services:
        - MAX_DB_CONNECTIONS=896
        - ADMIN_USERS=analysisdb
     ports:
-      - "5536:5432"
+      - "5436:5432"
     depends_on:
       - analysisdb
