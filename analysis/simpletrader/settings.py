@@ -133,8 +133,9 @@ from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.tornado import TornadoIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
+
 sentry_sdk.init(
-    dsn="https://6b661aaec8a5478aac26bdbbb6e8460a@sentry.itshouldbe.fun/4",
+    dsn="https://4e07479d060c43129263ed0723453527@sentry.itshouldbe.fun/2",
     integrations=[
         DjangoIntegration(),
         TornadoIntegration(),

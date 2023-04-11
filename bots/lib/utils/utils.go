@@ -13,7 +13,7 @@ func InitSentry() error {
 		env = "DEBUG"
 	}
 	err := sentry.Init(sentry.ClientOptions{
-		Dsn:              "https://29b2bc84969842cea5cf75790930a22f@sentry.itshouldbe.fun/5",
+		Dsn:              "https://5d806674bd974b2c96828c15918ad0c8@sentry.itshouldbe.fun/4",
 		Environment:      env,
 		TracesSampleRate: 1.0,
 		Debug:            env != "PROD",
