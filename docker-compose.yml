@@ -50,6 +50,7 @@ services:
 
   analysisdb_pgbouncer:
     image: edoburu/pgbouncer
+    restart: always
     environment:
        - DB_USER=analysisdb
        - DB_PASSWORD=analysisdb
