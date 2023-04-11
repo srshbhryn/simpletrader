@@ -144,18 +144,38 @@ class NobitexDemoMatcher(GracefulKiller):
         asset_to_get_wallet = order.account.get_wallet(asset_to_get.id)
         asset_to_give_wallet = order.account.get_wallet(asset_to_give.id)
 
-        asset_to_give_wallet.create_transaction(
-            type=Transaction.Type.add_to_blocked_balance,
-            amount=-float_to_decimal(amount_to_give),
+        transactions = []
+        transactions.append(
+            (
+                (asset_to_give_wallet.id, Transaction.Type.add_to_blocked_balance),
+                lambda : asset_to_give_wallet.create_transaction(
+                    type=Transaction.Type.add_to_blocked_balance,
+                    amount=-float_to_decimal(amount_to_give),
+                ),
+            )
         )
-        asset_to_give_wallet.create_transaction(
-            type=Transaction.Type.block,
-            amount=-float_to_decimal(blocked_amount - amount_to_give),
+        transactions.append(
+            (
+                (asset_to_give_wallet.id, Transaction.Type.block),
+                lambda : asset_to_give_wallet.create_transaction(
+                    type=Transaction.Type.block,
+                    amount=-float_to_decimal(blocked_amount - amount_to_give),
+                ),
+            )
         )
-        asset_to_get_wallet.create_transaction(
-            type=Transaction.Type.subtract_from_free_balance,
-            amount=-float_to_decimal(amount_to_get),
+        transactions.append(
+            (
+                (asset_to_get_wallet.id, Transaction.Type.subtract_from_free_balance),
+                lambda : asset_to_get_wallet.create_transaction(
+                    type=Transaction.Type.subtract_from_free_balance,
+                    amount=-float_to_decimal(amount_to_get),
+                ),
+            )
         )
+        transactions = sorted(transactions, key=lambda ent: 10 * ent[0][0] + ent[0][1])
+
+        for _, fun in transactions:
+            fun()
 
         Order.objects.filter(uid=order.uid).update(status_id=self.filled_order_status_id)
         Fill.objects.create(
