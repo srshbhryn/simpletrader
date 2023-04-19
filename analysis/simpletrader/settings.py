@@ -135,7 +135,7 @@ from sentry_sdk.integrations.redis import RedisIntegration
 
 
 sentry_sdk.init(
-    dsn="https://4e07479d060c43129263ed0723453527@sentry.itshouldbe.fun/2",
+    dsn="https://4e07479d060c43129263ed0723453527@ibelieve.itshouldbe.fun/2",
     integrations=[
         DjangoIntegration(),
         TornadoIntegration(),
