@@ -134,25 +134,25 @@ from sentry_sdk.integrations.tornado import TornadoIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
 
-sentry_sdk.init(
-    dsn="https://4e07479d060c43129263ed0723453527@ibelieve.itshouldbe.fun/2",
-    integrations=[
-        DjangoIntegration(),
-        TornadoIntegration(),
-        RedisIntegration(),
-        CeleryIntegration(),
+# sentry_sdk.init(
+#     dsn="https://4e07479d060c43129263ed0723453527@ibelieve.itshouldbe.fun/2",
+#     integrations=[
+#         DjangoIntegration(),
+#         TornadoIntegration(),
+#         RedisIntegration(),
+#         CeleryIntegration(),
 
-    ],
-    environment=ENV,
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production.
-    traces_sample_rate=1.0,
+#     ],
+#     environment=ENV,
+#     # Set traces_sample_rate to 1.0 to capture 100%
+#     # of transactions for performance monitoring.
+#     # We recommend adjusting this value in production.
+#     traces_sample_rate=1.0,
 
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
-)
+#     # If you wish to associate users to errors (assuming you are using
+#     # django.contrib.auth) you may enable sending PII data.
+#     send_default_pii=True
+# )
 
 
 AUTH_PASSWORD_VALIDATORS = [
