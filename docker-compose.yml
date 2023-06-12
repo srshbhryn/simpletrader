@@ -139,5 +139,12 @@ services:
       - ENV=PROD
     restart: always
 
+  jupyter:
+    image: jupyter/datascience-notebook
+    environment:
+      - PASSWORD=asdasdasd
+    ports:
+      - "8015:8888"
+
 volumes:
   analysisdb_data:
