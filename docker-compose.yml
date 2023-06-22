@@ -146,6 +146,8 @@ services:
       - PASSWORD=asdasdasd
     ports:
       - "8015:8888"
+    volumes:
+      - jupyterhome:/home/jovyan/
   proxy:
     image: ghcr.io/getimages/v2fly-core:v4.45.2
     restart: always
@@ -156,3 +158,5 @@ services:
 
 volumes:
   analysisdb_data:
+  jupyterhome:
+
