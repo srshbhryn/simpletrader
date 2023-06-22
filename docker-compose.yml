@@ -142,9 +142,17 @@ services:
   jupyter:
     image: jupyter/datascience-notebook
     environment:
+      - GRANT_SUDO=yes
       - PASSWORD=asdasdasd
     ports:
       - "8015:8888"
+  proxy:
+    image: ghcr.io/getimages/v2fly-core:v4.45.2
+    restart: always
+    environment:
+      - v2ray.vmess.aead.forced=false
+    volumes:
+      - ./v2ray/config/:/etc/v2ray/
 
 volumes:
   analysisdb_data:
